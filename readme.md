@@ -5,3 +5,6 @@
 
 2. 生成整个包的实体定义
 `go run main.go entitygen/domain`
+
+3. 使用 `go generate ./...` 需要在包里面写上对应的执行命令
+`//go:generate go run entitygen entitygen/domain.LandAttr`
