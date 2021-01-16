@@ -1,2 +1,2 @@
-//go:generate go run github.com/hlubek/metaprogramming-go/cmd/generator github.com/hlubek/metaprogramming-go/domain.Product
-package repository
+//go:generate go run entitygen entitygen/domain.LandAttr
+package entitydef
