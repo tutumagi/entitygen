@@ -12,37 +12,37 @@ type Int32Map struct {
 	// 比如 {
 	// 	"a": {"b": {"c": 123 } }
 	// }
-	// 那么 b，c 的 rootKey 都是 a
-	rootKey string
-	data    map[int32]interface{}
+	// 那么 b，c 的 parentKey 都是 a
+	parentKey string
+	data      map[int32]interface{}
 
-	// 存这个数据的祖宗
-	ancestry *AttrMap
+	// 存这个数据的父节点
+	parent AttrField
 }
 
 var Int32MapPool *sync.Pool = &sync.Pool{
 	New: func() interface{} {
 		return &Int32Map{
-			rootKey: "",
-			data:    map[int32]interface{}{},
+			parentKey: "",
+			data:      map[int32]interface{}{},
 
-			ancestry: nil,
+			parent: nil,
 		}
 	},
 }
 
 func NewInt32InterfaceMap(key string, ancestry *AttrMap, data map[int32]interface{}) *Int32Map {
 	int32map := Int32MapPool.Get().(*Int32Map)
-	int32map.rootKey = key
-	int32map.ancestry = ancestry
+	int32map.parentKey = key
+	int32map.parent = ancestry
 	int32map.data = data
 	return int32map
 }
 
 func ReleaseAttrInt32Map(mm *Int32Map) {
 	mm.data = map[int32]interface{}{}
-	mm.rootKey = ""
-	mm.ancestry = nil
+	mm.parentKey = ""
+	mm.parent = nil
 	attrPool.Put(mm)
 }
 
@@ -98,7 +98,7 @@ func (a *Int32Map) FastDelete(key int32) {
 }
 
 func (a *Int32Map) change() {
-	a.ancestry.setChangeKey(a.rootKey)
+	a.parent.setChangeKey(a.parentKey)
 }
 
 // TODO
@@ -118,18 +118,18 @@ func (a *Int32Map) change() {
 // 	return result
 // }
 
-func (a *Int32Map) SetRootKey(k string) {
-	if a.rootKey != "" && a.rootKey != k {
-		panic(fmt.Sprintf("key is already exit old:%s new:%s", a.rootKey, k))
+func (a *Int32Map) SetParent(k string, parent AttrField) {
+	if (a.parentKey != "" && a.parentKey != k) || (a.parent != nil && a.parent != parent) {
+		panic(
+			fmt.Sprintf(
+				"has already set parent oldKey:%s newKey:%s oldParent:%s newParent:%s",
+				a.parentKey, k,
+				a.parent, parent,
+			),
+		)
 	}
-	a.rootKey = k
-}
-
-func (a *Int32Map) SetAncestry(ancestry *AttrMap) {
-	if a.ancestry != nil && a.ancestry != ancestry {
-		panic(fmt.Sprintf("ancestry is already exit old:%s new:%s", a.ancestry, ancestry))
-	}
-	a.ancestry = ancestry
+	a.parentKey = k
+	a.parent = parent
 }
 
 func (a *Int32Map) SetData(data map[int32]interface{}) {

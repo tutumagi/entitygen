@@ -8,8 +8,7 @@ import (
 )
 
 type IField interface {
-	setRootKey(k string)
-	setAncestry(ancestry *attr.AttrMap)
+	setParent(k string, parent attr.AttrField)
 }
 
 // RoomExtends 外观
@@ -84,12 +83,8 @@ func (m *RoomExtends) ForEach(fn func(k int32, v int32) bool) {
 	})
 }
 
-func (m *RoomExtends) setRootKey(k string) {
-	m._data.SetRootKey(k)
-}
-
-func (m *RoomExtends) setAncestry(ancestry *attr.AttrMap) {
-	m._data.SetAncestry(ancestry)
+func (m *RoomExtends) setParent(k string, parent attr.AttrField) {
+	m._data.SetParent(k, parent)
 }
 
 func (m *RoomExtends) Equal(other *RoomExtends) bool {
@@ -185,12 +180,8 @@ func (m *RoomExtends1) ForEach(fn func(k int32, v string) bool) {
 	})
 }
 
-func (m *RoomExtends1) setRootKey(k string) {
-	m._data.SetRootKey(k)
-}
-
-func (m *RoomExtends1) setAncestry(ancestry *attr.AttrMap) {
-	m._data.SetAncestry(ancestry)
+func (m *RoomExtends1) setParent(k string, parent attr.AttrField) {
+	m._data.SetParent(k, parent)
 }
 
 func (m *RoomExtends1) Equal(other *RoomExtends1) bool {
@@ -285,12 +276,8 @@ func (m *RoomExtends2) ForEach(fn func(k string, v int32) bool) {
 	})
 }
 
-func (m *RoomExtends2) setRootKey(k string) {
-	m._data.SetRootKey(k)
-}
-
-func (m *RoomExtends2) setAncestry(ancestry *attr.AttrMap) {
-	m._data.SetAncestry(ancestry)
+func (m *RoomExtends2) setParent(k string, parent attr.AttrField) {
+	m._data.SetParent(k, parent)
 }
 
 func (m *RoomExtends2) Equal(other *RoomExtends2) bool {
@@ -385,12 +372,8 @@ func (m *RoomExtends3) ForEach(fn func(k string, v string) bool) {
 	})
 }
 
-func (m *RoomExtends3) setRootKey(k string) {
-	m._data.SetRootKey(k)
-}
-
-func (m *RoomExtends3) setAncestry(ancestry *attr.AttrMap) {
-	m._data.SetAncestry(ancestry)
+func (m *RoomExtends3) setParent(k string, parent attr.AttrField) {
+	m._data.SetParent(k, parent)
 }
 
 func (m *RoomExtends3) Equal(other *RoomExtends3) bool {
@@ -432,7 +415,7 @@ func init() {
 type Room struct {
 	// parent    AttrMapImp
 	// parentKey string
-	data *attr.AttrMap
+	_data *attr.AttrMap
 }
 
 func NewRoom(
@@ -445,7 +428,7 @@ func NewRoom(
 	desk *Desk,
 ) *Room {
 	m := &Room{}
-	m.data = attr.NewAttrMap()
+	m._data = attr.NewAttrMap()
 
 	m.SetCsvPos(csvPos)
 	m.SetBuildID(buildID)
@@ -455,23 +438,22 @@ func NewRoom(
 	m.SetExtends3(extends3)
 	m.SetDesk(desk)
 
-	m.data.ClearChangeKey()
+	m._data.ClearChangeKey()
 	return m
 }
 
 func (m *Room) MarshalJSON() ([]byte, error) {
-	return json.Marshal(m.data.ToMap())
+	return json.Marshal(m._data.ToMap())
 }
 func (m *Room) UnmarshalJSON(b []byte) error {
 	mm, err := room.UnmarshalJson(b)
 	if err != nil {
 		return err
 	}
-	m.data.SetData(mm)
-	m.data.ForEach(func(k string, v interface{}) bool {
+	m._data.SetData(mm)
+	m._data.ForEach(func(k string, v interface{}) bool {
 		if k != "id" && !room.GetDef(k).IsPrimary() {
-			v.(IField).setRootKey(k)
-			v.(IField).setAncestry(m.data)
+			v.(IField).setParent(k, m._data)
 		}
 		return true
 	})
@@ -479,7 +461,7 @@ func (m *Room) UnmarshalJSON(b []byte) error {
 }
 
 func (m *Room) MarshalBSON() ([]byte, error) {
-	return bson.Marshal(m.data.ToMap())
+	return bson.Marshal(m._data.ToMap())
 }
 
 func (m *Room) UnmarshalBSON(b []byte) error {
@@ -487,97 +469,92 @@ func (m *Room) UnmarshalBSON(b []byte) error {
 	if err != nil {
 		return err
 	}
-	m.data.SetData(mm)
+	m._data.SetData(mm)
 	return nil
 }
 
 func (m *Room) InitAttrMap() {
-	m.data = attr.NewAttrMap()
+	m._data = attr.NewAttrMap()
 }
 
 func (m *Room) ForEach(fn func(s string, v interface{}) bool) {
-	m.data.ForEach(fn)
+	m._data.ForEach(fn)
 }
 
 func (m *Room) GetBuildID() string {
-	return m.data.Str("build_id")
+	return m._data.Str("build_id")
 }
 
 func (m *Room) SetBuildID(v string) {
-	m.data.Set("build_id", v)
+	m._data.Set("build_id", v)
 }
 
 func (m *Room) GetCsvPos() int32 {
-	return m.data.Int32("csv_pos")
+	return m._data.Int32("csv_pos")
 }
 
 func (m *Room) SetCsvPos(v int32) {
-	m.data.Set("csv_pos", v)
+	m._data.Set("csv_pos", v)
 }
 
 func (m *Room) GetExtends() *RoomExtends {
-	return m.data.Value("extends").(*RoomExtends)
+	return m._data.Value("extends").(*RoomExtends)
 }
 
 func (m *Room) SetExtends(extends map[int32]int32) {
-	m.data.Set(
+	m._data.Set(
 		"extends",
-		NewRoomExtends("extends", m.data, extends),
+		NewRoomExtends("extends", m._data, extends),
 	)
 }
 
 func (m *Room) GetExtends1() *RoomExtends1 {
-	return m.data.Value("extends1").(*RoomExtends1)
+	return m._data.Value("extends1").(*RoomExtends1)
 }
 
 func (m *Room) SetExtends1(extends map[int32]string) {
-	m.data.Set(
+	m._data.Set(
 		"extends1",
-		NewRoomExtends1("extends1", m.data, extends),
+		NewRoomExtends1("extends1", m._data, extends),
 	)
 }
 
 func (m *Room) GetExtends2() *RoomExtends2 {
-	return m.data.Value("extends2").(*RoomExtends2)
+	return m._data.Value("extends2").(*RoomExtends2)
 }
 
 func (m *Room) SetExtends2(extends map[string]int32) {
-	m.data.Set(
+	m._data.Set(
 		"extends2",
-		NewRoomExtends2("extends2", m.data, extends),
+		NewRoomExtends2("extends2", m._data, extends),
 	)
 }
 
 func (m *Room) GetExtends3() *RoomExtends3 {
-	return m.data.Value("extends3").(*RoomExtends3)
+	return m._data.Value("extends3").(*RoomExtends3)
 }
 
 func (m *Room) SetExtends3(extends map[string]string) {
-	m.data.Set(
+	m._data.Set(
 		"extends3",
-		NewRoomExtends3("extends3", m.data, extends),
+		NewRoomExtends3("extends3", m._data, extends),
 	)
 }
 
 func (m *Room) GetDesk() *Desk {
-	return m.data.Value("desk").(*Desk)
+	return m._data.Value("desk").(*Desk)
 }
 
 func (m *Room) SetDesk(desk *Desk) {
-	desk.setAncestry(m.data)
-	desk.setRootKey("desk")
-	m.data.Set(
+	desk.setParent("desk", m._data)
+	m._data.Set(
 		"desk",
 		desk,
 	)
 }
 
-func (m *Room) setRootKey(k string) {
-	m.data.SetRootKey(k)
-}
-
-func (m *Room) setAncestry(ancestry *attr.AttrMap) {
-	m.data.SetAncestry(ancestry)
+func (m *Room) setParent(k string, parent attr.AttrField) {
+	m._data.SetParent(k, parent)
 }
 
 // func (m *Room) Equal(other *Room) bool {

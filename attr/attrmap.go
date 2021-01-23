@@ -6,12 +6,17 @@ import (
 	"sync"
 )
 
+type AttrField interface {
+	setChangeKey(k string)
+}
+
 // AttrMap map attr
 type AttrMap struct {
-	// 如果这个是 根AttrMap，则 rootKey 为空，ancestry 为 nil
-	rootKey string
+	// 如果这个是 根AttrMap，则 key 为空，ancestry 为 nil
+	key       string
+	parentKey string
 	// 存这个数据的祖宗
-	ancestry *AttrMap
+	parent AttrField
 
 	data map[string]interface{}
 
@@ -29,8 +34,9 @@ var attrPool *sync.Pool = &sync.Pool{
 
 func NewAttrMap() *AttrMap {
 	a := attrPool.Get().(*AttrMap)
-	a.rootKey = ""
-	a.ancestry = nil
+	a.key = ""
+	a.parentKey = ""
+	a.parent = nil
 
 	a.data = map[string]interface{}{}
 	for k := range a.changedkey {
@@ -41,8 +47,8 @@ func NewAttrMap() *AttrMap {
 
 func NewStringInterfaceMap(key string, ancestry *AttrMap, data map[string]interface{}) *AttrMap {
 	a := attrPool.Get().(*AttrMap)
-	a.rootKey = key
-	a.ancestry = ancestry
+	a.key = key
+	a.parent = ancestry
 	a.data = data
 
 	for k := range a.changedkey {
@@ -55,18 +61,18 @@ func ReleaseAttrMap(mm *AttrMap) {
 	attrPool.Put(mm)
 }
 
-func (a *AttrMap) SetRootKey(k string) {
-	if a.rootKey != "" && a.rootKey != k {
-		panic(fmt.Sprintf("key is already exit old:%s new:%s", a.rootKey, k))
+func (a *AttrMap) SetParent(k string, parent AttrField) {
+	if (a.parentKey != "" && a.parentKey != k) || (a.parent != nil && a.parent != parent) {
+		panic(
+			fmt.Sprintf(
+				"has already set parent oldKey:%s newKey:%s oldParent:%s newParent:%s",
+				a.parentKey, k,
+				a.parent, parent,
+			),
+		)
 	}
-	a.rootKey = k
-}
-
-func (a *AttrMap) SetAncestry(ancestry *AttrMap) {
-	if a.ancestry != nil && a.ancestry != ancestry {
-		panic(fmt.Sprintf("ancestry is already exit old:%s new:%s", a.ancestry, ancestry))
-	}
-	a.ancestry = ancestry
+	a.parentKey = k
+	a.parent = parent
 }
 
 // func (a *AttrMap) ToMap(filter ...func(k string) bool) map[string]interface{} {
@@ -102,9 +108,6 @@ func (a *AttrMap) ForEach(fn func(k string, v interface{}) bool) {
 }
 
 func (a *AttrMap) Delete(key string) bool {
-	if a.isRoot() {
-		panic("can not delete key in root attr")
-	}
 	if _, ok := a.data[key]; ok {
 		delete(a.data, key)
 		a.change()
@@ -114,9 +117,6 @@ func (a *AttrMap) Delete(key string) bool {
 }
 
 func (a *AttrMap) FastDelete(key string) {
-	if a.isRoot() {
-		panic("can not delete key in root attr")
-	}
 	delete(a.data, key)
 	a.change()
 }
@@ -126,19 +126,17 @@ func (a *AttrMap) Set(key string, val interface{}) {
 	a.data[key] = val
 	// 这里缓存 修改的 key
 	// 还有一种做法是 改变立马通知除去
-	a.setChangeKey(key)
-}
-
-func (a *AttrMap) change() {
-	if a.isRoot() {
-
+	if a.parent != nil {
+		a.parent.setChangeKey(a.parentKey)
 	} else {
-		a.ancestry.setChangeKey(a.rootKey)
+		a.setChangeKey(key)
 	}
 }
 
-func (a *AttrMap) isRoot() bool {
-	return a.ancestry == nil
+func (a *AttrMap) change() {
+	if a.parent != nil {
+		a.parent.setChangeKey(a.parentKey)
+	}
 }
 
 func (a *AttrMap) HasChange() bool {

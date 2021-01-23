@@ -20,7 +20,7 @@ func init() {
 type Desk struct {
 	// parent    AttrMapImp
 	// parentKey string
-	data *attr.AttrMap
+	_data *attr.AttrMap
 }
 
 func defaultDesk() *Desk {
@@ -33,29 +33,28 @@ func NewDesk(
 	name string,
 ) *Desk {
 	m := &Desk{}
-	m.data = attr.NewAttrMap()
+	m._data = attr.NewAttrMap()
 
 	m.SetWidth(width)
 	m.SetHeight(height)
 	m.SetName(name)
 
-	m.data.ClearChangeKey()
+	m._data.ClearChangeKey()
 	return m
 }
 
 func (m *Desk) MarshalJSON() ([]byte, error) {
-	return json.Marshal(m.data.ToMap())
+	return json.Marshal(m._data.ToMap())
 }
 func (m *Desk) UnmarshalJSON(b []byte) error {
 	mm, err := desk.UnmarshalJson(b)
 	if err != nil {
 		return err
 	}
-	m.data.SetData(mm)
-	m.data.ForEach(func(k string, v interface{}) bool {
+	m._data = attr.NewStringInterfaceMap("", nil, mm)
+	m._data.ForEach(func(k string, v interface{}) bool {
 		if k != "id" && !desk.GetDef(k).IsPrimary() {
-			v.(IField).setRootKey(k)
-			v.(IField).setAncestry(m.data)
+			v.(IField).setParent(k, m._data)
 		}
 		return true
 	})
@@ -63,7 +62,7 @@ func (m *Desk) UnmarshalJSON(b []byte) error {
 }
 
 func (m *Desk) MarshalBSON() ([]byte, error) {
-	return bson.Marshal(m.data.ToMap())
+	return bson.Marshal(m._data.ToMap())
 }
 
 func (m *Desk) UnmarshalBSON(b []byte) error {
@@ -71,46 +70,48 @@ func (m *Desk) UnmarshalBSON(b []byte) error {
 	if err != nil {
 		return err
 	}
-	m.data.SetData(mm)
+	m._data = attr.NewStringInterfaceMap("", nil, mm)
+	m._data.ForEach(func(k string, v interface{}) bool {
+		if k != "id" && !desk.GetDef(k).IsPrimary() {
+			v.(IField).setParent(k, m._data)
+		}
+		return true
+	})
 	return nil
 }
 
 func (m *Desk) InitAttrMap() {
-	m.data = attr.NewAttrMap()
+	m._data = attr.NewAttrMap()
 }
 
 func (m *Desk) ForEach(fn func(s string, v interface{}) bool) {
-	m.data.ForEach(fn)
+	m._data.ForEach(fn)
 }
 
 func (m *Desk) GetWidth() int32 {
-	return m.data.Int32("width")
+	return m._data.Int32("width")
 }
 
 func (m *Desk) SetWidth(v int32) {
-	m.data.Set("width", v)
+	m._data.Set("width", v)
 }
 
 func (m *Desk) GetHeight() int32 {
-	return m.data.Int32("height")
+	return m._data.Int32("height")
 }
 
 func (m *Desk) SetHeight(v int32) {
-	m.data.Set("height", v)
+	m._data.Set("height", v)
 }
 
 func (m *Desk) GetName() string {
-	return m.data.Str("name")
+	return m._data.Str("name")
 }
 
 func (m *Desk) SetName(v string) {
-	m.data.Set("name", v)
+	m._data.Set("name", v)
 }
 
-func (m *Desk) setRootKey(k string) {
-	m.data.SetRootKey(k)
-}
-
-func (m *Desk) setAncestry(ancestry *attr.AttrMap) {
-	m.data.SetAncestry(ancestry)
+func (m *Desk) setParent(k string, parent attr.AttrField) {
+	m._data.SetParent(k, parent)
 }

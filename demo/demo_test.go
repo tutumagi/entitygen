@@ -62,46 +62,96 @@ func TestDemo(t *testing.T) {
 
 	// 检查 changekey
 	room.SetCsvPos(100)
-	Equal(t, room.data.HasChange(), true)
-	Equal(t, room.data.ChangeKey(), map[string]struct{}{"csv_pos": {}})
+	Equal(t, room._data.HasChange(), true)
+	Equal(t, room._data.ChangeKey(), map[string]struct{}{"csv_pos": {}})
 	room.SetBuildID("xxaabbcc")
-	Equal(t, room.data.ChangeKey(), map[string]struct{}{
+	Equal(t, room._data.ChangeKey(), map[string]struct{}{
 		"csv_pos":  {},
 		"build_id": {},
 	})
 	room.SetExtends(map[int32]int32{888: 999})
-	Equal(t, room.data.ChangeKey(), map[string]struct{}{
+	Equal(t, room._data.ChangeKey(), map[string]struct{}{
 		"csv_pos":  {},
 		"build_id": {},
 		"extends":  {},
 	})
 	room.GetExtends1().Set(999, "money")
-	Equal(t, room.data.ChangeKey(), map[string]struct{}{
+	Equal(t, room._data.ChangeKey(), map[string]struct{}{
 		"csv_pos":  {},
 		"build_id": {},
 		"extends":  {},
 		"extends1": {},
 	})
 
-	room.data.ClearChangeKey()
-	Equal(t, room.data.HasChange(), false)
-	Equal(t, room.data.ChangeKey(), map[string]struct{}{})
+	room._data.ClearChangeKey()
+	Equal(t, room._data.HasChange(), false)
+	Equal(t, room._data.ChangeKey(), map[string]struct{}{})
 
 	room.GetExtends1().Set(999, "money")
-	Equal(t, room.data.ChangeKey(), map[string]struct{}{
+	Equal(t, room._data.ChangeKey(), map[string]struct{}{
 		"extends1": {},
 	})
 
-	room.data.ClearChangeKey()
+	room._data.ClearChangeKey()
 	room.GetExtends1().Delete(999)
-	Equal(t, room.data.ChangeKey(), map[string]struct{}{
+	Equal(t, room._data.ChangeKey(), map[string]struct{}{
 		"extends1": {},
 	})
 
-	room.data.ClearChangeKey()
+	room._data.ClearChangeKey()
 	// 这个 extends 没有这个 key，所以删掉后，没有这个 changkey
 	room.GetExtends1().Delete(1000)
-	Equal(t, room.data.ChangeKey(), map[string]struct{}{})
+	Equal(t, room._data.ChangeKey(), map[string]struct{}{})
+
+	room._data.ClearChangeKey()
+	room.GetDesk().SetHeight(200)
+	Equal(t, room.GetDesk().GetHeight(), int32(200))
+	Equal(t, room._data.ChangeKey(), map[string]struct{}{"desk": {}})
+
+}
+
+func TestMarshalUnmarshal(t *testing.T) {
+	roomModel := &RoomXXX{
+		// ID:      "1",
+		CsvPos:  3,
+		BuildID: "i am a build id",
+		Extends: map[int32]int32{
+			123: 456,
+			789: 1011,
+		},
+		Extends1: map[int32]string{
+			111: "hello",
+			222: "world",
+		},
+		Extends2: map[string]int32{
+			"tutu": 333,
+			"fff":  444,
+		},
+		Extends3: map[string]string{
+			"magi":   "jackie",
+			"monica": "chen",
+		},
+		Desk: &DeskXXX{
+			Width:  1024,
+			Height: 768,
+			Name:   "我是一张桌子",
+		},
+	}
+
+	desk := NewDesk(
+		roomModel.Desk.Width,
+		roomModel.Desk.Height,
+		roomModel.Desk.Name,
+	)
+	room := NewRoom(
+		roomModel.CsvPos,
+		roomModel.BuildID,
+		roomModel.Extends,
+		roomModel.Extends1,
+		roomModel.Extends2,
+		roomModel.Extends3,
+		desk,
+	)
 
 	{
 		bbs, err := json.Marshal(room)
@@ -133,5 +183,4 @@ func TestDemo(t *testing.T) {
 		Equal(t, newRoom.GetExtends().Equal(room.GetExtends()), true)
 		Equal(t, newRoom.GetExtends1().Equal(room.GetExtends1()), true)
 	}
-
 }
