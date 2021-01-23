@@ -39,12 +39,12 @@ func NewAttrMap() *AttrMap {
 	return a
 }
 
-func NewSubAttrMap(key string, ancestry *AttrMap) *AttrMap {
+func NewStringInterfaceMap(key string, ancestry *AttrMap, data map[string]interface{}) *AttrMap {
 	a := attrPool.Get().(*AttrMap)
 	a.rootKey = key
 	a.ancestry = ancestry
+	a.data = data
 
-	a.data = map[string]interface{}{}
 	for k := range a.changedkey {
 		delete(a.changedkey, k)
 	}

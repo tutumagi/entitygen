@@ -21,6 +21,14 @@ func TestDemo(t *testing.T) {
 			111: "hello",
 			222: "world",
 		},
+		Extends2: map[string]int32{
+			"tutu": 333,
+			"fff":  444,
+		},
+		Extends3: map[string]string{
+			"magi":   "jackie",
+			"monica": "chen",
+		},
 	}
 
 	room := NewRoom(
@@ -28,13 +36,15 @@ func TestDemo(t *testing.T) {
 		roomModel.BuildID,
 		roomModel.Extends,
 		roomModel.Extends1,
+		roomModel.Extends2,
+		roomModel.Extends3,
 	)
 
 	{
 		bbs, err := json.Marshal(room)
 		Equal(t, err, nil)
 
-		newRoom := NewRoom(0, "", nil, nil)
+		newRoom := NewRoom(0, "", nil, nil, nil, nil)
 		err = json.Unmarshal(bbs, newRoom)
 		Equal(t, err, nil)
 
@@ -42,13 +52,16 @@ func TestDemo(t *testing.T) {
 		Equal(t, newRoom.GetBuildID(), room.GetBuildID())
 		Equal(t, newRoom.GetExtends().Equal(room.GetExtends()), true)
 		Equal(t, newRoom.GetExtends1().Equal(room.GetExtends1()), true)
+		Equal(t, newRoom.GetExtends2().Equal(room.GetExtends2()), true)
+		Equal(t, newRoom.GetExtends3().Equal(room.GetExtends3()), true)
+
 	}
 
 	{
 		bbs, err := bson.Marshal(room)
 		Equal(t, err, nil)
 
-		newRoom := NewRoom(0, "", nil, nil)
+		newRoom := NewRoom(0, "", nil, nil, nil, nil)
 		err = bson.Unmarshal(bbs, newRoom)
 		Equal(t, err, nil)
 

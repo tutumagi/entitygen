@@ -196,6 +196,188 @@ func (m *RoomExtends1) Equal(other *RoomExtends1) bool {
 	return equal
 }
 
+type RoomExtends2 struct {
+	data *attr.AttrMap
+}
+
+func NewRoomExtends2(rootKey string, ancestry *attr.AttrMap, data map[string]int32) *RoomExtends2 {
+	var convertData map[string]interface{} = map[string]interface{}{}
+	for k, v := range data {
+		convertData[k] = v
+	}
+	dd := attr.NewStringInterfaceMap(rootKey, ancestry, convertData)
+
+	return &RoomExtends2{
+		data: dd,
+	}
+}
+
+func (m *RoomExtends2) MarshalJSON() ([]byte, error) {
+	return json.Marshal(m.data.ToMap())
+}
+func (m *RoomExtends2) UnmarshalJSON(b []byte) error {
+	var dd map[string]int32 = map[string]int32{}
+	err := json.Unmarshal(b, &dd)
+	if err != nil {
+		return err
+	}
+	var convertData map[string]interface{} = map[string]interface{}{}
+	for k, v := range dd {
+		convertData[k] = v
+	}
+
+	m.data = attr.NewStringInterfaceMap("", nil, convertData)
+	return nil
+}
+
+func (m *RoomExtends2) MarshalBSON() ([]byte, error) {
+	return bson.Marshal(m.data.ToMap())
+}
+
+func (m *RoomExtends2) UnmarshalBSON(b []byte) error {
+	var dd map[string]int32 = map[string]int32{}
+	err := bson.Unmarshal(b, &dd)
+	if err != nil {
+		return err
+	}
+	var convertData map[string]interface{} = map[string]interface{}{}
+	for k, v := range dd {
+		convertData[k] = v
+	}
+
+	m.data = attr.NewStringInterfaceMap("", nil, convertData)
+	return nil
+}
+
+func (m *RoomExtends2) Set(k string, v int32) {
+	m.data.Set(k, v)
+}
+
+func (m *RoomExtends2) Get(key string) int32 {
+	return m.data.Int32(key)
+}
+
+func (m *RoomExtends2) Delete(key string) bool {
+	return m.data.Delete(key)
+}
+
+func (m *RoomExtends2) ForEach(fn func(k string, v int32) bool) {
+	m.data.ForEach(func(k string, v interface{}) bool {
+		return fn(k, v.(int32))
+	})
+}
+
+func (m *RoomExtends2) setRootKey(k string) {
+	m.data.SetRootKey(k)
+}
+
+func (m *RoomExtends2) setAncestry(ancestry *attr.AttrMap) {
+	m.data.SetAncestry(ancestry)
+}
+
+func (m *RoomExtends2) Equal(other *RoomExtends2) bool {
+	equal := true
+	m.ForEach(func(k string, v int32) bool {
+		if v != other.Get(k) {
+			equal = false
+			return false
+		}
+		return true
+	})
+	return equal
+}
+
+type RoomExtends3 struct {
+	data *attr.AttrMap
+}
+
+func NewRoomExtends3(rootKey string, ancestry *attr.AttrMap, data map[string]string) *RoomExtends3 {
+	var convertData map[string]interface{} = map[string]interface{}{}
+	for k, v := range data {
+		convertData[k] = v
+	}
+	dd := attr.NewStringInterfaceMap(rootKey, ancestry, convertData)
+
+	return &RoomExtends3{
+		data: dd,
+	}
+}
+
+func (m *RoomExtends3) MarshalJSON() ([]byte, error) {
+	return json.Marshal(m.data.ToMap())
+}
+func (m *RoomExtends3) UnmarshalJSON(b []byte) error {
+	var dd map[string]string = map[string]string{}
+	err := json.Unmarshal(b, &dd)
+	if err != nil {
+		return err
+	}
+	var convertData map[string]interface{} = map[string]interface{}{}
+	for k, v := range dd {
+		convertData[k] = v
+	}
+
+	m.data = attr.NewStringInterfaceMap("", nil, convertData)
+	return nil
+}
+
+func (m *RoomExtends3) MarshalBSON() ([]byte, error) {
+	return bson.Marshal(m.data.ToMap())
+}
+
+func (m *RoomExtends3) UnmarshalBSON(b []byte) error {
+	var dd map[string]string = map[string]string{}
+	err := bson.Unmarshal(b, &dd)
+	if err != nil {
+		return err
+	}
+	var convertData map[string]interface{} = map[string]interface{}{}
+	for k, v := range dd {
+		convertData[k] = v
+	}
+
+	m.data = attr.NewStringInterfaceMap("", nil, convertData)
+	return nil
+}
+
+func (m *RoomExtends3) Set(k string, v string) {
+	m.data.Set(k, v)
+}
+
+func (m *RoomExtends3) Get(key string) string {
+	return m.data.Str(key)
+}
+
+func (m *RoomExtends3) Delete(key string) bool {
+	return m.data.Delete(key)
+}
+
+func (m *RoomExtends3) ForEach(fn func(k string, v string) bool) {
+	m.data.ForEach(func(k string, v interface{}) bool {
+		return fn(k, v.(string))
+	})
+}
+
+func (m *RoomExtends3) setRootKey(k string) {
+	m.data.SetRootKey(k)
+}
+
+func (m *RoomExtends3) setAncestry(ancestry *attr.AttrMap) {
+	m.data.SetAncestry(ancestry)
+}
+
+func (m *RoomExtends3) Equal(other *RoomExtends3) bool {
+	equal := true
+	m.ForEach(func(k string, v string) bool {
+		if v != other.Get(k) {
+			equal = false
+			return false
+		}
+		return true
+	})
+	return equal
+}
+
 var room *attr.DataDef
 
 func init() {
@@ -205,6 +387,9 @@ func init() {
 	room.DefAttr("build_id", attr.StringAttr, attr.AfBase, true)
 	room.DefAttr("extends", &RoomExtends{}, attr.AfBase, true)
 	room.DefAttr("extends1", &RoomExtends1{}, attr.AfBase, true)
+	room.DefAttr("extends2", &RoomExtends2{}, attr.AfBase, true)
+	room.DefAttr("extends3", &RoomExtends3{}, attr.AfBase, true)
+
 }
 
 type Room struct {
@@ -218,6 +403,8 @@ func NewRoom(
 	buildID string,
 	extends map[int32]int32,
 	extends1 map[int32]string,
+	extends2 map[string]int32,
+	extends3 map[string]string,
 ) *Room {
 	m := &Room{}
 	m.data = attr.NewAttrMap()
@@ -226,6 +413,8 @@ func NewRoom(
 	m.SetBuildID(buildID)
 	m.SetExtends(extends)
 	m.SetExtends1(extends1)
+	m.SetExtends2(extends2)
+	m.SetExtends3(extends3)
 
 	m.data.ClearChangeKey()
 	return m
@@ -306,6 +495,28 @@ func (m *Room) SetExtends1(extends map[int32]string) {
 	m.data.Set(
 		"extends1",
 		NewRoomExtends1("extends1", m.data, extends),
+	)
+}
+
+func (m *Room) GetExtends2() *RoomExtends2 {
+	return m.data.Value("extends2").(*RoomExtends2)
+}
+
+func (m *Room) SetExtends2(extends map[string]int32) {
+	m.data.Set(
+		"extends2",
+		NewRoomExtends2("extends2", m.data, extends),
+	)
+}
+
+func (m *Room) GetExtends3() *RoomExtends3 {
+	return m.data.Value("extends3").(*RoomExtends3)
+}
+
+func (m *Room) SetExtends3(extends map[string]string) {
+	m.data.Set(
+		"extends3",
+		NewRoomExtends3("extends3", m.data, extends),
 	)
 }
 

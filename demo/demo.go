@@ -18,4 +18,8 @@ type RoomXXX struct {
 	Extends map[int32]int32 `bson:"extends" json:"extends"`
 
 	Extends1 map[int32]string `bson:"extends1" json:"extends1"`
+
+	Extends2 map[string]int32 `bson:"extends2" json:"extends2"`
+
+	Extends3 map[string]string `bson:"extends3" json:"extends3"`
 }
