@@ -126,14 +126,14 @@ func (a *AttrMap) Set(key string, val interface{}) {
 	a.data[key] = val
 	// 这里缓存 修改的 key
 	// 还有一种做法是 改变立马通知除去
-	a.SetChangeKey(key)
+	a.setChangeKey(key)
 }
 
 func (a *AttrMap) change() {
 	if a.isRoot() {
 
 	} else {
-		a.ancestry.SetChangeKey(a.rootKey)
+		a.ancestry.setChangeKey(a.rootKey)
 	}
 }
 
@@ -151,7 +151,11 @@ func (a *AttrMap) ClearChangeKey() {
 	}
 }
 
-func (a *AttrMap) SetChangeKey(key string) {
+func (a *AttrMap) ChangeKey() map[string]struct{} {
+	return a.changedkey
+}
+
+func (a *AttrMap) setChangeKey(key string) {
 	a.changedkey[key] = struct{}{}
 }
 

@@ -22,4 +22,13 @@ type RoomXXX struct {
 	Extends2 map[string]int32 `bson:"extends2" json:"extends2"`
 
 	Extends3 map[string]string `bson:"extends3" json:"extends3"`
+
+	Desk *DeskXXX `bson:"desk" json:"desk"`
+}
+
+// 桌子
+type DeskXXX struct {
+	Width  int32  `bson:"width" json:"width"`
+	Height int32  `bson:"height" json:"height"`
+	Name   string `bson:"name" json:"name"`
 }

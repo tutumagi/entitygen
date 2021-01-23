@@ -14,7 +14,7 @@ type IField interface {
 
 // RoomExtends 外观
 type RoomExtends struct {
-	data *attr.Int32Map
+	_data *attr.Int32Map
 }
 
 func NewRoomExtends(rootKey string, ancestry *attr.AttrMap, data map[int32]int32) *RoomExtends {
@@ -25,12 +25,12 @@ func NewRoomExtends(rootKey string, ancestry *attr.AttrMap, data map[int32]int32
 	dd := attr.NewInt32InterfaceMap(rootKey, ancestry, convertData)
 
 	return &RoomExtends{
-		data: dd,
+		_data: dd,
 	}
 }
 
 func (m *RoomExtends) MarshalJSON() ([]byte, error) {
-	return json.Marshal(m.data.ToMap())
+	return json.Marshal(m._data.ToMap())
 }
 func (m *RoomExtends) UnmarshalJSON(b []byte) error {
 	var dd map[int32]int32 = map[int32]int32{}
@@ -43,12 +43,12 @@ func (m *RoomExtends) UnmarshalJSON(b []byte) error {
 		convertData[k] = v
 	}
 
-	m.data = attr.NewInt32InterfaceMap("", nil, convertData)
+	m._data = attr.NewInt32InterfaceMap("", nil, convertData)
 	return nil
 }
 
 func (m *RoomExtends) MarshalBSON() ([]byte, error) {
-	return bson.Marshal(m.data.ToMap())
+	return bson.Marshal(m._data.ToMap())
 }
 
 func (m *RoomExtends) UnmarshalBSON(b []byte) error {
@@ -62,34 +62,34 @@ func (m *RoomExtends) UnmarshalBSON(b []byte) error {
 		convertData[k] = v
 	}
 
-	m.data = attr.NewInt32InterfaceMap("", nil, convertData)
+	m._data = attr.NewInt32InterfaceMap("", nil, convertData)
 	return nil
 }
 
 func (m *RoomExtends) Set(k int32, v int32) {
-	m.data.Set(k, v)
+	m._data.Set(k, v)
 }
 
 func (m *RoomExtends) Get(key int32) int32 {
-	return m.data.Int32(key)
+	return m._data.Int32(key)
 }
 
 func (m *RoomExtends) Delete(key int32) bool {
-	return m.data.Delete(key)
+	return m._data.Delete(key)
 }
 
 func (m *RoomExtends) ForEach(fn func(k int32, v int32) bool) {
-	m.data.ForEach(func(k int32, v interface{}) bool {
+	m._data.ForEach(func(k int32, v interface{}) bool {
 		return fn(k, v.(int32))
 	})
 }
 
 func (m *RoomExtends) setRootKey(k string) {
-	m.data.SetRootKey(k)
+	m._data.SetRootKey(k)
 }
 
 func (m *RoomExtends) setAncestry(ancestry *attr.AttrMap) {
-	m.data.SetAncestry(ancestry)
+	m._data.SetAncestry(ancestry)
 }
 
 func (m *RoomExtends) Equal(other *RoomExtends) bool {
@@ -104,9 +104,18 @@ func (m *RoomExtends) Equal(other *RoomExtends) bool {
 	return equal
 }
 
+func (m *RoomExtends) data() map[int32]int32 {
+	var dd map[int32]int32 = map[int32]int32{}
+	m._data.ForEach(func(k int32, v interface{}) bool {
+		dd[k] = v.(int32)
+		return true
+	})
+	return dd
+}
+
 // RoomExtends1 外观1
 type RoomExtends1 struct {
-	data *attr.Int32Map
+	_data *attr.Int32Map
 }
 
 func NewRoomExtends1(rootKey string, ancestry *attr.AttrMap, data map[int32]string) *RoomExtends1 {
@@ -117,12 +126,12 @@ func NewRoomExtends1(rootKey string, ancestry *attr.AttrMap, data map[int32]stri
 	dd := attr.NewInt32InterfaceMap(rootKey, ancestry, convertData)
 
 	return &RoomExtends1{
-		data: dd,
+		_data: dd,
 	}
 }
 
 func (m *RoomExtends1) MarshalJSON() ([]byte, error) {
-	return json.Marshal(m.data.ToMap())
+	return json.Marshal(m._data.ToMap())
 }
 func (m *RoomExtends1) UnmarshalJSON(b []byte) error {
 	var dd map[int32]string = map[int32]string{}
@@ -135,12 +144,12 @@ func (m *RoomExtends1) UnmarshalJSON(b []byte) error {
 		convertData[k] = v
 	}
 
-	m.data = attr.NewInt32InterfaceMap("", nil, convertData)
+	m._data = attr.NewInt32InterfaceMap("", nil, convertData)
 	return nil
 }
 
 func (m *RoomExtends1) MarshalBSON() ([]byte, error) {
-	return bson.Marshal(m.data.ToMap())
+	return bson.Marshal(m._data.ToMap())
 }
 
 func (m *RoomExtends1) UnmarshalBSON(b []byte) error {
@@ -154,34 +163,34 @@ func (m *RoomExtends1) UnmarshalBSON(b []byte) error {
 		convertData[k] = v
 	}
 
-	m.data = attr.NewInt32InterfaceMap("", nil, convertData)
+	m._data = attr.NewInt32InterfaceMap("", nil, convertData)
 	return nil
 }
 
 func (m *RoomExtends1) Set(k int32, v string) {
-	m.data.Set(k, v)
+	m._data.Set(k, v)
 }
 
 func (m *RoomExtends1) Get(key int32) string {
-	return m.data.Str(key)
+	return m._data.Str(key)
 }
 
 func (m *RoomExtends1) Delete(key int32) bool {
-	return m.data.Delete(key)
+	return m._data.Delete(key)
 }
 
 func (m *RoomExtends1) ForEach(fn func(k int32, v string) bool) {
-	m.data.ForEach(func(k int32, v interface{}) bool {
+	m._data.ForEach(func(k int32, v interface{}) bool {
 		return fn(k, v.(string))
 	})
 }
 
 func (m *RoomExtends1) setRootKey(k string) {
-	m.data.SetRootKey(k)
+	m._data.SetRootKey(k)
 }
 
 func (m *RoomExtends1) setAncestry(ancestry *attr.AttrMap) {
-	m.data.SetAncestry(ancestry)
+	m._data.SetAncestry(ancestry)
 }
 
 func (m *RoomExtends1) Equal(other *RoomExtends1) bool {
@@ -196,8 +205,17 @@ func (m *RoomExtends1) Equal(other *RoomExtends1) bool {
 	return equal
 }
 
+func (m *RoomExtends1) data() map[int32]string {
+	var dd map[int32]string = map[int32]string{}
+	m._data.ForEach(func(k int32, v interface{}) bool {
+		dd[k] = v.(string)
+		return true
+	})
+	return dd
+}
+
 type RoomExtends2 struct {
-	data *attr.AttrMap
+	_data *attr.AttrMap
 }
 
 func NewRoomExtends2(rootKey string, ancestry *attr.AttrMap, data map[string]int32) *RoomExtends2 {
@@ -208,12 +226,12 @@ func NewRoomExtends2(rootKey string, ancestry *attr.AttrMap, data map[string]int
 	dd := attr.NewStringInterfaceMap(rootKey, ancestry, convertData)
 
 	return &RoomExtends2{
-		data: dd,
+		_data: dd,
 	}
 }
 
 func (m *RoomExtends2) MarshalJSON() ([]byte, error) {
-	return json.Marshal(m.data.ToMap())
+	return json.Marshal(m._data.ToMap())
 }
 func (m *RoomExtends2) UnmarshalJSON(b []byte) error {
 	var dd map[string]int32 = map[string]int32{}
@@ -226,12 +244,12 @@ func (m *RoomExtends2) UnmarshalJSON(b []byte) error {
 		convertData[k] = v
 	}
 
-	m.data = attr.NewStringInterfaceMap("", nil, convertData)
+	m._data = attr.NewStringInterfaceMap("", nil, convertData)
 	return nil
 }
 
 func (m *RoomExtends2) MarshalBSON() ([]byte, error) {
-	return bson.Marshal(m.data.ToMap())
+	return bson.Marshal(m._data.ToMap())
 }
 
 func (m *RoomExtends2) UnmarshalBSON(b []byte) error {
@@ -245,34 +263,34 @@ func (m *RoomExtends2) UnmarshalBSON(b []byte) error {
 		convertData[k] = v
 	}
 
-	m.data = attr.NewStringInterfaceMap("", nil, convertData)
+	m._data = attr.NewStringInterfaceMap("", nil, convertData)
 	return nil
 }
 
 func (m *RoomExtends2) Set(k string, v int32) {
-	m.data.Set(k, v)
+	m._data.Set(k, v)
 }
 
 func (m *RoomExtends2) Get(key string) int32 {
-	return m.data.Int32(key)
+	return m._data.Int32(key)
 }
 
 func (m *RoomExtends2) Delete(key string) bool {
-	return m.data.Delete(key)
+	return m._data.Delete(key)
 }
 
 func (m *RoomExtends2) ForEach(fn func(k string, v int32) bool) {
-	m.data.ForEach(func(k string, v interface{}) bool {
+	m._data.ForEach(func(k string, v interface{}) bool {
 		return fn(k, v.(int32))
 	})
 }
 
 func (m *RoomExtends2) setRootKey(k string) {
-	m.data.SetRootKey(k)
+	m._data.SetRootKey(k)
 }
 
 func (m *RoomExtends2) setAncestry(ancestry *attr.AttrMap) {
-	m.data.SetAncestry(ancestry)
+	m._data.SetAncestry(ancestry)
 }
 
 func (m *RoomExtends2) Equal(other *RoomExtends2) bool {
@@ -287,8 +305,17 @@ func (m *RoomExtends2) Equal(other *RoomExtends2) bool {
 	return equal
 }
 
+func (m *RoomExtends2) data() map[string]int32 {
+	var dd map[string]int32 = map[string]int32{}
+	m._data.ForEach(func(k string, v interface{}) bool {
+		dd[k] = v.(int32)
+		return true
+	})
+	return dd
+}
+
 type RoomExtends3 struct {
-	data *attr.AttrMap
+	_data *attr.AttrMap
 }
 
 func NewRoomExtends3(rootKey string, ancestry *attr.AttrMap, data map[string]string) *RoomExtends3 {
@@ -299,12 +326,12 @@ func NewRoomExtends3(rootKey string, ancestry *attr.AttrMap, data map[string]str
 	dd := attr.NewStringInterfaceMap(rootKey, ancestry, convertData)
 
 	return &RoomExtends3{
-		data: dd,
+		_data: dd,
 	}
 }
 
 func (m *RoomExtends3) MarshalJSON() ([]byte, error) {
-	return json.Marshal(m.data.ToMap())
+	return json.Marshal(m._data.ToMap())
 }
 func (m *RoomExtends3) UnmarshalJSON(b []byte) error {
 	var dd map[string]string = map[string]string{}
@@ -317,12 +344,12 @@ func (m *RoomExtends3) UnmarshalJSON(b []byte) error {
 		convertData[k] = v
 	}
 
-	m.data = attr.NewStringInterfaceMap("", nil, convertData)
+	m._data = attr.NewStringInterfaceMap("", nil, convertData)
 	return nil
 }
 
 func (m *RoomExtends3) MarshalBSON() ([]byte, error) {
-	return bson.Marshal(m.data.ToMap())
+	return bson.Marshal(m._data.ToMap())
 }
 
 func (m *RoomExtends3) UnmarshalBSON(b []byte) error {
@@ -336,34 +363,34 @@ func (m *RoomExtends3) UnmarshalBSON(b []byte) error {
 		convertData[k] = v
 	}
 
-	m.data = attr.NewStringInterfaceMap("", nil, convertData)
+	m._data = attr.NewStringInterfaceMap("", nil, convertData)
 	return nil
 }
 
 func (m *RoomExtends3) Set(k string, v string) {
-	m.data.Set(k, v)
+	m._data.Set(k, v)
 }
 
 func (m *RoomExtends3) Get(key string) string {
-	return m.data.Str(key)
+	return m._data.Str(key)
 }
 
 func (m *RoomExtends3) Delete(key string) bool {
-	return m.data.Delete(key)
+	return m._data.Delete(key)
 }
 
 func (m *RoomExtends3) ForEach(fn func(k string, v string) bool) {
-	m.data.ForEach(func(k string, v interface{}) bool {
+	m._data.ForEach(func(k string, v interface{}) bool {
 		return fn(k, v.(string))
 	})
 }
 
 func (m *RoomExtends3) setRootKey(k string) {
-	m.data.SetRootKey(k)
+	m._data.SetRootKey(k)
 }
 
 func (m *RoomExtends3) setAncestry(ancestry *attr.AttrMap) {
-	m.data.SetAncestry(ancestry)
+	m._data.SetAncestry(ancestry)
 }
 
 func (m *RoomExtends3) Equal(other *RoomExtends3) bool {
@@ -378,6 +405,15 @@ func (m *RoomExtends3) Equal(other *RoomExtends3) bool {
 	return equal
 }
 
+func (m *RoomExtends3) data() map[string]string {
+	var dd map[string]string = map[string]string{}
+	m._data.ForEach(func(k string, v interface{}) bool {
+		dd[k] = v.(string)
+		return true
+	})
+	return dd
+}
+
 var room *attr.DataDef
 
 func init() {
@@ -389,6 +425,7 @@ func init() {
 	room.DefAttr("extends1", &RoomExtends1{}, attr.AfBase, true)
 	room.DefAttr("extends2", &RoomExtends2{}, attr.AfBase, true)
 	room.DefAttr("extends3", &RoomExtends3{}, attr.AfBase, true)
+	room.DefAttr("desk", defaultDesk(), attr.AfBase, true)
 
 }
 
@@ -405,6 +442,7 @@ func NewRoom(
 	extends1 map[int32]string,
 	extends2 map[string]int32,
 	extends3 map[string]string,
+	desk *Desk,
 ) *Room {
 	m := &Room{}
 	m.data = attr.NewAttrMap()
@@ -415,6 +453,7 @@ func NewRoom(
 	m.SetExtends1(extends1)
 	m.SetExtends2(extends2)
 	m.SetExtends3(extends3)
+	m.SetDesk(desk)
 
 	m.data.ClearChangeKey()
 	return m
@@ -517,6 +556,19 @@ func (m *Room) SetExtends3(extends map[string]string) {
 	m.data.Set(
 		"extends3",
 		NewRoomExtends3("extends3", m.data, extends),
+	)
+}
+
+func (m *Room) GetDesk() *Desk {
+	return m.data.Value("desk").(*Desk)
+}
+
+func (m *Room) SetDesk(desk *Desk) {
+	desk.setAncestry(m.data)
+	desk.setRootKey("desk")
+	m.data.Set(
+		"desk",
+		desk,
 	)
 }
 

@@ -98,7 +98,7 @@ func (a *Int32Map) FastDelete(key int32) {
 }
 
 func (a *Int32Map) change() {
-	a.ancestry.SetChangeKey(a.rootKey)
+	a.ancestry.setChangeKey(a.rootKey)
 }
 
 // TODO

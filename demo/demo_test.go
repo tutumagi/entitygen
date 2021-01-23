@@ -29,8 +29,18 @@ func TestDemo(t *testing.T) {
 			"magi":   "jackie",
 			"monica": "chen",
 		},
+		Desk: &DeskXXX{
+			Width:  1024,
+			Height: 768,
+			Name:   "我是一张桌子",
+		},
 	}
 
+	desk := NewDesk(
+		roomModel.Desk.Width,
+		roomModel.Desk.Height,
+		roomModel.Desk.Name,
+	)
 	room := NewRoom(
 		roomModel.CsvPos,
 		roomModel.BuildID,
@@ -38,13 +48,66 @@ func TestDemo(t *testing.T) {
 		roomModel.Extends1,
 		roomModel.Extends2,
 		roomModel.Extends3,
+		desk,
 	)
+
+	// 检查 数据
+	Equal(t, room.GetCsvPos(), roomModel.CsvPos)
+	Equal(t, room.GetBuildID(), roomModel.BuildID)
+	Equal(t, room.GetExtends().data(), roomModel.Extends)
+	Equal(t, room.GetExtends1().data(), roomModel.Extends1)
+	Equal(t, room.GetExtends2().data(), roomModel.Extends2)
+	Equal(t, room.GetExtends3().data(), roomModel.Extends3)
+	Equal(t, room.GetDesk(), desk)
+
+	// 检查 changekey
+	room.SetCsvPos(100)
+	Equal(t, room.data.HasChange(), true)
+	Equal(t, room.data.ChangeKey(), map[string]struct{}{"csv_pos": {}})
+	room.SetBuildID("xxaabbcc")
+	Equal(t, room.data.ChangeKey(), map[string]struct{}{
+		"csv_pos":  {},
+		"build_id": {},
+	})
+	room.SetExtends(map[int32]int32{888: 999})
+	Equal(t, room.data.ChangeKey(), map[string]struct{}{
+		"csv_pos":  {},
+		"build_id": {},
+		"extends":  {},
+	})
+	room.GetExtends1().Set(999, "money")
+	Equal(t, room.data.ChangeKey(), map[string]struct{}{
+		"csv_pos":  {},
+		"build_id": {},
+		"extends":  {},
+		"extends1": {},
+	})
+
+	room.data.ClearChangeKey()
+	Equal(t, room.data.HasChange(), false)
+	Equal(t, room.data.ChangeKey(), map[string]struct{}{})
+
+	room.GetExtends1().Set(999, "money")
+	Equal(t, room.data.ChangeKey(), map[string]struct{}{
+		"extends1": {},
+	})
+
+	room.data.ClearChangeKey()
+	room.GetExtends1().Delete(999)
+	Equal(t, room.data.ChangeKey(), map[string]struct{}{
+		"extends1": {},
+	})
+
+	room.data.ClearChangeKey()
+	// 这个 extends 没有这个 key，所以删掉后，没有这个 changkey
+	room.GetExtends1().Delete(1000)
+	Equal(t, room.data.ChangeKey(), map[string]struct{}{})
 
 	{
 		bbs, err := json.Marshal(room)
 		Equal(t, err, nil)
 
-		newRoom := NewRoom(0, "", nil, nil, nil, nil)
+		newRoom := NewRoom(0, "", nil, nil, nil, nil, NewDesk(0, 0, ""))
 		err = json.Unmarshal(bbs, newRoom)
 		Equal(t, err, nil)
 
@@ -61,7 +124,7 @@ func TestDemo(t *testing.T) {
 		bbs, err := bson.Marshal(room)
 		Equal(t, err, nil)
 
-		newRoom := NewRoom(0, "", nil, nil, nil, nil)
+		newRoom := NewRoom(0, "", nil, nil, nil, nil, NewDesk(0, 0, ""))
 		err = bson.Unmarshal(bbs, newRoom)
 		Equal(t, err, nil)
 
