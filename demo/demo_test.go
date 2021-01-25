@@ -62,10 +62,10 @@ func mockRoom() (*Room, *RoomXXX) {
 	room := NewRoom(
 		roomModel.CsvPos,
 		roomModel.BuildID,
-		NewRoomExtends(roomModel.Extends),
-		NewRoomExtends1(roomModel.Extends1),
-		NewRoomExtends2(roomModel.Extends2),
-		NewRoomExtends3(roomModel.Extends3),
+		NewKVInt32Int32(roomModel.Extends),
+		NewKVInt32Str(roomModel.Extends1),
+		NewKVStrInt32(roomModel.Extends2),
+		NewKVStrStr(roomModel.Extends3),
 		desk,
 		deskss,
 	)
@@ -102,7 +102,7 @@ func TestDemo(t *testing.T) {
 		"csv_pos":  {},
 		"build_id": {},
 	})
-	room.SetExtends(NewRoomExtends(map[int32]int32{888: 999}))
+	room.SetExtends(NewKVInt32Int32(map[int32]int32{888: 999}))
 	Equal(t, room._data.ChangeKey(), map[string]struct{}{
 		"csv_pos":  {},
 		"build_id": {},

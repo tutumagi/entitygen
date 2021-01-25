@@ -99,7 +99,7 @@ func (m *Desks) setParent(k string, parent attr.AttrField) {
 func (m *Desks) Equal(other *Desks) bool {
 	equal := true
 	m.ForEach(func(k int32, v *Desk) bool {
-		if v.Equal(other.Get(k)) {
+		if !v.Equal(other.Get(k)) {
 			equal = false
 			return false
 		}
@@ -124,10 +124,10 @@ func init() {
 
 	room.DefAttr("csv_pos", attr.Int32Attr, attr.AfBase, true)
 	room.DefAttr("build_id", attr.StringAttr, attr.AfBase, true)
-	room.DefAttr("extends", &RoomExtends{}, attr.AfBase, true)
-	room.DefAttr("extends1", &RoomExtends1{}, attr.AfBase, true)
-	room.DefAttr("extends2", &RoomExtends2{}, attr.AfBase, true)
-	room.DefAttr("extends3", &RoomExtends3{}, attr.AfBase, true)
+	room.DefAttr("extends", &KVInt32Int32{}, attr.AfBase, true)
+	room.DefAttr("extends1", &KVInt32Str{}, attr.AfBase, true)
+	room.DefAttr("extends2", &KVStrInt32{}, attr.AfBase, true)
+	room.DefAttr("extends3", &KVStrStr{}, attr.AfBase, true)
 	room.DefAttr("desk", &Desk{}, attr.AfBase, true)
 	room.DefAttr("desks", &Desks{}, attr.AfBase, true)
 }
@@ -140,10 +140,10 @@ func EmptyRoom() *Room {
 	return NewRoom(
 		0,
 		"",
-		EmptyRoomExtends(),
-		EmptyRoomExtends1(),
-		EmptyRoomExtends2(),
-		EmptyRoomExtends3(),
+		EmptyKVInt32Int32(),
+		EmptyKVInt32Str(),
+		EmptyStrInt32(),
+		EmptyKVStrStr(),
 		EmptyDesk(),
 		EmptyDesks(),
 	)
@@ -152,10 +152,10 @@ func EmptyRoom() *Room {
 func NewRoom(
 	csvPos int32,
 	buildID string,
-	extends *RoomExtends,
-	extends1 *RoomExtends1,
-	extends2 *RoomExtends2,
-	extends3 *RoomExtends3,
+	extends *KVInt32Int32,
+	extends1 *KVInt32Str,
+	extends2 *KVStrInt32,
+	extends3 *KVStrStr,
 	desk *Desk,
 	desks *Desks,
 ) *Room {
@@ -230,11 +230,11 @@ func (m *Room) SetCsvPos(v int32) {
 	m._data.Set("csv_pos", v)
 }
 
-func (m *Room) GetExtends() *RoomExtends {
-	return m._data.Value("extends").(*RoomExtends)
+func (m *Room) GetExtends() *KVInt32Int32 {
+	return m._data.Value("extends").(*KVInt32Int32)
 }
 
-func (m *Room) SetExtends(extends *RoomExtends) {
+func (m *Room) SetExtends(extends *KVInt32Int32) {
 	extends.setParent("extends", m._data)
 	m._data.Set(
 		"extends",
@@ -242,11 +242,11 @@ func (m *Room) SetExtends(extends *RoomExtends) {
 	)
 }
 
-func (m *Room) GetExtends1() *RoomExtends1 {
-	return m._data.Value("extends1").(*RoomExtends1)
+func (m *Room) GetExtends1() *KVInt32Str {
+	return m._data.Value("extends1").(*KVInt32Str)
 }
 
-func (m *Room) SetExtends1(extends *RoomExtends1) {
+func (m *Room) SetExtends1(extends *KVInt32Str) {
 	extends.setParent("extends1", m._data)
 	m._data.Set(
 		"extends1",
@@ -254,11 +254,11 @@ func (m *Room) SetExtends1(extends *RoomExtends1) {
 	)
 }
 
-func (m *Room) GetExtends2() *RoomExtends2 {
-	return m._data.Value("extends2").(*RoomExtends2)
+func (m *Room) GetExtends2() *KVStrInt32 {
+	return m._data.Value("extends2").(*KVStrInt32)
 }
 
-func (m *Room) SetExtends2(extends *RoomExtends2) {
+func (m *Room) SetExtends2(extends *KVStrInt32) {
 	extends.setParent("extends2", m._data)
 	m._data.Set(
 		"extends2",
@@ -266,11 +266,11 @@ func (m *Room) SetExtends2(extends *RoomExtends2) {
 	)
 }
 
-func (m *Room) GetExtends3() *RoomExtends3 {
-	return m._data.Value("extends3").(*RoomExtends3)
+func (m *Room) GetExtends3() *KVStrStr {
+	return m._data.Value("extends3").(*KVStrStr)
 }
 
-func (m *Room) SetExtends3(extends *RoomExtends3) {
+func (m *Room) SetExtends3(extends *KVStrStr) {
 	extends.setParent("extends3", m._data)
 	m._data.Set(
 		"extends3",
