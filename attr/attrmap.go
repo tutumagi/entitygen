@@ -45,10 +45,21 @@ func NewAttrMap() *AttrMap {
 	return a
 }
 
-func NewStringInterfaceMap(key string, ancestry *AttrMap, data map[string]interface{}) *AttrMap {
+// func NewStringInterfaceMap(key string, ancestry *AttrMap, data map[string]interface{}) *AttrMap {
+// 	a := attrPool.Get().(*AttrMap)
+// 	a.key = key
+// 	a.parent = ancestry
+// 	a.data = data
+
+// 	for k := range a.changedkey {
+// 		delete(a.changedkey, k)
+// 	}
+// 	return a
+// }
+func NewStringInterfaceMap(data map[string]interface{}) *AttrMap {
 	a := attrPool.Get().(*AttrMap)
-	a.key = key
-	a.parent = ancestry
+	a.key = ""
+	a.parent = nil
 	a.data = data
 
 	for k := range a.changedkey {
@@ -133,6 +144,10 @@ func (a *AttrMap) Set(key string, val interface{}) {
 	}
 }
 
+func (a *AttrMap) setChangeKey(key string) {
+	a.changedkey[key] = struct{}{}
+}
+
 func (a *AttrMap) change() {
 	if a.parent != nil {
 		a.parent.setChangeKey(a.parentKey)
@@ -151,10 +166,6 @@ func (a *AttrMap) ClearChangeKey() {
 
 func (a *AttrMap) ChangeKey() map[string]struct{} {
 	return a.changedkey
-}
-
-func (a *AttrMap) setChangeKey(key string) {
-	a.changedkey[key] = struct{}{}
 }
 
 // Bool returns value with Bool type

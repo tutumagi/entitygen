@@ -31,10 +31,17 @@ var Int32MapPool *sync.Pool = &sync.Pool{
 	},
 }
 
-func NewInt32InterfaceMap(key string, ancestry *AttrMap, data map[int32]interface{}) *Int32Map {
+// func NewInt32InterfaceMap(key string, ancestry *AttrMap, data map[int32]interface{}) *Int32Map {
+// 	int32map := Int32MapPool.Get().(*Int32Map)
+// 	int32map.parentKey = key
+// 	int32map.parent = ancestry
+// 	int32map.data = data
+// 	return int32map
+// }
+func NewInt32InterfaceMap(data map[int32]interface{}) *Int32Map {
 	int32map := Int32MapPool.Get().(*Int32Map)
-	int32map.parentKey = key
-	int32map.parent = ancestry
+	int32map.parentKey = ""
+	int32map.parent = nil
 	int32map.data = data
 	return int32map
 }
@@ -98,7 +105,13 @@ func (a *Int32Map) FastDelete(key int32) {
 }
 
 func (a *Int32Map) change() {
-	a.parent.setChangeKey(a.parentKey)
+	if a.parent != nil {
+		a.parent.setChangeKey(a.parentKey)
+	}
+}
+
+func (a *Int32Map) setChangeKey(k string) {
+	a.change()
 }
 
 // TODO
