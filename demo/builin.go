@@ -8,9 +8,7 @@ import (
 )
 
 // KVInt32Int32 外观
-type KVInt32Int32 struct {
-	_data *attr.Int32Map
-}
+type KVInt32Int32 attr.Int32Map
 
 func EmptyKVInt32Int32() *KVInt32Int32 {
 	return NewKVInt32Int32(nil)
@@ -21,15 +19,14 @@ func NewKVInt32Int32(data map[int32]int32) *KVInt32Int32 {
 	for k, v := range data {
 		convertData[k] = v
 	}
-	dd := attr.NewInt32InterfaceMap(convertData)
+	dd := attr.NewInt32Map(convertData)
 
-	return &KVInt32Int32{
-		_data: dd,
-	}
+	return (*KVInt32Int32)(dd)
+
 }
 
 func (m *KVInt32Int32) MarshalJSON() ([]byte, error) {
-	return json.Marshal(m._data.ToMap())
+	return json.Marshal((*attr.Int32Map)(m).ToMap())
 }
 func (m *KVInt32Int32) UnmarshalJSON(b []byte) error {
 	var dd map[int32]int32 = map[int32]int32{}
@@ -42,12 +39,12 @@ func (m *KVInt32Int32) UnmarshalJSON(b []byte) error {
 		convertData[k] = v
 	}
 
-	m._data = attr.NewInt32InterfaceMap(convertData)
+	(*attr.Int32Map)(m).SetData(convertData)
 	return nil
 }
 
 func (m *KVInt32Int32) MarshalBSON() ([]byte, error) {
-	return bson.Marshal(m._data.ToMap())
+	return bson.Marshal((*attr.Int32Map)(m).ToMap())
 }
 
 func (m *KVInt32Int32) UnmarshalBSON(b []byte) error {
@@ -61,30 +58,30 @@ func (m *KVInt32Int32) UnmarshalBSON(b []byte) error {
 		convertData[k] = v
 	}
 
-	m._data = attr.NewInt32InterfaceMap(convertData)
+	(*attr.Int32Map)(m).SetData(convertData)
 	return nil
 }
 
 func (m *KVInt32Int32) Set(k int32, v int32) {
-	m._data.Set(k, v)
+	(*attr.Int32Map)(m).Set(k, v)
 }
 
 func (m *KVInt32Int32) Get(key int32) int32 {
-	return m._data.Int32(key)
+	return (*attr.Int32Map)(m).Int32(key)
 }
 
 func (m *KVInt32Int32) Delete(key int32) bool {
-	return m._data.Delete(key)
+	return (*attr.Int32Map)(m).Delete(key)
 }
 
 func (m *KVInt32Int32) ForEach(fn func(k int32, v int32) bool) {
-	m._data.ForEach(func(k int32, v interface{}) bool {
+	(*attr.Int32Map)(m).ForEach(func(k int32, v interface{}) bool {
 		return fn(k, v.(int32))
 	})
 }
 
 func (m *KVInt32Int32) setParent(k string, parent attr.AttrField) {
-	m._data.SetParent(k, parent)
+	(*attr.Int32Map)(m).SetParent(k, parent)
 }
 
 func (m *KVInt32Int32) Equal(other *KVInt32Int32) bool {
@@ -101,7 +98,7 @@ func (m *KVInt32Int32) Equal(other *KVInt32Int32) bool {
 
 func (m *KVInt32Int32) data() map[int32]int32 {
 	var dd map[int32]int32 = map[int32]int32{}
-	m._data.ForEach(func(k int32, v interface{}) bool {
+	(*attr.Int32Map)(m).ForEach(func(k int32, v interface{}) bool {
 		dd[k] = v.(int32)
 		return true
 	})
@@ -121,7 +118,7 @@ func NewKVInt32Str(data map[int32]string) *KVInt32Str {
 	for k, v := range data {
 		convertData[k] = v
 	}
-	dd := attr.NewInt32InterfaceMap(convertData)
+	dd := attr.NewInt32Map(convertData)
 
 	return &KVInt32Str{
 		_data: dd,
@@ -142,7 +139,7 @@ func (m *KVInt32Str) UnmarshalJSON(b []byte) error {
 		convertData[k] = v
 	}
 
-	m._data = attr.NewInt32InterfaceMap(convertData)
+	m._data = attr.NewInt32Map(convertData)
 	return nil
 }
 
@@ -161,7 +158,7 @@ func (m *KVInt32Str) UnmarshalBSON(b []byte) error {
 		convertData[k] = v
 	}
 
-	m._data = attr.NewInt32InterfaceMap(convertData)
+	m._data = attr.NewInt32Map(convertData)
 	return nil
 }
 
@@ -209,7 +206,7 @@ func (m *KVInt32Str) data() map[int32]string {
 }
 
 type KVStrInt32 struct {
-	_data *attr.AttrMap
+	_data *attr.StrMap
 }
 
 func EmptyStrInt32() *KVStrInt32 {
@@ -221,7 +218,7 @@ func NewKVStrInt32(data map[string]int32) *KVStrInt32 {
 	for k, v := range data {
 		convertData[k] = v
 	}
-	dd := attr.NewStringInterfaceMap(convertData)
+	dd := attr.NewStrMap(convertData)
 
 	return &KVStrInt32{
 		_data: dd,
@@ -242,7 +239,7 @@ func (m *KVStrInt32) UnmarshalJSON(b []byte) error {
 		convertData[k] = v
 	}
 
-	m._data = attr.NewStringInterfaceMap(convertData)
+	m._data = attr.NewStrMap(convertData)
 	return nil
 }
 
@@ -261,7 +258,7 @@ func (m *KVStrInt32) UnmarshalBSON(b []byte) error {
 		convertData[k] = v
 	}
 
-	m._data = attr.NewStringInterfaceMap(convertData)
+	m._data = attr.NewStrMap(convertData)
 	return nil
 }
 
@@ -309,7 +306,7 @@ func (m *KVStrInt32) data() map[string]int32 {
 }
 
 type KVStrStr struct {
-	_data *attr.AttrMap
+	_data *attr.StrMap
 }
 
 func EmptyKVStrStr() *KVStrStr {
@@ -321,7 +318,7 @@ func NewKVStrStr(data map[string]string) *KVStrStr {
 	for k, v := range data {
 		convertData[k] = v
 	}
-	dd := attr.NewStringInterfaceMap(convertData)
+	dd := attr.NewStrMap(convertData)
 
 	return &KVStrStr{
 		_data: dd,
@@ -342,7 +339,7 @@ func (m *KVStrStr) UnmarshalJSON(b []byte) error {
 		convertData[k] = v
 	}
 
-	m._data = attr.NewStringInterfaceMap(convertData)
+	m._data = attr.NewStrMap(convertData)
 	return nil
 }
 
@@ -361,7 +358,7 @@ func (m *KVStrStr) UnmarshalBSON(b []byte) error {
 		convertData[k] = v
 	}
 
-	m._data = attr.NewStringInterfaceMap(convertData)
+	m._data = attr.NewStrMap(convertData)
 	return nil
 }
 

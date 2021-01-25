@@ -25,7 +25,7 @@ func NewDesks(data map[int32]*Desk) *Desks {
 	for k, v := range data {
 		convertData[k] = v
 	}
-	dd := attr.NewInt32InterfaceMap(convertData)
+	dd := attr.NewInt32Map(convertData)
 
 	return &Desks{
 		_data: dd,
@@ -46,7 +46,7 @@ func (m *Desks) UnmarshalJSON(b []byte) error {
 		convertData[k] = v
 	}
 
-	m._data = attr.NewInt32InterfaceMap(convertData)
+	m._data = attr.NewInt32Map(convertData)
 	return nil
 }
 
@@ -65,7 +65,7 @@ func (m *Desks) UnmarshalBSON(b []byte) error {
 		convertData[k] = v
 	}
 
-	m._data = attr.NewInt32InterfaceMap(convertData)
+	m._data = attr.NewInt32Map(convertData)
 	return nil
 }
 
@@ -133,7 +133,7 @@ func init() {
 }
 
 type Room struct {
-	_data *attr.AttrMap
+	_data *attr.StrMap
 }
 
 func EmptyRoom() *Room {
@@ -160,7 +160,7 @@ func NewRoom(
 	desks *Desks,
 ) *Room {
 	m := &Room{}
-	m._data = attr.NewAttrMap()
+	m._data = attr.NewStrMap(nil)
 
 	m.SetCsvPos(csvPos)
 	m.SetBuildID(buildID)
@@ -183,7 +183,7 @@ func (m *Room) UnmarshalJSON(b []byte) error {
 	if err != nil {
 		return err
 	}
-	m._data.SetData(mm)
+	m._data = attr.NewStrMap(mm)
 	m._data.ForEach(func(k string, v interface{}) bool {
 		if k != "id" && !room.GetDef(k).IsPrimary() {
 			v.(IField).setParent(k, m._data)
@@ -202,12 +202,8 @@ func (m *Room) UnmarshalBSON(b []byte) error {
 	if err != nil {
 		return err
 	}
-	m._data.SetData(mm)
+	m._data = attr.NewStrMap(mm)
 	return nil
-}
-
-func (m *Room) InitAttrMap() {
-	m._data = attr.NewAttrMap()
 }
 
 func (m *Room) ForEach(fn func(s string, v interface{}) bool) {

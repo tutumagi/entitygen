@@ -20,7 +20,7 @@ func init() {
 type Desk struct {
 	// parent    AttrMapImp
 	// parentKey string
-	_data *attr.AttrMap
+	_data *attr.StrMap
 }
 
 func EmptyDesk() *Desk {
@@ -33,7 +33,7 @@ func NewDesk(
 	name string,
 ) *Desk {
 	m := &Desk{}
-	m._data = attr.NewAttrMap()
+	m._data = attr.NewStrMap(nil)
 
 	m.SetWidth(width)
 	m.SetHeight(height)
@@ -51,7 +51,7 @@ func (m *Desk) UnmarshalJSON(b []byte) error {
 	if err != nil {
 		return err
 	}
-	m._data = attr.NewStringInterfaceMap(mm)
+	m._data = attr.NewStrMap(mm)
 	m._data.ForEach(func(k string, v interface{}) bool {
 		if k != "id" && !desk.GetDef(k).IsPrimary() {
 			v.(IField).setParent(k, m._data)
@@ -70,7 +70,7 @@ func (m *Desk) UnmarshalBSON(b []byte) error {
 	if err != nil {
 		return err
 	}
-	m._data = attr.NewStringInterfaceMap(mm)
+	m._data = attr.NewStrMap(mm)
 	m._data.ForEach(func(k string, v interface{}) bool {
 		if k != "id" && !desk.GetDef(k).IsPrimary() {
 			v.(IField).setParent(k, m._data)
@@ -78,10 +78,6 @@ func (m *Desk) UnmarshalBSON(b []byte) error {
 		return true
 	})
 	return nil
-}
-
-func (m *Desk) InitAttrMap() {
-	m._data = attr.NewAttrMap()
 }
 
 func (m *Desk) ForEach(fn func(s string, v interface{}) bool) {

@@ -20,7 +20,7 @@ type Int32Map struct {
 	parent AttrField
 }
 
-var Int32MapPool *sync.Pool = &sync.Pool{
+var int32MapPool *sync.Pool = &sync.Pool{
 	New: func() interface{} {
 		return &Int32Map{
 			parentKey: "",
@@ -31,26 +31,19 @@ var Int32MapPool *sync.Pool = &sync.Pool{
 	},
 }
 
-// func NewInt32InterfaceMap(key string, ancestry *AttrMap, data map[int32]interface{}) *Int32Map {
-// 	int32map := Int32MapPool.Get().(*Int32Map)
-// 	int32map.parentKey = key
-// 	int32map.parent = ancestry
-// 	int32map.data = data
-// 	return int32map
-// }
-func NewInt32InterfaceMap(data map[int32]interface{}) *Int32Map {
-	int32map := Int32MapPool.Get().(*Int32Map)
+func NewInt32Map(data map[int32]interface{}) *Int32Map {
+	int32map := int32MapPool.Get().(*Int32Map)
 	int32map.parentKey = ""
 	int32map.parent = nil
 	int32map.data = data
 	return int32map
 }
 
-func ReleaseAttrInt32Map(mm *Int32Map) {
+func ReleaseInt32Map(mm *Int32Map) {
 	mm.data = map[int32]interface{}{}
 	mm.parentKey = ""
 	mm.parent = nil
-	attrPool.Put(mm)
+	int32MapPool.Put(mm)
 }
 
 func (a *Int32Map) String() string {
@@ -114,23 +107,6 @@ func (a *Int32Map) setChangeKey(k string) {
 	a.change()
 }
 
-// TODO
-// func (a *AttrInt32Map) ToMap() map[int32]interface{} {
-// 	result := map[string]interface{}{}
-// 	var f func(k string) bool = nil
-
-// 	for k, v := range a.data {
-// 		if f != nil {
-// 			if f(k) {
-// 				result[k] = v
-// 			}
-// 		} else {
-// 			result[k] = v
-// 		}
-// 	}
-// 	return result
-// }
-
 func (a *Int32Map) SetParent(k string, parent AttrField) {
 	if (a.parentKey != "" && a.parentKey != k) || (a.parent != nil && a.parent != parent) {
 		panic(
@@ -155,16 +131,6 @@ func (a *Int32Map) Set(key int32, val interface{}) {
 	// 还有一种做法是 改变立马通知除去
 	a.change()
 }
-
-// func (a *AttrInt32Map) HasChange() bool {
-// 	return len(a.changedkey) > 0
-// }
-
-// func (a *AttrInt32Map) ClearChangeKey() {
-// 	for k := range a.changedkey {
-// 		delete(a.changedkey, k)
-// 	}
-// }
 
 // Bool returns value with Bool type
 func (a *Int32Map) Bool(key int32) bool {

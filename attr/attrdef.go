@@ -10,6 +10,10 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 )
 
+type AttrField interface {
+	setChangeKey(k string)
+}
+
 // 每个实体都有自己的实体ID，角色的实体ID就是角色ID
 type _Empty struct {
 	ID string `bson:"id" json:"id"`

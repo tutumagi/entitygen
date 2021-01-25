@@ -6,14 +6,9 @@ import (
 	"sync"
 )
 
-type AttrField interface {
-	setChangeKey(k string)
-}
-
-// AttrMap map attr
-type AttrMap struct {
-	// 如果这个是 根AttrMap，则 key 为空，ancestry 为 nil
-	key       string
+// StrMap str 作为 key 的 map
+type StrMap struct {
+	key       interface{} // 在父节点中的 key，可能是 string，可能是 int32
 	parentKey string
 	// 存这个数据的祖宗
 	parent AttrField
@@ -23,56 +18,42 @@ type AttrMap struct {
 	changedkey map[string]struct{}
 }
 
-var attrPool *sync.Pool = &sync.Pool{
+var strMapPool *sync.Pool = &sync.Pool{
 	New: func() interface{} {
-		return &AttrMap{
+		return &StrMap{
+			key:        "",
+			parentKey:  "",
+			parent:     nil,
 			data:       map[string]interface{}{},
 			changedkey: map[string]struct{}{},
 		}
 	},
 }
 
-func NewAttrMap() *AttrMap {
-	a := attrPool.Get().(*AttrMap)
+func NewStrMap(data map[string]interface{}) *StrMap {
+	a := strMapPool.Get().(*StrMap)
 	a.key = ""
 	a.parentKey = ""
 	a.parent = nil
 
-	a.data = map[string]interface{}{}
-	for k := range a.changedkey {
-		delete(a.changedkey, k)
+	for k, v := range data {
+		a.data[k] = v
 	}
+
 	return a
 }
 
-// func NewStringInterfaceMap(key string, ancestry *AttrMap, data map[string]interface{}) *AttrMap {
-// 	a := attrPool.Get().(*AttrMap)
-// 	a.key = key
-// 	a.parent = ancestry
-// 	a.data = data
-
-// 	for k := range a.changedkey {
-// 		delete(a.changedkey, k)
-// 	}
-// 	return a
-// }
-func NewStringInterfaceMap(data map[string]interface{}) *AttrMap {
-	a := attrPool.Get().(*AttrMap)
-	a.key = ""
-	a.parent = nil
-	a.data = data
-
-	for k := range a.changedkey {
-		delete(a.changedkey, k)
+func ReleaseStrMap(strMap *StrMap) {
+	for k := range strMap.data {
+		delete(strMap.data, k)
 	}
-	return a
+	for k := range strMap.changedkey {
+		delete(strMap.changedkey, k)
+	}
+	strMapPool.Put(strMap)
 }
 
-func ReleaseAttrMap(mm *AttrMap) {
-	attrPool.Put(mm)
-}
-
-func (a *AttrMap) SetParent(k string, parent AttrField) {
+func (a *StrMap) SetParent(k string, parent AttrField) {
 	if (a.parentKey != "" && a.parentKey != k) || (a.parent != nil && a.parent != parent) {
 		panic(
 			fmt.Sprintf(
@@ -86,8 +67,8 @@ func (a *AttrMap) SetParent(k string, parent AttrField) {
 	a.parent = parent
 }
 
-// func (a *AttrMap) ToMap(filter ...func(k string) bool) map[string]interface{} {
-func (a *AttrMap) ToMap() map[string]interface{} {
+// func (a *StrMap) ToMap(filter ...func(k string) bool) map[string]interface{} {
+func (a *StrMap) ToMap() map[string]interface{} {
 	// result := map[string]interface{}{}
 	// var f func(k string) bool = nil
 	// if len(filter) > 0 {
@@ -106,11 +87,7 @@ func (a *AttrMap) ToMap() map[string]interface{} {
 	return a.data
 }
 
-func (a *AttrMap) SetData(data map[string]interface{}) {
-	a.data = data
-}
-
-func (a *AttrMap) ForEach(fn func(k string, v interface{}) bool) {
+func (a *StrMap) ForEach(fn func(k string, v interface{}) bool) {
 	for k, v := range a.data {
 		if !fn(k, v) {
 			break
@@ -118,58 +95,27 @@ func (a *AttrMap) ForEach(fn func(k string, v interface{}) bool) {
 	}
 }
 
-func (a *AttrMap) Delete(key string) bool {
+func (a *StrMap) Delete(key string) bool {
 	if _, ok := a.data[key]; ok {
 		delete(a.data, key)
-		a.change()
+		a.setChangeKey(key)
 		return true
 	}
 	return false
 }
 
-func (a *AttrMap) FastDelete(key string) {
+func (a *StrMap) FastDelete(key string) {
 	delete(a.data, key)
-	a.change()
+	a.setChangeKey(key)
 }
 
-func (a *AttrMap) Set(key string, val interface{}) {
-
+func (a *StrMap) Set(key string, val interface{}) {
 	a.data[key] = val
-	// 这里缓存 修改的 key
-	// 还有一种做法是 改变立马通知除去
-	if a.parent != nil {
-		a.parent.setChangeKey(a.parentKey)
-	} else {
-		a.setChangeKey(key)
-	}
-}
-
-func (a *AttrMap) setChangeKey(key string) {
-	a.changedkey[key] = struct{}{}
-}
-
-func (a *AttrMap) change() {
-	if a.parent != nil {
-		a.parent.setChangeKey(a.parentKey)
-	}
-}
-
-func (a *AttrMap) HasChange() bool {
-	return len(a.changedkey) > 0
-}
-
-func (a *AttrMap) ClearChangeKey() {
-	for k := range a.changedkey {
-		delete(a.changedkey, k)
-	}
-}
-
-func (a *AttrMap) ChangeKey() map[string]struct{} {
-	return a.changedkey
+	a.setChangeKey(key)
 }
 
 // Bool returns value with Bool type
-func (a *AttrMap) Bool(key string) bool {
+func (a *StrMap) Bool(key string) bool {
 	v, ok := a.data[key]
 	if !ok {
 		return false
@@ -182,7 +128,7 @@ func (a *AttrMap) Bool(key string) bool {
 }
 
 // String returns value with String type
-func (a *AttrMap) Str(key string) string {
+func (a *StrMap) Str(key string) string {
 	v, ok := a.data[key]
 	if !ok {
 		return ""
@@ -195,7 +141,7 @@ func (a *AttrMap) Str(key string) string {
 }
 
 // Value returns value with interface{} type
-func (a *AttrMap) Value(key string) interface{} {
+func (a *StrMap) Value(key string) interface{} {
 	v, ok := a.data[key]
 	if !ok {
 		return nil
@@ -204,7 +150,7 @@ func (a *AttrMap) Value(key string) interface{} {
 }
 
 // Int returns value with Int type
-func (a *AttrMap) Int(key string) int {
+func (a *StrMap) Int(key string) int {
 	v, ok := a.data[key]
 	if !ok {
 		return 0
@@ -217,7 +163,7 @@ func (a *AttrMap) Int(key string) int {
 }
 
 // Int8 returns value with Int8 type
-func (a *AttrMap) Int8(key string) int8 {
+func (a *StrMap) Int8(key string) int8 {
 	v, ok := a.data[key]
 	if !ok {
 		return 0
@@ -230,7 +176,7 @@ func (a *AttrMap) Int8(key string) int8 {
 }
 
 // Int16 returns value with Int16 type
-func (a *AttrMap) Int16(key string) int16 {
+func (a *StrMap) Int16(key string) int16 {
 	v, ok := a.data[key]
 	if !ok {
 		return 0
@@ -243,7 +189,7 @@ func (a *AttrMap) Int16(key string) int16 {
 }
 
 // Int32 returns value with Int32 type
-func (a *AttrMap) Int32(key string) int32 {
+func (a *StrMap) Int32(key string) int32 {
 	v, ok := a.data[key]
 	if !ok {
 		return 0
@@ -256,7 +202,7 @@ func (a *AttrMap) Int32(key string) int32 {
 }
 
 // Int64 returns value with Int64 type
-func (a *AttrMap) Int64(key string) int64 {
+func (a *StrMap) Int64(key string) int64 {
 	v, ok := a.data[key]
 	if !ok {
 		return 0
@@ -269,7 +215,7 @@ func (a *AttrMap) Int64(key string) int64 {
 }
 
 // UInt returns value with UInt type
-func (a *AttrMap) UInt(key string) uint {
+func (a *StrMap) UInt(key string) uint {
 	v, ok := a.data[key]
 	if !ok {
 		return 0
@@ -282,7 +228,7 @@ func (a *AttrMap) UInt(key string) uint {
 }
 
 // UInt8 returns value with UInt8 type
-func (a *AttrMap) UInt8(key string) uint8 {
+func (a *StrMap) UInt8(key string) uint8 {
 	v, ok := a.data[key]
 	if !ok {
 		return 0
@@ -295,7 +241,7 @@ func (a *AttrMap) UInt8(key string) uint8 {
 }
 
 // UInt16 returns value with UInt16 type
-func (a *AttrMap) UInt16(key string) uint16 {
+func (a *StrMap) UInt16(key string) uint16 {
 	v, ok := a.data[key]
 	if !ok {
 		return 0
@@ -308,7 +254,7 @@ func (a *AttrMap) UInt16(key string) uint16 {
 }
 
 // UInt32 returns value with UInt32 type
-func (a *AttrMap) UInt32(key string) uint32 {
+func (a *StrMap) UInt32(key string) uint32 {
 	v, ok := a.data[key]
 	if !ok {
 		return 0
@@ -321,7 +267,7 @@ func (a *AttrMap) UInt32(key string) uint32 {
 }
 
 // UInt64 returns value with UInt64 type
-func (a *AttrMap) UInt64(key string) uint64 {
+func (a *StrMap) UInt64(key string) uint64 {
 	v, ok := a.data[key]
 	if !ok {
 		return 0
@@ -335,7 +281,7 @@ func (a *AttrMap) UInt64(key string) uint64 {
 }
 
 // Float32 returns value with float32 type
-func (a *AttrMap) Float32(key string) float32 {
+func (a *StrMap) Float32(key string) float32 {
 	v, ok := a.data[key]
 	if !ok {
 		return 0
@@ -348,7 +294,7 @@ func (a *AttrMap) Float32(key string) float32 {
 }
 
 // Float64 returns value with float64 type
-func (a *AttrMap) Float64(key string) float64 {
+func (a *StrMap) Float64(key string) float64 {
 	v, ok := a.data[key]
 	if !ok {
 		return 0
@@ -361,7 +307,29 @@ func (a *AttrMap) Float64(key string) float64 {
 	return r
 }
 
-func (a *AttrMap) String() string {
+func (a *StrMap) setChangeKey(key string) {
+	if a.parent == nil {
+		a.changedkey[key] = struct{}{}
+	} else {
+		a.parent.setChangeKey(a.parentKey)
+	}
+}
+
+func (a *StrMap) HasChange() bool {
+	return len(a.changedkey) > 0
+}
+
+func (a *StrMap) ClearChangeKey() {
+	for k := range a.changedkey {
+		delete(a.changedkey, k)
+	}
+}
+
+func (a *StrMap) ChangeKey() map[string]struct{} {
+	return a.changedkey
+}
+
+func (a *StrMap) String() string {
 	var sb strings.Builder
 	sb.WriteString("MapAttr{")
 	isFirstField := true
@@ -373,7 +341,7 @@ func (a *AttrMap) String() string {
 		fmt.Fprintf(&sb, "%#v", k)
 		sb.WriteString(": ")
 		switch a := v.(type) {
-		case *AttrMap:
+		case *StrMap:
 			sb.WriteString(a.String())
 		// case *AttrList:
 		// 	sb.WriteString(a.String())
