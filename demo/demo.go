@@ -26,6 +26,8 @@ type RoomXXX struct {
 	Desk *DeskXXX `bson:"desk" json:"desk"`
 
 	Desks map[int32]*DeskXXX `bson:"desks" json:"desks"`
+
+	SliceOne []string `bson:"slice_one" json:"slice_one"`
 }
 
 // 桌子

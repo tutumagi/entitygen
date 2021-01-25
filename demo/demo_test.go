@@ -95,56 +95,56 @@ func TestDemo(t *testing.T) {
 
 	// 检查 changekey
 	room.SetCsvPos(100)
-	Equal(t, room._data.HasChange(), true)
-	Equal(t, room._data.ChangeKey(), map[string]struct{}{"csv_pos": {}})
+	Equal(t, room.HasChange(), true)
+	Equal(t, room.ChangeKey(), map[string]struct{}{"csv_pos": {}})
 	room.SetBuildID("xxaabbcc")
-	Equal(t, room._data.ChangeKey(), map[string]struct{}{
+	Equal(t, room.ChangeKey(), map[string]struct{}{
 		"csv_pos":  {},
 		"build_id": {},
 	})
 	room.SetExtends(NewKVInt32Int32(map[int32]int32{888: 999}))
-	Equal(t, room._data.ChangeKey(), map[string]struct{}{
+	Equal(t, room.ChangeKey(), map[string]struct{}{
 		"csv_pos":  {},
 		"build_id": {},
 		"extends":  {},
 	})
 	room.GetExtends1().Set(999, "money")
-	Equal(t, room._data.ChangeKey(), map[string]struct{}{
+	Equal(t, room.ChangeKey(), map[string]struct{}{
 		"csv_pos":  {},
 		"build_id": {},
 		"extends":  {},
 		"extends1": {},
 	})
 
-	room._data.ClearChangeKey()
-	Equal(t, room._data.HasChange(), false)
-	Equal(t, room._data.ChangeKey(), map[string]struct{}{})
+	room.ClearChangeKey()
+	Equal(t, room.HasChange(), false)
+	Equal(t, room.ChangeKey(), map[string]struct{}{})
 
 	room.GetExtends1().Set(999, "money")
-	Equal(t, room._data.ChangeKey(), map[string]struct{}{
+	Equal(t, room.ChangeKey(), map[string]struct{}{
 		"extends1": {},
 	})
 
-	room._data.ClearChangeKey()
+	room.ClearChangeKey()
 	room.GetExtends1().Delete(999)
-	Equal(t, room._data.ChangeKey(), map[string]struct{}{
+	Equal(t, room.ChangeKey(), map[string]struct{}{
 		"extends1": {},
 	})
 
-	room._data.ClearChangeKey()
+	room.ClearChangeKey()
 	// 这个 extends 没有这个 key，所以删掉后，没有这个 changkey
 	room.GetExtends1().Delete(1000)
-	Equal(t, room._data.ChangeKey(), map[string]struct{}{})
+	Equal(t, room.ChangeKey(), map[string]struct{}{})
 
-	room._data.ClearChangeKey()
+	room.ClearChangeKey()
 	room.GetDesk().SetHeight(200)
 	Equal(t, room.GetDesk().GetHeight(), int32(200))
-	Equal(t, room._data.ChangeKey(), map[string]struct{}{"desk": {}})
+	Equal(t, room.ChangeKey(), map[string]struct{}{"desk": {}})
 
-	room._data.ClearChangeKey()
-	Equal(t, room._data.ChangeKey(), map[string]struct{}{})
+	room.ClearChangeKey()
+	Equal(t, room.ChangeKey(), map[string]struct{}{})
 	room.GetDesks().Get(101).SetWidth(500)
-	Equal(t, room._data.ChangeKey(), map[string]struct{}{"desks": {}})
+	Equal(t, room.ChangeKey(), map[string]struct{}{"desks": {}})
 }
 
 func TestMarshalUnmarshal(t *testing.T) {
