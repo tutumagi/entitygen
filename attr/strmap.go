@@ -109,6 +109,10 @@ func (a *StrMap) FastDelete(key string) {
 	a.setChangeKey(key)
 }
 
+func (a *StrMap) SetData(data map[string]interface{}) {
+	a.data = data
+}
+
 func (a *StrMap) Set(key string, val interface{}) {
 	a.data[key] = val
 	a.setChangeKey(key)
