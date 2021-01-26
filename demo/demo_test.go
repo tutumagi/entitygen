@@ -8,8 +8,8 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 )
 
-func mockRoom() (*Room, *RoomXXX) {
-	roomModel := &RoomXXX{
+func mockRoom() (*RoomDef, *Room) {
+	roomModel := &Room{
 		// ID:      "1",
 		CsvPos:  3,
 		BuildID: "i am a build id",
@@ -29,12 +29,12 @@ func mockRoom() (*Room, *RoomXXX) {
 			"magi":   "jackie",
 			"monica": "chen",
 		},
-		Desk: &DeskXXX{
+		Desk: &Desk{
 			Width:  1024,
 			Height: 768,
 			Name:   "我是一张桌子",
 		},
-		Desks: map[int32]*DeskXXX{
+		Desks: map[int32]*Desk{
 			101: {
 				Width:  101,
 				Height: 1010,
@@ -97,7 +97,7 @@ func TestDemo(t *testing.T) {
 	testChangeKey(t, room)
 }
 
-func testChangeKey(t *testing.T, room *Room) {
+func testChangeKey(t *testing.T, room *RoomDef) {
 	room.ClearChangeKey()
 	Equal(t, room.HasChange(), false)
 	Equal(t, room.ChangeKey(), map[string]struct{}{})

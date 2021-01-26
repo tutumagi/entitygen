@@ -7,19 +7,19 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 )
 
-var desk *attr.Def
+var deskAttrDef *attr.Def
 
 func init() {
-	desk = &attr.Def{}
+	deskAttrDef = &attr.Def{}
 
-	desk.DefAttr("width", attr.Int32Attr, attr.AfBase, true)
-	desk.DefAttr("height", attr.Int32Attr, attr.AfBase, true)
-	desk.DefAttr("name", attr.StringAttr, attr.AfBase, true)
+	deskAttrDef.DefAttr("width", attr.Int32, attr.AfBase, true)
+	deskAttrDef.DefAttr("height", attr.Int32, attr.AfBase, true)
+	deskAttrDef.DefAttr("name", attr.String, attr.AfBase, true)
 }
 
-type Desk attr.StrMap
+type DeskDef attr.StrMap
 
-func EmptyDesk() *Desk {
+func EmptyDesk() *DeskDef {
 	return NewDesk(0, 0, "")
 }
 
@@ -27,8 +27,8 @@ func NewDesk(
 	width int32,
 	height int32,
 	name string,
-) *Desk {
-	m := (*Desk)(attr.NewStrMap(nil))
+) *DeskDef {
+	m := (*DeskDef)(attr.NewStrMap(nil))
 
 	m.SetWidth(width)
 	m.SetHeight(height)
@@ -38,17 +38,17 @@ func NewDesk(
 	return m
 }
 
-func (m *Desk) MarshalJSON() ([]byte, error) {
+func (m *DeskDef) MarshalJSON() ([]byte, error) {
 	return json.Marshal((*attr.StrMap)(m).ToMap())
 }
-func (m *Desk) UnmarshalJSON(b []byte) error {
-	mm, err := desk.UnmarshalJson(b)
+func (m *DeskDef) UnmarshalJSON(b []byte) error {
+	mm, err := deskAttrDef.UnmarshalJson(b)
 	if err != nil {
 		return err
 	}
 	(*attr.StrMap)(m).SetData(mm)
 	(*attr.StrMap)(m).ForEach(func(k string, v interface{}) bool {
-		if k != "id" && !desk.GetDef(k).IsPrimary() {
+		if k != "id" && !deskAttrDef.GetDef(k).IsPrimary() {
 			v.(IField).setParent(k, (*attr.StrMap)(m))
 		}
 		return true
@@ -56,18 +56,18 @@ func (m *Desk) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
-func (m *Desk) MarshalBSON() ([]byte, error) {
+func (m *DeskDef) MarshalBSON() ([]byte, error) {
 	return bson.Marshal((*attr.StrMap)(m).ToMap())
 }
 
-func (m *Desk) UnmarshalBSON(b []byte) error {
-	mm, err := desk.UnmarshalBson(b)
+func (m *DeskDef) UnmarshalBSON(b []byte) error {
+	mm, err := deskAttrDef.UnmarshalBson(b)
 	if err != nil {
 		return err
 	}
 	(*attr.StrMap)(m).SetData(mm)
 	(*attr.StrMap)(m).ForEach(func(k string, v interface{}) bool {
-		if k != "id" && !desk.GetDef(k).IsPrimary() {
+		if k != "id" && !deskAttrDef.GetDef(k).IsPrimary() {
 			v.(IField).setParent(k, (*attr.StrMap)(m))
 		}
 		return true
@@ -75,50 +75,50 @@ func (m *Desk) UnmarshalBSON(b []byte) error {
 	return nil
 }
 
-func (m *Desk) ForEach(fn func(s string, v interface{}) bool) {
+func (m *DeskDef) ForEach(fn func(s string, v interface{}) bool) {
 	(*attr.StrMap)(m).ForEach(fn)
 }
 
-func (m *Desk) GetWidth() int32 {
+func (m *DeskDef) GetWidth() int32 {
 	return (*attr.StrMap)(m).Int32("width")
 }
 
-func (m *Desk) SetWidth(v int32) {
+func (m *DeskDef) SetWidth(v int32) {
 	(*attr.StrMap)(m).Set("width", v)
 }
 
-func (m *Desk) GetHeight() int32 {
+func (m *DeskDef) GetHeight() int32 {
 	return (*attr.StrMap)(m).Int32("height")
 }
 
-func (m *Desk) SetHeight(v int32) {
+func (m *DeskDef) SetHeight(v int32) {
 	(*attr.StrMap)(m).Set("height", v)
 }
 
-func (m *Desk) GetName() string {
+func (m *DeskDef) GetName() string {
 	return (*attr.StrMap)(m).Str("name")
 }
 
-func (m *Desk) SetName(v string) {
+func (m *DeskDef) SetName(v string) {
 	(*attr.StrMap)(m).Set("name", v)
 }
 
-func (m *Desk) setParent(k string, parent attr.Field) {
+func (m *DeskDef) setParent(k string, parent attr.Field) {
 	(*attr.StrMap)(m).SetParent(k, parent)
 }
 
-func (m *Desk) Equal(other *Desk) bool {
+func (m *DeskDef) Equal(other *DeskDef) bool {
 	return m.GetHeight() == other.GetHeight() && m.GetWidth() == other.GetWidth() && m.GetName() == other.GetName()
 }
 
-func (m *Desk) HasChange() bool {
+func (m *DeskDef) HasChange() bool {
 	return (*attr.StrMap)(m).HasChange()
 }
 
-func (m *Desk) ChangeKey() map[string]struct{} {
+func (m *DeskDef) ChangeKey() map[string]struct{} {
 	return (*attr.StrMap)(m).ChangeKey()
 }
 
-func (m *Desk) ClearChangeKey() {
+func (m *DeskDef) ClearChangeKey() {
 	(*attr.StrMap)(m).ClearChangeKey()
 }

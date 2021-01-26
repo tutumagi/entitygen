@@ -1,2 +1,2 @@
-//go:generate go run entitygen entitygen/domain.DeskXXX
+//go:generate go run entitygen entitygen/domain.Desk
 package entitydef

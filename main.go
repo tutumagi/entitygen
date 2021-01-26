@@ -74,6 +74,28 @@ func generate(sourceTypeName string, structType *types.Struct) error {
 
 	fmt.Printf("begin generate type:%s\n", sourceTypeName)
 
+	attrStrMap := func() *Statement { return Id("*").Qual("entitygen/attr", "StrMap") }
+	attrField := func() *Statement { return Qual("entitygen/attr", "Field") }
+	attrDef := func() *Statement { return Id("*").Qual("entitygen/attr", "Def") }
+
+	// 写 attrDef
+	attrDefName := strings.ToLower(sourceTypeName) + "AttrDef"
+	// var xxxAttrDef *attr.Def
+	f.Var().Id(attrDefName).Add(attrDef())
+	f.Func().Id("init").Params().
+		BlockFunc(
+			func(g *Group) {
+				g.Id(attrDefName).Op("=").Op("&").Qual("entitygen/attr", "Def").Block()
+
+				for i := 0; i < structType.NumFields(); i++ {
+					g.Id(attrDefName).CallFunc(func(g *Group) {
+
+					})
+				}
+
+			},
+		)
+
 	// 1. 写定义  type XXXDef attr.StrMap
 	structName := sourceTypeName + "Def"
 	f.Type().Id(structName).Qual(
@@ -84,7 +106,7 @@ func generate(sourceTypeName string, structType *types.Struct) error {
 	// 2. 写字段的 getter/setter
 
 	thisFn := func() *Statement { return Id("a").Op("*").Id(structName) }
-	convertThisFn := func() *Statement { return Parens(Id("*").Qual("entitygen/attr", "StrMap")).Parens(Id("a")) }
+	convertThisFn := func() *Statement { return Parens(attrStrMap()).Parens(Id("a")) }
 
 	for i := 0; i < structType.NumFields(); i++ {
 
@@ -164,6 +186,30 @@ func generate(sourceTypeName string, structType *types.Struct) error {
 		Block(
 			convertThisFn().Dot("ClearChangeKey").Call(),
 		)
+
+	// 4. 写 setParent
+	f.Func().Params(thisFn()).Id("setParent").Params(Id("k").String(), Id("parent").Add(attrField())).
+		Block(
+			convertThisFn().Dot("SetParent").Call(Id("k"), Id("parent")),
+		)
+
+	// 5. ForEach
+	f.Func().Params(thisFn()).Id("ForEach").Params(Id("fn").Func().Params(Id("s").String(), Id("v").Interface()).Bool()).
+		Block(
+			convertThisFn().Dot("ForEach").Call(Id("fn")),
+		)
+
+	// 6. 写 json marshal & unmarshal
+	// marshal
+	f.Func().Params(thisFn()).Id("MarshalJSON").Params().Params(Index().Byte(), Error()).
+		Block(
+			Return(Qual("encoding/json", "Marshal").Call(convertThisFn().Dot("ToMap").Params())),
+		)
+	// // unmarshal
+	// f.Func().Params(thisFn()).Id("UnmarshalJSON").Params().Params(Index().Byte()).Error().
+	// 	Block(
+	// 		Return(Qual("encoding/json", "UnmarshalJson").Call(convertThisFn().Dot("ToMap").Params())),
+	// 	)
 
 	goFile := os.Getenv("GOFILE")
 	ext := filepath.Ext(goFile)

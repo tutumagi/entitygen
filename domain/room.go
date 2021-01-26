@@ -1,38 +1,36 @@
 package domain
 
 // Room model
-type RoomXXX struct {
-	// ID string `bson:"id" json:"id"`
+type Room struct {
+	// ID string `key:"id" flag:"cell" client:"true" storedb:"true"`
 	// CsvPos 是指配置表里面的pos，表示房间在整个建筑结构里面的方位
-	CsvPos int32 `bson:"csv_pos" json:"csv_pos"`
+	CsvPos int32 `key:"csv_pos" flag:"cell" client:"true" storedb:"true"`
 	// 所属建筑的id
-	BuildID string `bson:"build_id" json:"build_id"`
-	// CsvID   int32  `bson:"csv_id" json:"csv_id"`
-	// Left    string `bson:"left" json:"left"`
-	// Right   string `bson:"right" json:"right"`
-	// Top     string `bson:"top" json:"top"`
-	// Bottom  string `bson:"bottom" json:"bottom"`
-	// Front   string `bson:"front" json:"front"`
-	// Behind  string `bson:"behind" json:"behind"`
+	BuildID string `key:"build_id" flag:"cell" client:"true" storedb:"true"`
+	// CsvID   int32  `key:"csv_id" flag:"cell" client:"true" storedb:"true"`
+	// Left    string `key:"left" flag:"cell" client:"true" storedb:"true"`
+	// Right   string `key:"right" flag:"cell" client:"true" storedb:"true"`
+	// Top     string `key:"top" flag:"cell" client:"true" storedb:"true"`
+	// Bottom  string `key:"bottom" flag:"cell" client:"true" storedb:"true"`
+	// Front   string `key:"front" flag:"cell" client:"true" storedb:"true"`
+	// Behind  string `key:"behind" flag:"cell" client:"true" storedb:"true"`
 
-	// Extends map[int32]int32 `bson:"extends" json:"extends"`
+	// Extends map[int32]int32 `key:"extends" flag:"cell" client:"true" storedb:"true"`
 
-	// Extends1 map[int32]string `bson:"extends1" json:"extends1"`
+	// Extends1 map[int32]string `key:"extends1" flag:"cell" client:"true" storedb:"true"`
 
-	// Extends2 map[string]int32 `bson:"extends2" json:"extends2"`
+	// Extends2 map[string]int32 `key:"extends2" flag:"cell" client:"true" storedb:"true"`
 
-	// Extends3 map[string]string `bson:"extends3" json:"extends3"`
+	// Extends3 map[string]string `key:"extends3" flag:"cell" client:"true" storedb:"true"`
 
-	// Desk *DeskXXX `bson:"desk" json:"desk"`
+	// Desk *Desk `key:"desk" flag:"cell" client:"true" storedb:"true"`
 
-	// Desks map[int32]*DeskXXX `bson:"desks" json:"desks"`
-
-	// SliceOne []string `bson:"slice_one" json:"slice_one"`
+	// Desks map[int32]*Desk `key:"desks" flag:"cell" client:"true" storedb:"true"`
 }
 
 // 桌子
-type DeskXXX struct {
-	Width  int32  `bson:"width" json:"width"`
-	Height int32  `bson:"height" json:"height"`
-	Name   string `bson:"name" json:"name"`
+type Desk struct {
+	Width  int32  `key:"width" flag:"cell" client:"true" storedb:"true"`
+	Height int32  `key:"height" flag:"cell" client:"true" storedb:"true"`
+	Name   string `key:"name" flag:"cell" client:"true" storedb:"true"`
 }
