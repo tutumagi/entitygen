@@ -30,9 +30,9 @@ type RoomXXX struct {
 	// SliceOne []string `bson:"slice_one" json:"slice_one"`
 }
 
-// // 桌子
-// type DeskXXX struct {
-// 	Width  int32  `bson:"width" json:"width"`
-// 	Height int32  `bson:"height" json:"height"`
-// 	Name   string `bson:"name" json:"name"`
-// }
+// 桌子
+type DeskXXX struct {
+	Width  int32  `bson:"width" json:"width"`
+	Height int32  `bson:"height" json:"height"`
+	Name   string `bson:"name" json:"name"`
+}
