@@ -11,7 +11,7 @@ type Slice struct {
 	data []interface{}
 
 	// 存这个数据的父节点和在父节点中的 key
-	parent    AttrField
+	parent    Field
 	parentKey string
 }
 
@@ -80,7 +80,7 @@ func (a *Slice) setChangeKey(k string) {
 	a.change()
 }
 
-func (a *Slice) SetParent(k string, parent AttrField) {
+func (a *Slice) SetParent(k string, parent Field) {
 	if (a.parentKey != "" && a.parentKey != k) || (a.parent != nil && a.parent != parent) {
 		panic(
 			fmt.Sprintf(

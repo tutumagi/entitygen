@@ -8,7 +8,7 @@ import (
 )
 
 type IField interface {
-	setParent(k string, parent attr.AttrField)
+	setParent(k string, parent attr.Field)
 }
 
 type Desks attr.Int32Map
@@ -89,7 +89,7 @@ func (m *Desks) ForEach(fn func(k int32, v *Desk) bool) {
 	})
 }
 
-func (m *Desks) setParent(k string, parent attr.AttrField) {
+func (m *Desks) setParent(k string, parent attr.Field) {
 	(*attr.Int32Map)(m).SetParent(k, parent)
 }
 
@@ -114,10 +114,10 @@ func (m *Desks) data() map[int32]*Desk {
 	return dd
 }
 
-var room *attr.DataDef
+var room *attr.Def
 
 func init() {
-	room = &attr.DataDef{}
+	room = &attr.Def{}
 
 	room.DefAttr("csv_pos", attr.Int32Attr, attr.AfBase, true)
 	room.DefAttr("build_id", attr.StringAttr, attr.AfBase, true)

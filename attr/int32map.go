@@ -17,7 +17,7 @@ type Int32Map struct {
 	data      map[int32]interface{}
 
 	// 存这个数据的父节点
-	parent AttrField
+	parent Field
 }
 
 var int32MapPool *sync.Pool = &sync.Pool{
@@ -107,7 +107,7 @@ func (a *Int32Map) setChangeKey(k string) {
 	a.change()
 }
 
-func (a *Int32Map) SetParent(k string, parent AttrField) {
+func (a *Int32Map) SetParent(k string, parent Field) {
 	if (a.parentKey != "" && a.parentKey != k) || (a.parent != nil && a.parent != parent) {
 		panic(
 			fmt.Sprintf(

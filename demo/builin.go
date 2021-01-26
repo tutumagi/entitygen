@@ -80,7 +80,7 @@ func (m *KVInt32Int32) ForEach(fn func(k int32, v int32) bool) {
 	})
 }
 
-func (m *KVInt32Int32) setParent(k string, parent attr.AttrField) {
+func (m *KVInt32Int32) setParent(k string, parent attr.Field) {
 	(*attr.Int32Map)(m).SetParent(k, parent)
 }
 
@@ -174,7 +174,7 @@ func (m *KVInt32Str) ForEach(fn func(k int32, v string) bool) {
 	})
 }
 
-func (m *KVInt32Str) setParent(k string, parent attr.AttrField) {
+func (m *KVInt32Str) setParent(k string, parent attr.Field) {
 	(*attr.Int32Map)(m).SetParent(k, parent)
 }
 
@@ -282,7 +282,7 @@ func (m *KVStrInt32) ForEach(fn func(k string, v int32) bool) {
 	})
 }
 
-func (m *KVStrInt32) setParent(k string, parent attr.AttrField) {
+func (m *KVStrInt32) setParent(k string, parent attr.Field) {
 	(*attr.StrMap)(m).SetParent(k, parent)
 }
 
@@ -376,7 +376,7 @@ func (m *KVStrStr) ForEach(fn func(k string, v string) bool) {
 	})
 }
 
-func (m *KVStrStr) setParent(k string, parent attr.AttrField) {
+func (m *KVStrStr) setParent(k string, parent attr.Field) {
 	(*attr.StrMap)(m).SetParent(k, parent)
 }
 

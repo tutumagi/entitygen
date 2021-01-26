@@ -10,7 +10,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 )
 
-type AttrField interface {
+type Field interface {
 	setChangeKey(k string)
 }
 
@@ -134,13 +134,13 @@ func (f *FieldDef) IsPrimary() bool {
 	return f.primary
 }
 
-type DataDef struct {
+type Def struct {
 	attrDefs map[string]*FieldDef
 
 	dynStruct dynamicstruct.DynamicStruct
 }
 
-func (desc *DataDef) DefAttr(key string, typ AttrTyp, flag AttrFlag, storeDB bool) {
+func (desc *Def) DefAttr(key string, typ AttrTyp, flag AttrFlag, storeDB bool) {
 	if desc.attrDefs == nil {
 		desc.attrDefs = make(map[string]*FieldDef, 10)
 	}
@@ -153,20 +153,20 @@ func (desc *DataDef) DefAttr(key string, typ AttrTyp, flag AttrFlag, storeDB boo
 	}
 }
 
-func (desc *DataDef) GetDef(key string) *FieldDef {
+func (desc *Def) GetDef(key string) *FieldDef {
 	return desc.attrDefs[key]
 }
 
-func (desc *DataDef) DynamicStruct() interface{} {
+func (desc *Def) DynamicStruct() interface{} {
 	return desc.builder().New()
 }
 
-func (desc *DataDef) DynamicSliceOfStruct() interface{} {
+func (desc *Def) DynamicSliceOfStruct() interface{} {
 	// TODO 有没有可能构造Slice时 加cap
 	return desc.builder().NewSliceOfStructs()
 }
 
-func (desc *DataDef) builder() dynamicstruct.DynamicStruct {
+func (desc *Def) builder() dynamicstruct.DynamicStruct {
 	if desc.dynStruct == nil {
 		builder := dynamicstruct.ExtendStruct(_Empty{})
 		for k, v := range desc.attrDefs {
@@ -190,12 +190,12 @@ func (desc *DataDef) builder() dynamicstruct.DynamicStruct {
 }
 
 // 通过 dynamicStruct 解析到的struct，转为 map[string]interface{}
-func (desc *DataDef) unmarshal(srcStruct interface{}) map[string]interface{} {
+func (desc *Def) unmarshal(srcStruct interface{}) map[string]interface{} {
 	return desc.readerToMap(dynamicstruct.NewReader(srcStruct))
 }
 
 // 通过 dynamicStruct 解析到的struct，转为 map[string]interface{}
-func (desc *DataDef) unmarshalSlice(srcStruct interface{}) []map[string]interface{} {
+func (desc *Def) unmarshalSlice(srcStruct interface{}) []map[string]interface{} {
 	var attrs = []map[string]interface{}{}
 	readers := dynamicstruct.NewReader(srcStruct).ToSliceOfReaders()
 	for _, r := range readers {
@@ -206,7 +206,7 @@ func (desc *DataDef) unmarshalSlice(srcStruct interface{}) []map[string]interfac
 }
 
 // 将 dynamicstruct.Reader 转为 map[string]interface{}
-func (desc *DataDef) readerToMap(r dynamicstruct.Reader) map[string]interface{} {
+func (desc *Def) readerToMap(r dynamicstruct.Reader) map[string]interface{} {
 	var attrs = map[string]interface{}{}
 	for _, field := range r.GetAllFields() {
 		name := strings.ToLower(field.Name()) // TODO 这里有性能瓶颈，可以考虑 修改dynamicstruct 的源码，去缓存这个 小写开头的字符串
@@ -216,7 +216,7 @@ func (desc *DataDef) readerToMap(r dynamicstruct.Reader) map[string]interface{} 
 	return attrs
 }
 
-func (desc *DataDef) UnmarshalBson(bytes []byte) (map[string]interface{}, error) {
+func (desc *Def) UnmarshalBson(bytes []byte) (map[string]interface{}, error) {
 	dynStruct := desc.DynamicStruct()
 	err := bson.Unmarshal(bytes, dynStruct)
 	if err != nil {
@@ -225,7 +225,7 @@ func (desc *DataDef) UnmarshalBson(bytes []byte) (map[string]interface{}, error)
 	return desc.unmarshal(dynStruct), nil
 }
 
-func (desc *DataDef) UnmarshalJson(bytes []byte) (map[string]interface{}, error) {
+func (desc *Def) UnmarshalJson(bytes []byte) (map[string]interface{}, error) {
 	dynStruct := desc.DynamicStruct()
 	err := json.Unmarshal(bytes, dynStruct)
 	if err != nil {

@@ -7,10 +7,10 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 )
 
-var desk *attr.DataDef
+var desk *attr.Def
 
 func init() {
-	desk = &attr.DataDef{}
+	desk = &attr.Def{}
 
 	desk.DefAttr("width", attr.Int32Attr, attr.AfBase, true)
 	desk.DefAttr("height", attr.Int32Attr, attr.AfBase, true)
@@ -103,7 +103,7 @@ func (m *Desk) SetName(v string) {
 	(*attr.StrMap)(m).Set("name", v)
 }
 
-func (m *Desk) setParent(k string, parent attr.AttrField) {
+func (m *Desk) setParent(k string, parent attr.Field) {
 	(*attr.StrMap)(m).SetParent(k, parent)
 }
 

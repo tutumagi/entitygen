@@ -11,7 +11,7 @@ type StrMap struct {
 	key       interface{} // 在父节点中的 key，可能是 string，可能是 int32
 	parentKey string
 	// 存这个数据的祖宗
-	parent AttrField
+	parent Field
 
 	data map[string]interface{}
 
@@ -53,7 +53,7 @@ func ReleaseStrMap(strMap *StrMap) {
 	strMapPool.Put(strMap)
 }
 
-func (a *StrMap) SetParent(k string, parent AttrField) {
+func (a *StrMap) SetParent(k string, parent Field) {
 	if (a.parentKey != "" && a.parentKey != k) || (a.parent != nil && a.parent != parent) {
 		panic(
 			fmt.Sprintf(

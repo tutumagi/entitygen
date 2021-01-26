@@ -1,4 +1,4 @@
-package demo
+package domain
 
 // Room model
 type RoomXXX struct {
@@ -15,22 +15,24 @@ type RoomXXX struct {
 	// Front   string `bson:"front" json:"front"`
 	// Behind  string `bson:"behind" json:"behind"`
 
-	Extends map[int32]int32 `bson:"extends" json:"extends"`
+	// Extends map[int32]int32 `bson:"extends" json:"extends"`
 
-	Extends1 map[int32]string `bson:"extends1" json:"extends1"`
+	// Extends1 map[int32]string `bson:"extends1" json:"extends1"`
 
-	Extends2 map[string]int32 `bson:"extends2" json:"extends2"`
+	// Extends2 map[string]int32 `bson:"extends2" json:"extends2"`
 
-	Extends3 map[string]string `bson:"extends3" json:"extends3"`
+	// Extends3 map[string]string `bson:"extends3" json:"extends3"`
 
-	Desk *DeskXXX `bson:"desk" json:"desk"`
+	// Desk *DeskXXX `bson:"desk" json:"desk"`
 
-	Desks map[int32]*DeskXXX `bson:"desks" json:"desks"`
+	// Desks map[int32]*DeskXXX `bson:"desks" json:"desks"`
+
+	// SliceOne []string `bson:"slice_one" json:"slice_one"`
 }
 
-// 桌子
-type DeskXXX struct {
-	Width  int32  `bson:"width" json:"width"`
-	Height int32  `bson:"height" json:"height"`
-	Name   string `bson:"name" json:"name"`
-}
+// // 桌子
+// type DeskXXX struct {
+// 	Width  int32  `bson:"width" json:"width"`
+// 	Height int32  `bson:"height" json:"height"`
+// 	Name   string `bson:"name" json:"name"`
+// }
