@@ -5,6 +5,7 @@ import (
 	"go/types"
 	"os"
 	"path/filepath"
+	"reflect"
 	"regexp"
 	"strings"
 
@@ -74,6 +75,8 @@ func generate(sourceTypeName string, structType *types.Struct) error {
 
 	fmt.Printf("begin generate type:%s\n", sourceTypeName)
 
+	fields := getStructFields(structType)
+
 	attrStrMap := func() *Statement { return Id("*").Qual("entitygen/attr", "StrMap") }
 	attrField := func() *Statement { return Qual("entitygen/attr", "Field") }
 	attrDef := func() *Statement { return Id("*").Qual("entitygen/attr", "Def") }
@@ -86,11 +89,31 @@ func generate(sourceTypeName string, structType *types.Struct) error {
 		BlockFunc(
 			func(g *Group) {
 				g.Id(attrDefName).Op("=").Op("&").Qual("entitygen/attr", "Def").Block()
+				g.Line()
 
-				for i := 0; i < structType.NumFields(); i++ {
-					g.Id(attrDefName).CallFunc(func(g *Group) {
+				for i := 0; i < len(fields); i++ {
+					field := fields[i]
 
-					})
+					switch v := field.typ.(type) {
+					case *types.Basic:
+						g.Id(attrDefName).Dot("DefAttr").CallFunc(func(ig *Group) {
+							ig.Lit(field.key)
+							ig.Qual("entitygen/attr", strings.Title(v.Name()))
+
+							if field.cell {
+								ig.Qual("entitygen/attr", "AfCell")
+							} else {
+								ig.Qual("entitygen/attr", "AfBase")
+							}
+
+							if field.storeDB {
+								ig.True()
+							} else {
+								ig.False()
+							}
+						})
+					}
+
 				}
 
 			},
@@ -108,16 +131,11 @@ func generate(sourceTypeName string, structType *types.Struct) error {
 	thisFn := func() *Statement { return Id("a").Op("*").Id(structName) }
 	convertThisFn := func() *Statement { return Parens(attrStrMap()).Parens(Id("a")) }
 
-	for i := 0; i < structType.NumFields(); i++ {
+	for i := 0; i < len(fields); i++ {
 
-		field := structType.Field(i)
-		// tagValue := structType.Tag(i)
+		field := fields[i]
 
-		fieldName := field.Name()
-		// TODO  从结构化数据中的 tag 读取出来
-		fieldKeyName := strings.ToLower(fieldName)
-
-		switch v := field.Type().(type) {
+		switch v := field.typ.(type) {
 		case *types.Basic:
 			// 写 getter
 			// attr.StrMap 的 get 方法
@@ -130,17 +148,17 @@ func generate(sourceTypeName string, structType *types.Struct) error {
 			}
 
 			// func (a *XXXDef) GetField() FieldType
-			f.Func().Params(thisFn()).Id(fmt.Sprintf("Get%s", fieldName)).Params().Id(v.Name()).
+			f.Func().Params(thisFn()).Id(fmt.Sprintf("Get%s", field.name)).Params().Id(v.Name()).
 				Block(
 					Return(
-						convertThisFn().Dot(attrGetFuncName).Params(Lit(fieldKeyName)),
+						convertThisFn().Dot(attrGetFuncName).Params(Lit(field.key)),
 					),
 				)
 
 			//  写 setter
-			f.Func().Params(thisFn()).Id(fmt.Sprintf("Set%s", fieldName)).Params(Id(fieldKeyName).Id(v.Name())).
+			f.Func().Params(thisFn()).Id(fmt.Sprintf("Set%s", field.name)).Params(Id(field.key).Id(v.Name())).
 				Block(
-					convertThisFn().Dot("Set").Params(Lit(fieldKeyName), Id(fieldKeyName)),
+					convertThisFn().Dot("Set").Params(Lit(field.key), Id(field.key)),
 				)
 
 			// 换行符
@@ -248,4 +266,82 @@ func failErr(err error) {
 		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
 		os.Exit(1)
 	}
+}
+
+type structField struct {
+	name    string
+	key     string
+	typ     types.Type
+	storeDB bool
+	base    bool
+	cell    bool
+	client  bool
+}
+
+func getStructFields(structType *types.Struct) []*structField {
+	result := make([]*structField, 0, structType.NumFields())
+	for i := 0; i < structType.NumFields(); i++ {
+		field := structType.Field(i)
+		name := field.Name()
+		typ := field.Type()
+		storeDB := false
+		flagBase := true // 目前的实现里面属性肯定会存储在 base 里面
+		flagCell := false
+		client := false
+
+		tagValue := reflect.StructTag(structType.Tag(i))
+		key, ok := tagValue.Lookup("key")
+		if !ok {
+			failErr(fmt.Errorf("field:%s 必须有tag:key", name))
+		}
+		{
+			storeDBStr, ok := tagValue.Lookup("storedb")
+			if !ok {
+				failErr(fmt.Errorf("field:%s 必须有tag:storedb", name))
+			}
+			if storeDBStr != "true" && storeDBStr != "false" {
+				failErr(fmt.Errorf("field:%s storedb(%s) 必须是 true 或者 false", name, storeDBStr))
+			}
+			if storeDBStr == "true" {
+				storeDB = true
+			}
+		}
+
+		{
+			clientStr, ok := tagValue.Lookup("client")
+			if !ok {
+				failErr(fmt.Errorf("field:%s 必须有tag:client", name))
+			}
+			if clientStr != "true" && clientStr != "false" {
+				failErr(fmt.Errorf("field:%s client(%s) 必须是 true 或者 false", name, clientStr))
+			}
+			if clientStr == "true" {
+				client = true
+			}
+		}
+
+		{
+			flagStr, ok := tagValue.Lookup("flag")
+			if !ok {
+				failErr(fmt.Errorf("field:%s 必须有tag:flag", name))
+			}
+			if flagStr != "base" && flagStr != "cell" {
+				failErr(fmt.Errorf("field:%s flag(%s) 必须是 base 或者 cell", name, flagStr))
+			}
+			if flagStr == "cell" {
+				flagCell = true
+			}
+		}
+
+		result = append(result, &structField{
+			name:    name,
+			key:     key,
+			typ:     typ,
+			storeDB: storeDB,
+			base:    flagBase,
+			cell:    flagCell,
+			client:  client,
+		})
+	}
+	return result
 }

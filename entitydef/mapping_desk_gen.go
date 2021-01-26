@@ -10,9 +10,11 @@ var deskAttrDef *attr.Def
 
 func init() {
 	deskAttrDef = &attr.Def{}
-	deskAttrDef()
-	deskAttrDef()
-	deskAttrDef()
+
+	deskAttrDef.DefAttr("width", attr.Int32, attr.AfCell, true)
+	deskAttrDef.DefAttr("height", attr.Int32, attr.AfCell, true)
+	deskAttrDef.DefAttr("name", attr.String, attr.AfCell, true)
+	deskAttrDef.DefAttr("csv_id", attr.Int32, attr.AfCell, true)
 }
 
 type DeskDef attr.StrMap
@@ -36,6 +38,13 @@ func (a *DeskDef) GetName() string {
 }
 func (a *DeskDef) SetName(name string) {
 	(*attr.StrMap)(a).Set("name", name)
+}
+
+func (a *DeskDef) GetCsvID() int32 {
+	return (*attr.StrMap)(a).Int32("csv_id")
+}
+func (a *DeskDef) SetCsvID(csv_id int32) {
+	(*attr.StrMap)(a).Set("csv_id", csv_id)
 }
 
 func (a *DeskDef) HasChange() bool {
