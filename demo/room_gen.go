@@ -38,6 +38,8 @@ func (m *Desks) UnmarshalJSON(b []byte) error {
 	var convertData map[int32]interface{} = map[int32]interface{}{}
 	for k, v := range dd {
 		convertData[k] = v
+
+		v.setParent("", (*attr.Int32Map)(m))
 	}
 
 	(*attr.Int32Map)(m).SetData(convertData)
@@ -57,6 +59,8 @@ func (m *Desks) UnmarshalBSON(b []byte) error {
 	var convertData map[int32]interface{} = map[int32]interface{}{}
 	for k, v := range dd {
 		convertData[k] = v
+
+		v.setParent("", (*attr.Int32Map)(m))
 	}
 	(*attr.Int32Map)(m).SetData(convertData)
 	return nil
@@ -163,6 +167,10 @@ func NewRoom(
 
 	(*attr.StrMap)(m).ClearChangeKey()
 	return m
+}
+
+func (m *Room) String() string {
+	return (*attr.StrMap)(m).String()
 }
 
 func (m *Room) HasChange() bool {

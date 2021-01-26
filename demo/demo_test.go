@@ -94,21 +94,32 @@ func TestDemo(t *testing.T) {
 	}
 
 	// 检查 changekey
+	testChangeKey(t, room)
+}
+
+func testChangeKey(t *testing.T, room *Room) {
+	room.ClearChangeKey()
+	Equal(t, room.HasChange(), false)
+	Equal(t, room.ChangeKey(), map[string]struct{}{})
+
 	room.SetCsvPos(100)
 	Equal(t, room.HasChange(), true)
 	Equal(t, room.ChangeKey(), map[string]struct{}{"csv_pos": {}})
 	room.SetBuildID("xxaabbcc")
+	Equal(t, room.GetBuildID(), "xxaabbcc")
 	Equal(t, room.ChangeKey(), map[string]struct{}{
 		"csv_pos":  {},
 		"build_id": {},
 	})
 	room.SetExtends(NewKVInt32Int32(map[int32]int32{888: 999}))
+	Equal(t, room.GetExtends().data(), map[int32]int32{888: 999})
 	Equal(t, room.ChangeKey(), map[string]struct{}{
 		"csv_pos":  {},
 		"build_id": {},
 		"extends":  {},
 	})
 	room.GetExtends1().Set(999, "money")
+	Equal(t, room.GetExtends1().Get(999), "money")
 	Equal(t, room.ChangeKey(), map[string]struct{}{
 		"csv_pos":  {},
 		"build_id": {},
@@ -120,13 +131,15 @@ func TestDemo(t *testing.T) {
 	Equal(t, room.HasChange(), false)
 	Equal(t, room.ChangeKey(), map[string]struct{}{})
 
-	room.GetExtends1().Set(999, "money")
+	room.GetExtends1().Set(999, "moneykkk")
+	Equal(t, room.GetExtends1().Get(999), "moneykkk")
 	Equal(t, room.ChangeKey(), map[string]struct{}{
 		"extends1": {},
 	})
 
 	room.ClearChangeKey()
 	room.GetExtends1().Delete(999)
+	Equal(t, room.GetExtends1().Get(999), "")
 	Equal(t, room.ChangeKey(), map[string]struct{}{
 		"extends1": {},
 	})
@@ -167,6 +180,16 @@ func TestMarshalUnmarshal(t *testing.T) {
 		Equal(t, newRoom.GetDesk().Equal(room.GetDesk()), true)
 		Equal(t, newRoom.GetDesks().Equal(room.GetDesks()), true)
 
+		Equal(t, room.ChangeKey(), map[string]struct{}{})
+		Equal(t, newRoom.ChangeKey(), map[string]struct{}{})
+
+		t.Run("oldroom", func(t *testing.T) {
+			testChangeKey(t, room)
+		})
+
+		t.Run("newroom", func(t *testing.T) {
+			testChangeKey(t, newRoom)
+		})
 	}
 
 	{
@@ -185,5 +208,13 @@ func TestMarshalUnmarshal(t *testing.T) {
 		Equal(t, newRoom.GetExtends3().Equal(room.GetExtends3()), true)
 		Equal(t, newRoom.GetDesk().Equal(room.GetDesk()), true)
 		Equal(t, newRoom.GetDesks().Equal(room.GetDesks()), true)
+
+		t.Run("oldroom", func(t *testing.T) {
+			testChangeKey(t, room)
+		})
+
+		t.Run("newroom", func(t *testing.T) {
+			testChangeKey(t, newRoom)
+		})
 	}
 }

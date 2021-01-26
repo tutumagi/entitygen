@@ -57,7 +57,7 @@ func (a *StrMap) SetParent(k string, parent AttrField) {
 	if (a.parentKey != "" && a.parentKey != k) || (a.parent != nil && a.parent != parent) {
 		panic(
 			fmt.Sprintf(
-				"has already set parent oldKey:%s newKey:%s oldParent:%s newParent:%s",
+				"has already set parent oldKey:%s newKey:%s oldParent:%v newParent:%v",
 				a.parentKey, k,
 				a.parent, parent,
 			),
