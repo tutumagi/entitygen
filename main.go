@@ -6,7 +6,6 @@ import (
 	"os"
 	"path/filepath"
 	"reflect"
-	"regexp"
 	"strings"
 
 	"golang.org/x/tools/go/packages"
@@ -58,14 +57,6 @@ func main() {
 	}
 }
 
-var structJsonPattern = regexp.MustCompile(`json:"([^"]+)"`)
-var structBsonPattern = regexp.MustCompile(`bson:"([^"]+)"`)
-
-const (
-	ParentKeyName  = "parentKey"
-	AttrsFieldName = "attrs"
-)
-
 func generate(sourceTypeName string, structType *types.Struct) error {
 	goPackage := os.Getenv("GOPACKAGE")
 
@@ -75,190 +66,51 @@ func generate(sourceTypeName string, structType *types.Struct) error {
 
 	fmt.Printf("begin generate type:%s\n", sourceTypeName)
 
+	// 读取 types.Struct 所有字段信息，计算出我们要的信息，并做合法性判断
 	fields := getStructFields(structType)
 
+	// 生成的结构体名字 XXXDef
+	structName := sourceTypeName + "Def"
+	// 生成的对应的数据结构描述的名字 XXXAttrDef
+	attrDefName := strings.ToLower(sourceTypeName) + "AttrDef"
+
+	// 一些预设的类型或者关键字
 	// *attr.StrMap
 	attrStrMap := func() *Statement { return Id("*").Qual("entitygen/attr", "StrMap") }
 	// attr.Field
 	attrField := func() *Statement { return Qual("entitygen/attr", "Field") }
-	// *attr.Def
-	attrDef := func() *Statement { return Id("*").Qual("entitygen/attr", "Def") }
+	// 将 name 变量转为 *attr.StrMap类型: (*attr.StrMap)(name)
+	convertAttrStrMap := func(name string) *Statement { return Parens(attrStrMap()).Parens(Id(name)) }
+	// a *XXXDef
+	thisFn := func() *Statement { return Id("a").Op("*").Id(structName) }
+	// 将 "a" 转为 *attr.StrMap 类型：(*attr.StrMap)(a)
+	convertThisFn := func() *Statement { return convertAttrStrMap("a") }
 
-	// 写 attrDef
-	attrDefName := strings.ToLower(sourceTypeName) + "AttrDef"
-	// var xxxAttrDef *attr.Def
-	f.Var().Id(attrDefName).Add(attrDef())
-	f.Func().Id("init").Params().
-		BlockFunc(
-			func(g *Group) {
-				g.Id(attrDefName).Op("=").Op("&").Qual("entitygen/attr", "Def").Block()
-				g.Line()
+	// 1. 写 attrDef
+	writeAttrDef(f, attrDefName, fields)
 
-				for i := 0; i < len(fields); i++ {
-					field := fields[i]
-
-					switch v := field.typ.(type) {
-					case *types.Basic:
-						g.Id(attrDefName).Dot("DefAttr").CallFunc(func(ig *Group) {
-							ig.Lit(field.key)
-							ig.Qual("entitygen/attr", strings.Title(v.Name()))
-
-							if field.cell {
-								ig.Qual("entitygen/attr", "AfCell")
-							} else {
-								ig.Qual("entitygen/attr", "AfBase")
-							}
-
-							if field.storeDB {
-								ig.True()
-							} else {
-								ig.False()
-							}
-						})
-					}
-				}
-			},
-		)
-
-	// 1. 写定义  type XXXDef attr.StrMap
-	structName := sourceTypeName + "Def"
+	// 2. 写定义  type XXXDef attr.StrMap
 	f.Type().Id(structName).Qual(
 		"entitygen/attr",
 		"StrMap",
 	)
 
-	// 写构造函数
-	// EmptyXXXX 和 NewXXX
-	emptyCtorName := fmt.Sprintf("Empty%s", sourceTypeName)
-	normalCtorName := fmt.Sprintf("New%s", sourceTypeName)
-	// 写 EmptyXXX
-	f.Func().Id(emptyCtorName).Params().Op("*").Id(structName).
-		Block(
-			Return(Id(normalCtorName).CallFunc(func(g *Group) {
-				for _, field := range fields {
-					g.Add(field.emptyValue)
-				}
-			})),
-		)
-	// 写 NewXXX
-	f.Func().Id(normalCtorName).ParamsFunc(func(g *Group) {
-		for _, field := range fields {
-			g.Add(field.setParam)
-		}
-	}).Op("*").Id(structName).
-		BlockFunc(func(g *Group) {
+	// 3. 写构造函数
+	writeCtor(f, structName, sourceTypeName, fields)
 
-			g.Id("m").Op(":=").Parens(Op("*").Id(structName)).Parens(Qual("entitygen/attr", "NewStrMap").Call(Nil()))
-
-			for _, field := range fields {
-				g.Id("m").Dot("").Add(field.setter).Call(Id(field.key))
-			}
-
-			g.Id("m").Dot("ClearChangeKey").Call()
-
-			g.Return(Id("m"))
-		})
-
-	// 2. 写字段的 getter/setter
-
-	thisFn := func() *Statement { return Id("a").Op("*").Id(structName) }
-	convertAttrStrMap := func(name string) *Statement { return Parens(attrStrMap()).Parens(Id(name)) }
-	convertThisFn := func() *Statement { return convertAttrStrMap("a") }
-
-	for i := 0; i < len(fields); i++ {
-
-		field := fields[i]
-
-		switch v := field.typ.(type) {
-		case *types.Basic:
-			// 写 getter
-			// attr.StrMap 的 get 方法
-			// 如果是基础类型，则直接大写第一个字母的方法进行 getter 比如 int32 就是 .Int32("xxx")
-			// 如果是 string 类型，则使用 Str 方法，比如 .Str("yyy")
-			attrGetFuncName := strings.Title(v.Name())
-			switch v.Kind() {
-			case types.String, types.UntypedString:
-				attrGetFuncName = "Str"
-			}
-
-			// func (a *XXXDef) GetField() FieldType
-			f.Func().Params(thisFn()).Add(field.getter).Params().Id(v.Name()).
-				Block(
-					Return(
-						convertThisFn().Dot(attrGetFuncName).Params(Lit(field.key)),
-					),
-				)
-
-			//  写 setter
-			f.Func().Params(thisFn()).Add(field.setter).Params(field.setParam).
-				Block(
-					convertThisFn().Dot("Set").Params(Lit(field.key), Id(field.key)),
-				)
-
-			// 换行符
-			f.Line()
-		case *types.Map:
-			switch mapK := v.Key().(type) {
-			case *types.Basic:
-				if mapK.Kind() == types.Int32 || mapK.Kind() == types.String {
-
-				} else {
-					return fmt.Errorf("不支持的map key，目前 map key 只支持 int32 和 string. %T", mapK)
-				}
-			default:
-				return fmt.Errorf("不支持的map key，目前 map key 只支持 zint32 和 string. %T", mapK)
-			}
-			// getter
-
-		case *types.Named:
-
-			// typName := v.Obj()
-			// // Qual automatically imports packages
-			// code.Op("*").Qual(
-			// 	typName.Pkg().Path(),
-			// 	typName.Name(),
-			// )
-		default:
-			return fmt.Errorf("struct field type not handled: %T", v)
-		}
+	// 4. 写所有字段的 getter/setter
+	err := writeGetterSetter(f, fields, thisFn, convertThisFn)
+	if err != nil {
+		failErr(err)
 	}
 
-	// 3. 写 changekey 相关的
-	f.Func().Params(thisFn()).Id("HasChange").Params().Bool().
-		Block(
-			Return(convertThisFn().Dot("HasChange").Call()),
-		)
-
-	f.Func().Params(thisFn()).Id("ChangeKey").Params().Map(String()).Struct().
-		Block(
-			Return(convertThisFn().Dot("ChangeKey").Call()),
-		)
-
-	f.Func().Params(thisFn()).Id("ClearChangeKey").Params().
-		Block(
-			convertThisFn().Dot("ClearChangeKey").Call(),
-		)
-
-	// 4. 写 setParent
-	f.Func().Params(thisFn()).Id("setParent").Params(Id("k").String(), Id("parent").Add(attrField())).
-		Block(
-			convertThisFn().Dot("SetParent").Call(Id("k"), Id("parent")),
-		)
-
-	// 5. ForEach
-	f.Func().Params(thisFn()).Id("ForEach").Params(Id("fn").Func().Params(Id("s").String(), Id("v").Interface()).Bool()).
-		Block(
-			convertThisFn().Dot("ForEach").Call(Id("fn")),
-		)
-
-	// 写 Equal
-	f.Func().Params(thisFn()).Id("Equal").Params(Id("other").Op("*").Id(structName)).Bool().Block(
-		Return(convertThisFn().Dot("Equal").Call(convertAttrStrMap("other"))),
-	)
+	// 5. 写自定义方法
+	writeCustomMethod(f, structName, attrField, thisFn, convertThisFn, convertAttrStrMap)
 
 	// 6. 写 marshal & unmarshal
 	writeEncodeDecode(f, thisFn, convertThisFn, attrDefName)
 
+	// 7. dump 到 文件
 	goFile := os.Getenv("GOFILE")
 	ext := filepath.Ext(goFile)
 	baseFilename := goFile[0 : len(goFile)-len(ext)]
@@ -475,4 +327,179 @@ func writeEncodeDecode(f *File, thisFn func() *Statement, convertThisFn func() *
 	// 		g.Return(Nil())
 	// 	},
 	// 	)
+}
+
+func writeCustomMethod(
+	f *File,
+	structName string,
+	attrField func() *Statement,
+	thisFn func() *Statement,
+	convertThisFn func() *Statement,
+	convertAttrStrMap func(string) *Statement,
+) {
+	// 3. 写 changekey 相关的
+	f.Func().Params(thisFn()).Id("HasChange").Params().Bool().
+		Block(
+			Return(convertThisFn().Dot("HasChange").Call()),
+		)
+
+	f.Func().Params(thisFn()).Id("ChangeKey").Params().Map(String()).Struct().
+		Block(
+			Return(convertThisFn().Dot("ChangeKey").Call()),
+		)
+
+	f.Func().Params(thisFn()).Id("ClearChangeKey").Params().
+		Block(
+			convertThisFn().Dot("ClearChangeKey").Call(),
+		)
+
+	// 4. 写 setParent
+	f.Func().Params(thisFn()).Id("setParent").Params(Id("k").String(), Id("parent").Add(attrField())).
+		Block(
+			convertThisFn().Dot("SetParent").Call(Id("k"), Id("parent")),
+		)
+
+	// 5. ForEach
+	f.Func().Params(thisFn()).Id("ForEach").Params(Id("fn").Func().Params(Id("s").String(), Id("v").Interface()).Bool()).
+		Block(
+			convertThisFn().Dot("ForEach").Call(Id("fn")),
+		)
+
+	// 写 Equal
+	f.Func().Params(thisFn()).Id("Equal").Params(Id("other").Op("*").Id(structName)).Bool().Block(
+		Return(convertThisFn().Dot("Equal").Call(convertAttrStrMap("other"))),
+	)
+}
+
+func writeGetterSetter(f *File, fields []*structField, thisFn func() *Statement, convertThisFn func() *Statement) error {
+	for i := 0; i < len(fields); i++ {
+
+		field := fields[i]
+
+		switch v := field.typ.(type) {
+		case *types.Basic:
+			// 写 getter
+			// attr.StrMap 的 get 方法
+			// 如果是基础类型，则直接大写第一个字母的方法进行 getter 比如 int32 就是 .Int32("xxx")
+			// 如果是 string 类型，则使用 Str 方法，比如 .Str("yyy")
+			attrGetFuncName := strings.Title(v.Name())
+			switch v.Kind() {
+			case types.String, types.UntypedString:
+				attrGetFuncName = "Str"
+			}
+
+			// func (a *XXXDef) GetField() FieldType
+			f.Func().Params(thisFn()).Add(field.getter).Params().Id(v.Name()).
+				Block(
+					Return(
+						convertThisFn().Dot(attrGetFuncName).Params(Lit(field.key)),
+					),
+				)
+
+			//  写 setter
+			f.Func().Params(thisFn()).Add(field.setter).Params(field.setParam).
+				Block(
+					convertThisFn().Dot("Set").Params(Lit(field.key), Id(field.key)),
+				)
+
+			// 换行符
+			f.Line()
+		case *types.Map:
+			switch mapK := v.Key().(type) {
+			case *types.Basic:
+				if mapK.Kind() == types.Int32 || mapK.Kind() == types.String {
+
+				} else {
+					return fmt.Errorf("不支持的map key，目前 map key 只支持 int32 和 string. %T", mapK)
+				}
+			default:
+				return fmt.Errorf("不支持的map key，目前 map key 只支持 zint32 和 string. %T", mapK)
+			}
+			// getter
+
+		case *types.Named:
+
+			// typName := v.Obj()
+			// // Qual automatically imports packages
+			// code.Op("*").Qual(
+			// 	typName.Pkg().Path(),
+			// 	typName.Name(),
+			// )
+		default:
+			return fmt.Errorf("struct field type not handled: %T", v)
+		}
+	}
+	return nil
+}
+
+func writeCtor(f *File, structName string, sourceTypeName string, fields []*structField) {
+	// EmptyXXXX 和 NewXXX
+	emptyCtorName := fmt.Sprintf("Empty%s", sourceTypeName)
+	normalCtorName := fmt.Sprintf("New%s", sourceTypeName)
+	// 写 EmptyXXX
+	f.Func().Id(emptyCtorName).Params().Op("*").Id(structName).
+		Block(
+			Return(Id(normalCtorName).CallFunc(func(g *Group) {
+				for _, field := range fields {
+					g.Add(field.emptyValue)
+				}
+			})),
+		)
+	// 写 NewXXX
+	f.Func().Id(normalCtorName).ParamsFunc(func(g *Group) {
+		for _, field := range fields {
+			g.Add(field.setParam)
+		}
+	}).Op("*").Id(structName).
+		BlockFunc(func(g *Group) {
+
+			g.Id("m").Op(":=").Parens(Op("*").Id(structName)).Parens(Qual("entitygen/attr", "NewStrMap").Call(Nil()))
+
+			for _, field := range fields {
+				g.Id("m").Dot("").Add(field.setter).Call(Id(field.key))
+			}
+
+			g.Id("m").Dot("ClearChangeKey").Call()
+
+			g.Return(Id("m"))
+		})
+}
+
+func writeAttrDef(f *File, attrDefName string, fields []*structField) {
+	// *attr.Def
+	attrDef := func() *Statement { return Id("*").Qual("entitygen/attr", "Def") }
+
+	// var xxxAttrDef *attr.Def
+	f.Var().Id(attrDefName).Add(attrDef())
+	f.Func().Id("init").Params().
+		BlockFunc(
+			func(g *Group) {
+				g.Id(attrDefName).Op("=").Op("&").Qual("entitygen/attr", "Def").Block()
+				g.Line()
+
+				for i := 0; i < len(fields); i++ {
+					field := fields[i]
+
+					switch v := field.typ.(type) {
+					case *types.Basic:
+						g.Id(attrDefName).Dot("DefAttr").CallFunc(func(ig *Group) {
+							ig.Lit(field.key)
+							ig.Qual("entitygen/attr", strings.Title(v.Name()))
+
+							if field.cell {
+								ig.Qual("entitygen/attr", "AfCell")
+							} else {
+								ig.Qual("entitygen/attr", "AfBase")
+							}
+
+							if field.storeDB {
+								ig.True()
+							} else {
+								ig.False()
+							}
+						})
+					}
+				}
+			},
+		)
 }
