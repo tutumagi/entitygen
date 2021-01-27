@@ -141,33 +141,55 @@ func getTypString(typ types.Type) string {
 	switch v := typ.(type) {
 	case *types.Basic:
 		return v.String()
-
+	// case *types.Struct:
+	// 	return v.String()
+	case *types.Named:
+		// 如果是 命名字段类型，比如 struct { A *Desk }
+		// 则 v.Obj().Name() 为 "Desk", v.Underlying() 为 types.Struct(Desk)
+		return getNamedTypName(v.Obj().Name(), v.Underlying())
 	case *types.Pointer:
 		// types.Pointer 就用 .Elem 解引用
 		// types.Named 就用 .Underlying 获取引用的类型
-		switch vv := v.Elem().(type) {
-		case *types.Basic:
-			return fmt.Sprintf("*%s", vv.String())
-		case *types.Struct:
-			return fmt.Sprintf("*%s", vv.String())
-		case *types.Named:
-			switch vvv := vv.Underlying().(type) {
-			case *types.Basic:
-				return fmt.Sprintf("*%s", vvv.String())
-			case *types.Struct:
-				// 这样就不会带包名和路径名，否则会出现 entitygen/entitydef.Desk 这种情况
-				return fmt.Sprintf("*%s", genStructName(vv.Obj().Name()))
-				// return fmt.Sprintf("*%s", vvv.String())
-			default:
-				failErr(fmt.Errorf("1 不支持的类型 %s", vvv.String()))
-			}
-		default:
-			failErr(fmt.Errorf("2 不支持的类型 %s", vv.String()))
-		}
+		return fmt.Sprintf("*%s", getTypString(v.Elem()))
+		// switch vv := v.Elem().(type) {
+		// case *types.Basic:
+		// 	return fmt.Sprintf("*%s", vv.String())
+		// case *types.Struct:
+		// 	return fmt.Sprintf("*%s", vv.String())
+		// case *types.Named:
+		// 	switch vvv := vv.Underlying().(type) {
+		// 	case *types.Basic:
+		// 		return fmt.Sprintf("*%s", vvv.String())
+		// 	case *types.Struct:
+		// 		// 这样就不会带包名和路径名，否则会出现 entitygen/entitydef.Desk 这种情况
+		// 		return fmt.Sprintf("*%s", genStructName(vv.Obj().Name()))
+		// 		// return fmt.Sprintf("*%s", vvv.String())
+		// 	default:
+		// 		failErr(fmt.Errorf("1 不支持的类型 %s", vvv.String()))
+		// 	}
+		// default:
+		// 	failErr(fmt.Errorf("2 不支持的类型 %s", vv.String()))
+		// }
 	default:
 		failErr(fmt.Errorf("3 不支持的类型 %s", v.String()))
 	}
 	return ""
+}
+
+// 获取命名字段的类型字符串，如果是基础类型, 则直接返回对应的类型字符串（比如 int, uint, string, bool...）
+// 如果是结构体，则是 name + "Def"
+// 如果是 Map，这是 "KV" + Key + Value
+func getNamedTypName(name string, typ types.Type) string {
+	switch v := typ.(type) {
+	case *types.Basic:
+		return name
+	case *types.Struct:
+		return genStructName(name)
+	case *types.Map:
+		return fmt.Sprintf("KV%s%s", v.Key().String(), getTypString(v.Elem()))
+	default:
+		return name
+	}
 }
 
 // 获取 attr.StrMap 或者 attr.Int32Map 的 getter 方法名
