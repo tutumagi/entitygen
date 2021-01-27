@@ -19,12 +19,13 @@ func init() {
 type RoomDef attr.StrMap
 
 func EmptyRoom() *RoomDef {
-	return NewRoom(0, "")
+	return NewRoom(0, "", nil)
 }
-func NewRoom(csv_pos int32, build_id string) *RoomDef {
+func NewRoom(csv_pos int32, build_id string, desk *DeskDef) *RoomDef {
 	m := (*RoomDef)(attr.NewStrMap(nil))
 	m.SetCsvPos(csv_pos)
 	m.SetBuildID(build_id)
+	m.SetDesk111(desk)
 	m.ClearChangeKey()
 	return m
 }
@@ -40,6 +41,13 @@ func (a *RoomDef) GetBuildID() string {
 }
 func (a *RoomDef) SetBuildID(build_id string) {
 	(*attr.StrMap)(a).Set("build_id", build_id)
+}
+
+func (a *RoomDef) GetDesk111() *DeskDef {
+	return (*attr.StrMap)(a).Value("desk").(*DeskDef)
+}
+func (a *RoomDef) SetDesk111(desk *DeskDef) {
+	(*attr.StrMap)(a).Set("desk", desk)
 }
 
 func (a *RoomDef) HasChange() bool {

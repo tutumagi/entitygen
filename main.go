@@ -110,6 +110,10 @@ func main() {
 
 }
 
+func genStructName(srcName string) string {
+	return srcName + "Def"
+}
+
 func generate(sourceTypeName string, structType *types.Struct) error {
 	goPackage := os.Getenv("GOPACKAGE")
 
@@ -123,7 +127,7 @@ func generate(sourceTypeName string, structType *types.Struct) error {
 	fields := getStructFields(structType)
 
 	// 生成的结构体名字 XXXDef
-	structName := sourceTypeName + "Def"
+	structName := genStructName(sourceTypeName)
 	// 生成的对应的数据结构描述的名字 XXXAttrDef
 	attrDefName := strings.ToLower(sourceTypeName) + "AttrDef"
 
@@ -205,16 +209,21 @@ func failErr(err error) {
 }
 
 type structField struct {
-	name     string
-	key      string
-	typ      types.Type
-	storeDB  bool
-	base     bool
-	cell     bool
-	client   bool
-	getter   Code
-	setter   Code
-	setParam Code
+	name       string
+	key        string
+	typ        types.Type
+	storeDB    bool
+	base       bool
+	cell       bool
+	client     bool
+	getter     Code
+	setter     Code
+	setParam   Code
+	attrGetter string
+	// 该字段类型 转换后的字符串
+	// 比如 string 就是 string， int8 就是  int8
+	// 自定义类型就要转一下 加一个 Def 后面，比如 Desk 就是 DeskDef
+	typString string
 	// zero value 对应的 Code
 	emptyValue Code
 }
@@ -291,7 +300,9 @@ func getStructFields(structType *types.Struct) []*structField {
 			emptyValue: getEmptyValue(typ),
 			getter:     Id(fmt.Sprintf("Get%s", name)),
 			setter:     Id(fmt.Sprintf("Set%s", name)),
-			setParam:   Id(key).Id(typ.String()),
+			setParam:   Id(key).Id(getTypString(typ)),
+			typString:  getTypString(typ),
+			attrGetter: getFieldAttrGetterFnName(typ),
 		})
 	}
 	return result
@@ -308,10 +319,61 @@ func getEmptyValue(typ types.Type) Code {
 		case types.Bool:
 			return Lit(false)
 		default:
-			return Lit(nil)
+			return Nil()
 		}
 	default:
-		return Lit(nil)
+		return Nil()
+	}
+}
+
+func getTypString(typ types.Type) string {
+	switch v := typ.(type) {
+	case *types.Basic:
+		return v.String()
+
+	case *types.Pointer:
+		// types.Pointer 就用 .Elem 解引用
+		// types.Named 就用 .Underlying 获取引用的类型
+		switch vv := v.Elem().(type) {
+		case *types.Basic:
+			return fmt.Sprintf("*%s", vv.String())
+		case *types.Struct:
+			return fmt.Sprintf("*%s", vv.String())
+		case *types.Named:
+			switch vvv := vv.Underlying().(type) {
+			case *types.Basic:
+				return fmt.Sprintf("*%s", vvv.String())
+			case *types.Struct:
+				// 这样就不会带包名和路径名，否则会出现 entitygen/entitydef.Desk 这种情况
+				return fmt.Sprintf("*%s", genStructName(vv.Obj().Name()))
+				// return fmt.Sprintf("*%s", vvv.String())
+			default:
+				failErr(fmt.Errorf("1 不支持的类型 %s", vvv.String()))
+			}
+		default:
+			failErr(fmt.Errorf("2 不支持的类型 %s", vv.String()))
+		}
+	default:
+		failErr(fmt.Errorf("3 不支持的类型 %s", v.String()))
+	}
+	return ""
+}
+
+// 获取 attr.StrMap 或者 attr.Int32Map 的 getter 方法名
+func getFieldAttrGetterFnName(typ types.Type) string {
+	switch v := typ.(type) {
+	case *types.Basic:
+		// attr.StrMap 的 get 方法
+		// 如果是基础类型，则直接大写第一个字母的方法进行 getter 比如 int32 就是 .Int32("xxx")
+		// 如果是 string 类型，则使用 Str 方法，比如 .Str("yyy")
+		attrGetFuncName := strings.Title(v.Name())
+		switch v.Kind() {
+		case types.String, types.UntypedString:
+			attrGetFuncName = "Str"
+		}
+		return attrGetFuncName
+	default:
+		return "Value"
 	}
 }
 
@@ -431,23 +493,19 @@ func writeGetterSetter(f *File, fields []*structField, thisFn func() *Statement,
 		field := fields[i]
 
 		switch v := field.typ.(type) {
-		case *types.Basic:
+		case *types.Basic, *types.Pointer:
 			// 写 getter
-			// attr.StrMap 的 get 方法
-			// 如果是基础类型，则直接大写第一个字母的方法进行 getter 比如 int32 就是 .Int32("xxx")
-			// 如果是 string 类型，则使用 Str 方法，比如 .Str("yyy")
-			attrGetFuncName := strings.Title(v.Name())
-			switch v.Kind() {
-			case types.String, types.UntypedString:
-				attrGetFuncName = "Str"
-			}
-
+			_, isBasic := v.(*types.Basic)
 			// func (a *XXXDef) GetField() FieldType
-			f.Func().Params(thisFn()).Add(field.getter).Params().Id(v.Name()).
+			f.Func().Params(thisFn()).Add(field.getter).Params().Id(field.typString).
 				Block(
-					Return(
-						convertThisFn().Dot(attrGetFuncName).Params(Lit(field.key)),
-					),
+					ReturnFunc(func(g *Group) {
+						statement := g.Add(convertThisFn()).Dot(field.attrGetter).Params(Lit(field.key))
+						// 如果不是基础类型，则加上类型转换
+						if !isBasic {
+							statement.Dot("").Parens(Id(field.typString))
+						}
+					}),
 				)
 
 			//  写 setter
@@ -473,12 +531,12 @@ func writeGetterSetter(f *File, fields []*structField, thisFn func() *Statement,
 
 		case *types.Named:
 
-			// typName := v.Obj()
-			// // Qual automatically imports packages
-			// code.Op("*").Qual(
-			// 	typName.Pkg().Path(),
-			// 	typName.Name(),
-			// )
+		// typName := v.Obj()
+		// // Qual automatically imports packages
+		// code.Op("*").Qual(
+		// 	typName.Pkg().Path(),
+		// 	typName.Name(),
+		// )
 		default:
 			return fmt.Errorf("struct field type not handled: %T", v)
 		}
