@@ -19,10 +19,10 @@ func init() {
 
 type DeskDef attr.StrMap
 
-func EmptyDesk() *DeskDef {
-	return NewDesk(0, 0, "")
+func EmptyDeskDef() *DeskDef {
+	return NewDeskDef(0, 0, "")
 }
-func NewDesk(width int32, height int32, name string) *DeskDef {
+func NewDeskDef(width int32, height int32, name string) *DeskDef {
 	m := (*DeskDef)(attr.NewStrMap(nil))
 	m.SetWidth(width)
 	m.SetHeight(height)

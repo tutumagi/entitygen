@@ -38,7 +38,7 @@ func writeStruct(f *File, sourceTypeName string, structType *types.Struct) {
 	)
 
 	// 4. 写构造函数
-	writeCtor(f, structName, sourceTypeName, fields)
+	writeCtor(f, structName, fields)
 
 	// 5. 写所有字段的 getter/setter
 	err := writeGetterSetter(f, fields, thisFn, convertThisFn)

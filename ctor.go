@@ -6,10 +6,10 @@ import (
 	. "github.com/dave/jennifer/jen"
 )
 
-func writeCtor(f *File, structName string, sourceTypeName string, fields []*structField) {
+func writeCtor(f *File, structName string, fields []*structField) {
 	// EmptyXXXX 和 NewXXX
-	emptyCtorName := fmt.Sprintf("Empty%s", sourceTypeName)
-	normalCtorName := fmt.Sprintf("New%s", sourceTypeName)
+	emptyCtorName := fmt.Sprintf("Empty%s", structName)
+	normalCtorName := fmt.Sprintf("New%s", structName)
 	// 写 EmptyXXX
 	f.Func().Id(emptyCtorName).Params().Op("*").Id(structName).
 		Block(

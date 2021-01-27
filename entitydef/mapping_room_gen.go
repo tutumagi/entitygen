@@ -18,10 +18,10 @@ func init() {
 
 type RoomDef attr.StrMap
 
-func EmptyRoom() *RoomDef {
-	return NewRoom(0, "", nil, nil, nil)
+func EmptyRoomDef() *RoomDef {
+	return NewRoomDef(0, "", nil, nil, nil)
 }
-func NewRoom(csv_pos int32, build_id string, extends2 *KVStrInt32, extends3 *KVStrStr, desk *DeskDef) *RoomDef {
+func NewRoomDef(csv_pos int32, build_id string, extends2 *KVStrInt32, extends3 *KVStrStr, desk *DeskDef) *RoomDef {
 	m := (*RoomDef)(attr.NewStrMap(nil))
 	m.SetCsvPos(csv_pos)
 	m.SetBuildID(build_id)
