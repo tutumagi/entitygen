@@ -1,4 +1,4 @@
-//go:generate go run entitygen entitygen/domain.Desk
+//go:generate go run entitygen entitygen/domain
 package entitydef
 
 import attr "entitygen/attr"

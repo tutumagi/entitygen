@@ -13,6 +13,16 @@
             "args": [
                 "entitygen/domain.DeskXXX"
             ]
+        },
+        {
+            "name": "Launch all types",
+            "type": "go",
+            "request": "launch",
+            "mode": "auto",
+            "program": "${workspaceFolder}/main.go",
+            "args": [
+                "entitygen/domain"
+            ]
         }
     ]
 }

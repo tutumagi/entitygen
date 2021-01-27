@@ -21,40 +21,93 @@ func main() {
 	}
 
 	// 2. 拿到参数
-	sourceType := os.Args[1] // 包名.类型名
-	sourceTypePackage, sourceTypeName := splitSourceType(sourceType)
+	sourceArg := os.Args[1] // 包名.类型名
+	// 如果要生成的是 包名/路径.类型格式的，则加载指定类型
+	if len(strings.Split(sourceArg, ".")) >= 2 {
+		sourceTypePackage, sourceTypeName := splitSourceType(sourceArg)
 
-	// 3. 加载包
-	pkg := loadPackage(sourceTypePackage)
+		// 3. 加载包
+		pkg := loadPackage(sourceTypePackage)
 
-	// 4. 搜索这个包有没有这个类型
-	obj := pkg.Types.Scope().Lookup(sourceTypeName)
-	if obj == nil {
-		failErr(fmt.Errorf("%s not found in declared types of %s", sourceTypeName, pkg))
+		// 4. 搜索这个包有没有这个类型
+		obj := pkg.Types.Scope().Lookup(sourceTypeName)
+		if obj == nil {
+			failErr(fmt.Errorf("%s not found in declared types of %s", sourceTypeName, pkg))
+		}
+
+		// 5. 判断 sourceTypeName 是否是个类型名字
+		if _, ok := obj.(*types.TypeName); !ok {
+			failErr(fmt.Errorf("%s is not a named type", obj))
+		}
+
+		// 6. 判断 类型名字 的含义是否是个 struct
+		structType, ok := obj.Type().Underlying().(*types.Struct)
+		if !ok {
+			failErr(fmt.Errorf("type %v is not a struct", obj))
+		}
+
+		err := generate(sourceTypeName, structType)
+		if err != nil {
+			failErr(err)
+		}
+	} else {
+		pkg := loadPackage(sourceArg)
+
+		type ssInfo struct {
+			name    string
+			structt *types.Struct
+		}
+		allStrucs := make([]ssInfo, 0, len(pkg.TypesInfo.Types))
+		for _, tt := range pkg.TypesInfo.Defs {
+			// 这里为 nil 情况就是类似 go 源文件第一行写着 `package domain`，则 ast 是有的，不过类型定义为 nil
+			if tt != nil {
+				switch v := tt.Type().(type) {
+				case *types.Basic:
+					fmt.Printf("collect types name:%s type:%s. skip it\n", tt.Name(), tt.Type())
+				case *types.Map:
+					fmt.Printf("collect types name:%s type:%s. \n", tt.Name(), tt.Type())
+				case *types.Struct:
+					fmt.Printf("collect types name:%s type:%s. \n", tt.Name(), tt.Type())
+					allStrucs = append(allStrucs, ssInfo{
+						name:    tt.Name(),
+						structt: v,
+					})
+				case *types.Named: // 某个字段是自定义类型 会跑到这里
+					// fmt.Printf("collect types is named: %s. \n", tt.Type.String())
+					fmt.Printf("collect types(named) name:%s type:%s. \n", tt.Name(), tt.Type())
+					allStrucs = append(allStrucs, ssInfo{
+						name:    tt.Name(),
+						structt: tt.Type().Underlying().(*types.Struct),
+					})
+				}
+			}
+		}
+		// for _, tt := range pkg.TypesInfo.Types {
+		// 	// fmt.Printf("collect types is buildin:%v %s\n", tt.IsBuiltin(), tt.Type.String())
+
+		// 	switch v := tt.Type.(type) {
+		// 	case *types.Basic:
+		// 		fmt.Printf("collect types is %s. skip it.\n", v.Name())
+		// 	case *types.Map:
+		// 		fmt.Printf("collect types is %s.\n", tt.Type.String())
+		// 	case *types.Struct:
+		// 		fmt.Printf("collect types is %s value:%v.\n", v.String(), tt.Value)
+		// 		allStrucs = append(allStrucs, v)
+		// 	case *types.Named: // 某个字段是自定义类型 会跑到这里
+		// 		// fmt.Printf("collect types is named: %s. \n", tt.Type.String())
+		// 		fmt.Printf("collect types is named: %s. \n", v.Obj().Name())
+
+		// 	}
+		// }
+		for _, info := range allStrucs {
+			err := generate(info.name, info.structt)
+			if err != nil {
+				failErr(err)
+			}
+		}
+		return
 	}
 
-	// 5. 判断 sourceTypeName 是否是个类型名字
-	if _, ok := obj.(*types.TypeName); !ok {
-		failErr(fmt.Errorf("%s is not a named type", obj))
-	}
-
-	// 6. 判断 类型名字 的含义是否是个 struct
-	structType, ok := obj.Type().Underlying().(*types.Struct)
-	if !ok {
-		failErr(fmt.Errorf("type %v is not a struct", obj))
-	}
-
-	// 7. 遍历所有的 struct 的名字
-	// for i := 0; i < structType.NumFields(); i++ {
-	// 	field := structType.Field(i)
-	// 	tagValue := structType.Tag(i)
-	// 	fmt.Println(field.Name(), tagValue, field.Type())
-	// }
-
-	err := generate(sourceTypeName, structType)
-	if err != nil {
-		failErr(err)
-	}
 }
 
 func generate(sourceTypeName string, structType *types.Struct) error {
@@ -121,7 +174,7 @@ func generate(sourceTypeName string, structType *types.Struct) error {
 
 func loadPackage(path string) *packages.Package {
 	cfg := &packages.Config{
-		Mode: packages.NeedTypes | packages.NeedImports,
+		Mode: packages.NeedTypes | packages.NeedImports | packages.NeedTypesInfo,
 	}
 	pkgs, err := packages.Load(cfg, path)
 	if err != nil {
@@ -133,6 +186,7 @@ func loadPackage(path string) *packages.Package {
 	return pkgs[0]
 }
 
+// 解析字符串，拿到哪个包里面的，哪个类型字符串
 func splitSourceType(sourceType string) (string, string) {
 	idx := strings.LastIndexByte(sourceType, '.')
 	if idx == -1 {
