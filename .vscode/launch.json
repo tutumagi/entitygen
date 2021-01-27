@@ -12,7 +12,12 @@
             "program": "${workspaceFolder}/main.go",
             "args": [
                 "entitygen/domain.DeskXXX"
-            ]
+            ],
+            "env": {
+                "GOFILE": "mapping.go",
+                "GOPACKAGE": "entitydef"
+            },
+            "cwd": "${workspaceFolder}/entitydef"
         },
         {
             "name": "Launch all types",
@@ -22,7 +27,12 @@
             "program": "${workspaceFolder}/main.go",
             "args": [
                 "entitygen/domain"
-            ]
+            ],
+            "env": {
+                "GOFILE": "mapping.go",
+                "GOPACKAGE": "entitydef"
+            },
+            "cwd": "${workspaceFolder}/entitydef"
         }
     ]
 }
