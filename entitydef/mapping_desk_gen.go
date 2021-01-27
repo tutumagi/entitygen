@@ -19,6 +19,18 @@ func init() {
 
 type DeskDef attr.StrMap
 
+func EmptyDesk() *DeskDef {
+	return NewDesk(0, 0, "", 0)
+}
+func NewDesk(width int32, height int32, name string, csv_id int32) *DeskDef {
+	m := (*DeskDef)(attr.NewStrMap(nil))
+	m.SetWidth(width)
+	m.SetHeight(height)
+	m.SetName(name)
+	m.SetCsvID(csv_id)
+	m.ClearChangeKey()
+	return m
+}
 func (a *DeskDef) GetWidth() int32 {
 	return (*attr.StrMap)(a).Int32("width")
 }
@@ -64,4 +76,18 @@ func (a *DeskDef) ForEach(fn func(s string, v interface{}) bool) {
 }
 func (a *DeskDef) MarshalJSON() ([]byte, error) {
 	return json.Marshal((*attr.StrMap)(a).ToMap())
+}
+func (a *DeskDef) UnmarshalJSON(b []byte) error {
+	mm, err := deskAttrDef.UnmarshalJson(b)
+	if err != nil {
+		return err
+	}
+	(*attr.StrMap)(a).SetData(mm)
+	(*attr.StrMap)(a).ForEach(func(k string, v interface{}) bool {
+		if k != "id" && !deskAttrDef.GetDef(k).IsPrimary() {
+			v.(IField).setParent(k, (*attr.StrMap)(a))
+		}
+		return true
+	})
+	return nil
 }

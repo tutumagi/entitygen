@@ -77,8 +77,11 @@ func generate(sourceTypeName string, structType *types.Struct) error {
 
 	fields := getStructFields(structType)
 
+	// *attr.StrMap
 	attrStrMap := func() *Statement { return Id("*").Qual("entitygen/attr", "StrMap") }
+	// attr.Field
 	attrField := func() *Statement { return Qual("entitygen/attr", "Field") }
+	// *attr.Def
 	attrDef := func() *Statement { return Id("*").Qual("entitygen/attr", "Def") }
 
 	// 写 attrDef
@@ -113,9 +116,7 @@ func generate(sourceTypeName string, structType *types.Struct) error {
 							}
 						})
 					}
-
 				}
-
 			},
 		)
 
@@ -125,6 +126,38 @@ func generate(sourceTypeName string, structType *types.Struct) error {
 		"entitygen/attr",
 		"StrMap",
 	)
+
+	// 写构造函数
+	// EmptyXXXX 和 NewXXX
+	emptyCtorName := fmt.Sprintf("Empty%s", sourceTypeName)
+	normalCtorName := fmt.Sprintf("New%s", sourceTypeName)
+	// 写 EmptyXXX
+	f.Func().Id(emptyCtorName).Params().Op("*").Id(structName).
+		Block(
+			Return(Id(normalCtorName).CallFunc(func(g *Group) {
+				for _, field := range fields {
+					g.Add(field.emptyValue)
+				}
+			})),
+		)
+	// 写 NewXXX
+	f.Func().Id(normalCtorName).ParamsFunc(func(g *Group) {
+		for _, field := range fields {
+			g.Add(field.setParam)
+		}
+	}).Op("*").Id(structName).
+		BlockFunc(func(g *Group) {
+
+			g.Id("m").Op(":=").Parens(Op("*").Id(structName)).Parens(Qual("entitygen/attr", "NewStrMap").Call(Nil()))
+
+			for _, field := range fields {
+				g.Id("m").Dot("").Add(field.setter).Call(Id(field.key))
+			}
+
+			g.Id("m").Dot("ClearChangeKey").Call()
+
+			g.Return(Id("m"))
+		})
 
 	// 2. 写字段的 getter/setter
 
@@ -148,7 +181,7 @@ func generate(sourceTypeName string, structType *types.Struct) error {
 			}
 
 			// func (a *XXXDef) GetField() FieldType
-			f.Func().Params(thisFn()).Id(fmt.Sprintf("Get%s", field.name)).Params().Id(v.Name()).
+			f.Func().Params(thisFn()).Add(field.getter).Params().Id(v.Name()).
 				Block(
 					Return(
 						convertThisFn().Dot(attrGetFuncName).Params(Lit(field.key)),
@@ -156,7 +189,7 @@ func generate(sourceTypeName string, structType *types.Struct) error {
 				)
 
 			//  写 setter
-			f.Func().Params(thisFn()).Id(fmt.Sprintf("Set%s", field.name)).Params(Id(field.key).Id(v.Name())).
+			f.Func().Params(thisFn()).Add(field.setter).Params(field.setParam).
 				Block(
 					convertThisFn().Dot("Set").Params(Lit(field.key), Id(field.key)),
 				)
@@ -223,11 +256,26 @@ func generate(sourceTypeName string, structType *types.Struct) error {
 		Block(
 			Return(Qual("encoding/json", "Marshal").Call(convertThisFn().Dot("ToMap").Params())),
 		)
-	// // unmarshal
-	// f.Func().Params(thisFn()).Id("UnmarshalJSON").Params().Params(Index().Byte()).Error().
-	// 	Block(
-	// 		Return(Qual("encoding/json", "UnmarshalJson").Call(convertThisFn().Dot("ToMap").Params())),
-	// 	)
+	// unmarshal
+	f.Func().Params(thisFn()).Id("UnmarshalJSON").Params(Id("b").Index().Byte()).Error().
+		BlockFunc(func(g *Group) {
+			g.Id("mm").Id(",").Id("err").Op(":=").Id(attrDefName).Dot("UnmarshalJson").Params(Id("b"))
+			g.If(Id("err").Op("!=").Nil()).Block(
+				Return(Id("err")),
+			)
+			g.Add(convertThisFn().Dot("SetData").Params(Id("mm")))
+			g.Add(convertThisFn().Dot("ForEach").Params(
+				Func().Params(Id("k").String(), Id("v").Interface()).Bool().
+					BlockFunc(func(g *Group) {
+						g.If(Id("k").Op("!=").Lit("id").Op("&&").Op("!").Id(attrDefName).Dot("GetDef").Params(Id("k")).Dot("IsPrimary").Params().Block(
+							Id("v").Dot("").Parens(Id("IField")).Dot("setParent").Params(Id("k"), convertThisFn()),
+						))
+						g.Return(True())
+					}),
+			))
+			g.Return(Nil())
+		},
+		)
 
 	goFile := os.Getenv("GOFILE")
 	ext := filepath.Ext(goFile)
@@ -269,13 +317,18 @@ func failErr(err error) {
 }
 
 type structField struct {
-	name    string
-	key     string
-	typ     types.Type
-	storeDB bool
-	base    bool
-	cell    bool
-	client  bool
+	name     string
+	key      string
+	typ      types.Type
+	storeDB  bool
+	base     bool
+	cell     bool
+	client   bool
+	getter   Code
+	setter   Code
+	setParam Code
+	// zero value 对应的 Code
+	emptyValue Code
 }
 
 func getStructFields(structType *types.Struct) []*structField {
@@ -283,6 +336,12 @@ func getStructFields(structType *types.Struct) []*structField {
 	for i := 0; i < structType.NumFields(); i++ {
 		field := structType.Field(i)
 		name := field.Name()
+
+		if name == "id" {
+			// NOTE: 目前生成的代码里面跳过 id 的处理
+			continue
+		}
+
 		typ := field.Type()
 		storeDB := false
 		flagBase := true // 目前的实现里面属性肯定会存储在 base 里面
@@ -334,14 +393,36 @@ func getStructFields(structType *types.Struct) []*structField {
 		}
 
 		result = append(result, &structField{
-			name:    name,
-			key:     key,
-			typ:     typ,
-			storeDB: storeDB,
-			base:    flagBase,
-			cell:    flagCell,
-			client:  client,
+			name:       name,
+			key:        key,
+			typ:        typ,
+			storeDB:    storeDB,
+			base:       flagBase,
+			cell:       flagCell,
+			client:     client,
+			emptyValue: getEmptyValue(typ),
+			getter:     Id(fmt.Sprintf("Get%s", name)),
+			setter:     Id(fmt.Sprintf("Set%s", name)),
+			setParam:   Id(key).Id(typ.String()),
 		})
 	}
 	return result
+}
+
+func getEmptyValue(typ types.Type) Code {
+	switch v := typ.(type) {
+	case *types.Basic:
+		switch v.Kind() {
+		case types.String, types.UntypedString:
+			return Lit("")
+		case types.Int, types.Uint, types.Int8, types.Uint8, types.Int16, types.Uint16, types.Int32, types.Uint32, types.Int64, types.Uint64, types.Float32, types.Float64:
+			return Lit(0)
+		case types.Bool:
+			return Lit(false)
+		default:
+			return Lit(nil)
+		}
+	default:
+		return Lit(nil)
+	}
 }
