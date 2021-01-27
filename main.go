@@ -109,10 +109,6 @@ func main() {
 
 }
 
-func genStructName(srcName string) string {
-	return srcName + "Def"
-}
-
 func generate(sourceTypeName string, structType *types.Struct) error {
 	fmt.Printf("begin generate type:%s\n", sourceTypeName)
 
@@ -123,7 +119,7 @@ func generate(sourceTypeName string, structType *types.Struct) error {
 	// 生成的结构体名字 XXXDef
 	structName := genStructName(sourceTypeName)
 	// 生成的对应的数据结构描述的名字 XXXAttrDef
-	attrDefName := strings.ToLower(sourceTypeName) + "AttrDef"
+	attrDefName := genMetaName(sourceTypeName)
 
 	// 一些预设的类型或者关键字
 	// *attr.StrMap
