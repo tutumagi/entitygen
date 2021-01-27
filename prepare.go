@@ -151,25 +151,8 @@ func getTypString(typ types.Type) string {
 		// types.Pointer 就用 .Elem 解引用
 		// types.Named 就用 .Underlying 获取引用的类型
 		return fmt.Sprintf("*%s", getTypString(v.Elem()))
-		// switch vv := v.Elem().(type) {
-		// case *types.Basic:
-		// 	return fmt.Sprintf("*%s", vv.String())
-		// case *types.Struct:
-		// 	return fmt.Sprintf("*%s", vv.String())
-		// case *types.Named:
-		// 	switch vvv := vv.Underlying().(type) {
-		// 	case *types.Basic:
-		// 		return fmt.Sprintf("*%s", vvv.String())
-		// 	case *types.Struct:
-		// 		// 这样就不会带包名和路径名，否则会出现 entitygen/entitydef.Desk 这种情况
-		// 		return fmt.Sprintf("*%s", genStructName(vv.Obj().Name()))
-		// 		// return fmt.Sprintf("*%s", vvv.String())
-		// 	default:
-		// 		failErr(fmt.Errorf("1 不支持的类型 %s", vvv.String()))
-		// 	}
-		// default:
-		// 	failErr(fmt.Errorf("2 不支持的类型 %s", vv.String()))
-		// }
+	case *types.Map:
+		return fmt.Sprintf("*%s", genMapTypName(v))
 	default:
 		failErr(fmt.Errorf("3 不支持的类型 %s", v.String()))
 	}

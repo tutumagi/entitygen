@@ -13,9 +13,14 @@ func writeGetterSetter(f *File, fields []*structField, thisFn func() *Statement,
 		field := fields[i]
 
 		switch v := field.typ.(type) {
-		case *types.Basic, *types.Pointer:
+		case *types.Basic, *types.Pointer, *types.Map:
 			// 写 getter
 			_, isBasic := v.(*types.Basic)
+			if vvm, ok := v.(*types.Map); ok {
+				if err := checkMapKey(vvm); err != nil {
+					return err
+				}
+			}
 			// func (a *XXXDef) GetField() FieldType
 			f.Func().Params(thisFn()).Add(field.getter).Params().Id(field.typString).
 				Block(
@@ -36,19 +41,6 @@ func writeGetterSetter(f *File, fields []*structField, thisFn func() *Statement,
 
 			// 换行符
 			f.Line()
-		case *types.Map:
-			switch mapK := v.Key().(type) {
-			case *types.Basic:
-				if mapK.Kind() == types.Int32 || mapK.Kind() == types.String {
-
-				} else {
-					return fmt.Errorf("不支持的map key，目前 map key 只支持 int32 和 string. %T", mapK)
-				}
-			default:
-				return fmt.Errorf("不支持的map key，目前 map key 只支持 zint32 和 string. %T", mapK)
-			}
-			// getter
-
 		case *types.Named:
 
 		// typName := v.Obj()

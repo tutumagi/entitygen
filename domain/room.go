@@ -19,13 +19,13 @@ type Room struct {
 
 	// Extends1 map[int32]string `key:"extends1" flag:"cell" client:"true" storedb:"true"`
 
-	// Extends2 map[string]int32 `key:"extends2" flag:"cell" client:"true" storedb:"true"`
+	Extends2 map[string]int32 `key:"extends2" flag:"cell" client:"true" storedb:"true"`
 
-	// Extends3 map[string]string `key:"extends3" flag:"cell" client:"true" storedb:"true"`
+	Extends3 map[string]string `key:"extends3" flag:"cell" client:"true" storedb:"true"`
 
 	Desk111 *Desk `key:"desk" flag:"cell" client:"true" storedb:"true"`
 
-	// Desks map[int32]*Desk `key:"desks" flag:"cell" client:"true" storedb:"true"`
+	// Desks222 map[int32]*Desk `key:"desks" flag:"cell" client:"true" storedb:"true"`
 }
 
 // 桌子

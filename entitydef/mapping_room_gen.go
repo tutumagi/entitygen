@@ -19,12 +19,14 @@ func init() {
 type RoomDef attr.StrMap
 
 func EmptyRoom() *RoomDef {
-	return NewRoom(0, "", nil)
+	return NewRoom(0, "", nil, nil, nil)
 }
-func NewRoom(csv_pos int32, build_id string, desk *DeskDef) *RoomDef {
+func NewRoom(csv_pos int32, build_id string, extends2 *KVStrInt32, extends3 *KVStrStr, desk *DeskDef) *RoomDef {
 	m := (*RoomDef)(attr.NewStrMap(nil))
 	m.SetCsvPos(csv_pos)
 	m.SetBuildID(build_id)
+	m.SetExtends2(extends2)
+	m.SetExtends3(extends3)
 	m.SetDesk111(desk)
 	m.ClearChangeKey()
 	return m
@@ -41,6 +43,20 @@ func (a *RoomDef) GetBuildID() string {
 }
 func (a *RoomDef) SetBuildID(build_id string) {
 	(*attr.StrMap)(a).Set("build_id", build_id)
+}
+
+func (a *RoomDef) GetExtends2() *KVStrInt32 {
+	return (*attr.StrMap)(a).Value("extends2").(*KVStrInt32)
+}
+func (a *RoomDef) SetExtends2(extends2 *KVStrInt32) {
+	(*attr.StrMap)(a).Set("extends2", extends2)
+}
+
+func (a *RoomDef) GetExtends3() *KVStrStr {
+	return (*attr.StrMap)(a).Value("extends3").(*KVStrStr)
+}
+func (a *RoomDef) SetExtends3(extends3 *KVStrStr) {
+	(*attr.StrMap)(a).Set("extends3", extends3)
 }
 
 func (a *RoomDef) GetDesk111() *DeskDef {
