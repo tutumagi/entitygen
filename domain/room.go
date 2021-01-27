@@ -33,5 +33,5 @@ type Desk struct {
 	Width  int32  `key:"width" flag:"cell" client:"true" storedb:"true"`
 	Height int32  `key:"height" flag:"cell" client:"true" storedb:"true"`
 	Name   string `key:"name" flag:"cell" client:"true" storedb:"true"`
-	CsvID  int32  `key:"csv_id" flag:"cell" client:"true" storedb:"true"`
+	// CsvID  int32  `key:"csv_id" flag:"cell" client:"true" storedb:"true"`
 }

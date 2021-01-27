@@ -12,9 +12,9 @@ var deskAttrDef *attr.Def
 func init() {
 	deskAttrDef = &attr.Def{}
 
-	deskAttrDef.DefAttr("width", attr.Int32, attr.AfBase, true)
-	deskAttrDef.DefAttr("height", attr.Int32, attr.AfBase, true)
-	deskAttrDef.DefAttr("name", attr.String, attr.AfBase, true)
+	deskAttrDef.DefAttr("width", attr.Int32, attr.AfCell, true)
+	deskAttrDef.DefAttr("height", attr.Int32, attr.AfCell, true)
+	deskAttrDef.DefAttr("name", attr.String, attr.AfCell, true)
 }
 
 type DeskDef attr.StrMap
@@ -22,103 +22,84 @@ type DeskDef attr.StrMap
 func EmptyDesk() *DeskDef {
 	return NewDesk(0, 0, "")
 }
-
-func NewDesk(
-	width int32,
-	height int32,
-	name string,
-) *DeskDef {
+func NewDesk(width int32, height int32, name string) *DeskDef {
 	m := (*DeskDef)(attr.NewStrMap(nil))
-
 	m.SetWidth(width)
 	m.SetHeight(height)
 	m.SetName(name)
-
-	(*attr.StrMap)(m).ClearChangeKey()
+	m.ClearChangeKey()
 	return m
 }
-
-func (m *DeskDef) MarshalJSON() ([]byte, error) {
-	return json.Marshal((*attr.StrMap)(m).ToMap())
+func (a *DeskDef) GetWidth() int32 {
+	return (*attr.StrMap)(a).Int32("width")
 }
-func (m *DeskDef) UnmarshalJSON(b []byte) error {
+func (a *DeskDef) SetWidth(width int32) {
+	(*attr.StrMap)(a).Set("width", width)
+}
+
+func (a *DeskDef) GetHeight() int32 {
+	return (*attr.StrMap)(a).Int32("height")
+}
+func (a *DeskDef) SetHeight(height int32) {
+	(*attr.StrMap)(a).Set("height", height)
+}
+
+func (a *DeskDef) GetName() string {
+	return (*attr.StrMap)(a).Str("name")
+}
+func (a *DeskDef) SetName(name string) {
+	(*attr.StrMap)(a).Set("name", name)
+}
+
+func (a *DeskDef) HasChange() bool {
+	return (*attr.StrMap)(a).HasChange()
+}
+func (a *DeskDef) ChangeKey() map[string]struct{} {
+	return (*attr.StrMap)(a).ChangeKey()
+}
+func (a *DeskDef) ClearChangeKey() {
+	(*attr.StrMap)(a).ClearChangeKey()
+}
+func (a *DeskDef) setParent(k string, parent attr.Field) {
+	(*attr.StrMap)(a).SetParent(k, parent)
+}
+func (a *DeskDef) ForEach(fn func(s string, v interface{}) bool) {
+	(*attr.StrMap)(a).ForEach(fn)
+}
+func (a *DeskDef) Equal(other *DeskDef) bool {
+	return (*attr.StrMap)(a).Equal((*attr.StrMap)(other))
+}
+func (a *DeskDef) MarshalJSON() ([]byte, error) {
+	return json.Marshal((*attr.StrMap)(a).ToMap())
+}
+func (a *DeskDef) UnmarshalJSON(b []byte) error {
 	mm, err := deskAttrDef.UnmarshalJson(b)
 	if err != nil {
 		return err
 	}
-	(*attr.StrMap)(m).SetData(mm)
-	(*attr.StrMap)(m).ForEach(func(k string, v interface{}) bool {
+	(*attr.StrMap)(a).SetData(mm)
+	(*attr.StrMap)(a).ForEach(func(k string, v interface{}) bool {
 		if k != "id" && !deskAttrDef.GetDef(k).IsPrimary() {
-			v.(IField).setParent(k, (*attr.StrMap)(m))
+			v.(IField).setParent(k, (*attr.StrMap)(a))
 		}
 		return true
 	})
 	return nil
 }
-
-func (m *DeskDef) MarshalBSON() ([]byte, error) {
-	return bson.Marshal((*attr.StrMap)(m).ToMap())
+func (a *DeskDef) MarshalBSON() ([]byte, error) {
+	return bson.Marshal((*attr.StrMap)(a).ToMap())
 }
-
-func (m *DeskDef) UnmarshalBSON(b []byte) error {
+func (a *DeskDef) UnmarshalBSON(b []byte) error {
 	mm, err := deskAttrDef.UnmarshalBson(b)
 	if err != nil {
 		return err
 	}
-	(*attr.StrMap)(m).SetData(mm)
-	(*attr.StrMap)(m).ForEach(func(k string, v interface{}) bool {
+	(*attr.StrMap)(a).SetData(mm)
+	(*attr.StrMap)(a).ForEach(func(k string, v interface{}) bool {
 		if k != "id" && !deskAttrDef.GetDef(k).IsPrimary() {
-			v.(IField).setParent(k, (*attr.StrMap)(m))
+			v.(IField).setParent(k, (*attr.StrMap)(a))
 		}
 		return true
 	})
 	return nil
-}
-
-func (m *DeskDef) ForEach(fn func(s string, v interface{}) bool) {
-	(*attr.StrMap)(m).ForEach(fn)
-}
-
-func (m *DeskDef) GetWidth() int32 {
-	return (*attr.StrMap)(m).Int32("width")
-}
-
-func (m *DeskDef) SetWidth(v int32) {
-	(*attr.StrMap)(m).Set("width", v)
-}
-
-func (m *DeskDef) GetHeight() int32 {
-	return (*attr.StrMap)(m).Int32("height")
-}
-
-func (m *DeskDef) SetHeight(v int32) {
-	(*attr.StrMap)(m).Set("height", v)
-}
-
-func (m *DeskDef) GetName() string {
-	return (*attr.StrMap)(m).Str("name")
-}
-
-func (m *DeskDef) SetName(v string) {
-	(*attr.StrMap)(m).Set("name", v)
-}
-
-func (m *DeskDef) setParent(k string, parent attr.Field) {
-	(*attr.StrMap)(m).SetParent(k, parent)
-}
-
-func (m *DeskDef) Equal(other *DeskDef) bool {
-	return (*attr.StrMap)(m).Equal((*attr.StrMap)(other))
-}
-
-func (m *DeskDef) HasChange() bool {
-	return (*attr.StrMap)(m).HasChange()
-}
-
-func (m *DeskDef) ChangeKey() map[string]struct{} {
-	return (*attr.StrMap)(m).ChangeKey()
-}
-
-func (m *DeskDef) ClearChangeKey() {
-	(*attr.StrMap)(m).ClearChangeKey()
 }

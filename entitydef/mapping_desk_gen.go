@@ -15,20 +15,18 @@ func init() {
 	deskAttrDef.DefAttr("width", attr.Int32, attr.AfCell, true)
 	deskAttrDef.DefAttr("height", attr.Int32, attr.AfCell, true)
 	deskAttrDef.DefAttr("name", attr.String, attr.AfCell, true)
-	deskAttrDef.DefAttr("csv_id", attr.Int32, attr.AfCell, true)
 }
 
 type DeskDef attr.StrMap
 
 func EmptyDesk() *DeskDef {
-	return NewDesk(0, 0, "", 0)
+	return NewDesk(0, 0, "")
 }
-func NewDesk(width int32, height int32, name string, csv_id int32) *DeskDef {
+func NewDesk(width int32, height int32, name string) *DeskDef {
 	m := (*DeskDef)(attr.NewStrMap(nil))
 	m.SetWidth(width)
 	m.SetHeight(height)
 	m.SetName(name)
-	m.SetCsvID(csv_id)
 	m.ClearChangeKey()
 	return m
 }
@@ -53,13 +51,6 @@ func (a *DeskDef) SetName(name string) {
 	(*attr.StrMap)(a).Set("name", name)
 }
 
-func (a *DeskDef) GetCsvID() int32 {
-	return (*attr.StrMap)(a).Int32("csv_id")
-}
-func (a *DeskDef) SetCsvID(csv_id int32) {
-	(*attr.StrMap)(a).Set("csv_id", csv_id)
-}
-
 func (a *DeskDef) HasChange() bool {
 	return (*attr.StrMap)(a).HasChange()
 }
@@ -74,6 +65,9 @@ func (a *DeskDef) setParent(k string, parent attr.Field) {
 }
 func (a *DeskDef) ForEach(fn func(s string, v interface{}) bool) {
 	(*attr.StrMap)(a).ForEach(fn)
+}
+func (a *DeskDef) Equal(other *DeskDef) bool {
+	return (*attr.StrMap)(a).Equal((*attr.StrMap)(other))
 }
 func (a *DeskDef) MarshalJSON() ([]byte, error) {
 	return json.Marshal((*attr.StrMap)(a).ToMap())

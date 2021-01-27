@@ -162,7 +162,8 @@ func generate(sourceTypeName string, structType *types.Struct) error {
 	// 2. 写字段的 getter/setter
 
 	thisFn := func() *Statement { return Id("a").Op("*").Id(structName) }
-	convertThisFn := func() *Statement { return Parens(attrStrMap()).Parens(Id("a")) }
+	convertAttrStrMap := func(name string) *Statement { return Parens(attrStrMap()).Parens(Id(name)) }
+	convertThisFn := func() *Statement { return convertAttrStrMap("a") }
 
 	for i := 0; i < len(fields); i++ {
 
@@ -249,6 +250,11 @@ func generate(sourceTypeName string, structType *types.Struct) error {
 		Block(
 			convertThisFn().Dot("ForEach").Call(Id("fn")),
 		)
+
+	// 写 Equal
+	f.Func().Params(thisFn()).Id("Equal").Params(Id("other").Op("*").Id(structName)).Bool().Block(
+		Return(convertThisFn().Dot("Equal").Call(convertAttrStrMap("other"))),
+	)
 
 	// 6. 写 marshal & unmarshal
 	writeEncodeDecode(f, thisFn, convertThisFn, attrDefName)
