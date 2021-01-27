@@ -168,7 +168,8 @@ func (desc *Def) DynamicSliceOfStruct() interface{} {
 
 func (desc *Def) builder() dynamicstruct.DynamicStruct {
 	if desc.dynStruct == nil {
-		builder := dynamicstruct.ExtendStruct(_Empty{})
+		// builder := dynamicstruct.ExtendStruct(_Empty{})	// 这个是默认数据结构中都有一个 ID("id")
+		builder := dynamicstruct.NewStruct()
 		for k, v := range desc.attrDefs {
 			tagStr := "-"
 			if v.storeDB {

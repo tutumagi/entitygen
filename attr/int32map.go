@@ -324,3 +324,41 @@ func (a *Int32Map) Float64(key int32) float64 {
 
 	return r
 }
+
+func (a *Int32Map) Equal(other *Int32Map) bool {
+	if len(a.data) != len(other.data) {
+		return false
+	}
+	equal := true
+	for k, v := range a.data {
+		switch vv := v.(type) {
+		case *Int32Map:
+			if otherVV, ok := other.Value(k).(*Int32Map); ok {
+				if vv.Equal(otherVV) {
+					continue
+				}
+			}
+			equal = false
+			goto exit
+		case *StrMap:
+			if otherVV, ok := other.Value(k).(*StrMap); ok {
+				if vv.Equal(otherVV) {
+					continue
+				}
+			}
+			equal = false
+			goto exit
+		default:
+			if v == other.Value(k) {
+				continue
+			}
+			equal = false
+			goto exit
+		}
+
+	exit:
+		break
+	}
+
+	return equal
+}

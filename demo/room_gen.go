@@ -314,18 +314,6 @@ func (m *RoomDef) SetDesks(desks *Desks) {
 	)
 }
 
-// func (m *Room) Equal(other *Room) bool {
-// 	equal := true
-// 	m.ForEach(func(k string, v interface{}) bool {
-// 		def := room.GetDef(k)
-// 		if def.IsPrimary() {
-// 			if v != other {
-// 				equal = false
-// 				return false
-// 			}
-// 		} else {
-// 			v.(IEqualable)
-// 		}
-// 	})
-// 	return equal
-// }
+func (m *RoomDef) Equal(other *RoomDef) bool {
+	return (*attr.StrMap)(m).Equal((*attr.StrMap)(other))
+}

@@ -36,6 +36,7 @@ func NewStrMap(data map[string]interface{}) *StrMap {
 	a.parentKey = ""
 	a.parent = nil
 
+	// a.data["id"] = ""
 	for k, v := range data {
 		a.data[k] = v
 	}
@@ -89,6 +90,9 @@ func (a *StrMap) ToMap() map[string]interface{} {
 
 func (a *StrMap) ForEach(fn func(k string, v interface{}) bool) {
 	for k, v := range a.data {
+		// if k == "id" {
+		// 	continue
+		// }
 		if !fn(k, v) {
 			break
 		}
@@ -356,4 +360,42 @@ func (a *StrMap) String() string {
 	}
 	sb.WriteString("}")
 	return sb.String()
+}
+
+func (a *StrMap) Equal(other *StrMap) bool {
+	if len(a.data) != len(other.data) {
+		return false
+	}
+	equal := true
+	for k, v := range a.data {
+		switch vv := v.(type) {
+		case *Int32Map:
+			if otherVV, ok := other.Value(k).(*Int32Map); ok {
+				if vv.Equal(otherVV) {
+					continue
+				}
+			}
+			equal = false
+			goto exit
+		case *StrMap:
+			if otherVV, ok := other.Value(k).(*StrMap); ok {
+				if vv.Equal(otherVV) {
+					continue
+				}
+			}
+			equal = false
+			goto exit
+		default:
+			if v == other.Value(k) {
+				continue
+			}
+			equal = false
+			goto exit
+		}
+
+	exit:
+		break
+	}
+
+	return equal
 }

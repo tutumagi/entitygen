@@ -85,15 +85,7 @@ func (m *KVInt32Int32) setParent(k string, parent attr.Field) {
 }
 
 func (m *KVInt32Int32) Equal(other *KVInt32Int32) bool {
-	equal := true
-	m.ForEach(func(k, v int32) bool {
-		if v != other.Get(k) {
-			equal = false
-			return false
-		}
-		return true
-	})
-	return equal
+	return (*attr.Int32Map)(m).Equal((*attr.Int32Map)(other))
 }
 
 func (m *KVInt32Int32) data() map[int32]int32 {
@@ -179,15 +171,7 @@ func (m *KVInt32Str) setParent(k string, parent attr.Field) {
 }
 
 func (m *KVInt32Str) Equal(other *KVInt32Str) bool {
-	equal := true
-	m.ForEach(func(k int32, v string) bool {
-		if v != other.Get(k) {
-			equal = false
-			return false
-		}
-		return true
-	})
-	return equal
+	return (*attr.Int32Map)(m).Equal((*attr.Int32Map)(other))
 }
 
 func (m *KVInt32Str) data() map[int32]string {
@@ -381,15 +365,7 @@ func (m *KVStrStr) setParent(k string, parent attr.Field) {
 }
 
 func (m *KVStrStr) Equal(other *KVStrStr) bool {
-	equal := true
-	m.ForEach(func(k string, v string) bool {
-		if v != other.Get(k) {
-			equal = false
-			return false
-		}
-		return true
-	})
-	return equal
+	return (*attr.StrMap)(m).Equal((*attr.StrMap)(other))
 }
 
 func (m *KVStrStr) data() map[string]string {

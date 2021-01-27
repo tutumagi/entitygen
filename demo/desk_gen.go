@@ -108,7 +108,7 @@ func (m *DeskDef) setParent(k string, parent attr.Field) {
 }
 
 func (m *DeskDef) Equal(other *DeskDef) bool {
-	return m.GetHeight() == other.GetHeight() && m.GetWidth() == other.GetWidth() && m.GetName() == other.GetName()
+	return (*attr.StrMap)(m).Equal((*attr.StrMap)(other))
 }
 
 func (m *DeskDef) HasChange() bool {
