@@ -4,6 +4,7 @@ package entitydef
 import (
 	"encoding/json"
 	attr "entitygen/attr"
+	bson "go.mongodb.org/mongo-driver/bson"
 )
 
 var deskAttrDef *attr.Def
@@ -79,6 +80,23 @@ func (a *DeskDef) MarshalJSON() ([]byte, error) {
 }
 func (a *DeskDef) UnmarshalJSON(b []byte) error {
 	mm, err := deskAttrDef.UnmarshalJson(b)
+	if err != nil {
+		return err
+	}
+	(*attr.StrMap)(a).SetData(mm)
+	(*attr.StrMap)(a).ForEach(func(k string, v interface{}) bool {
+		if k != "id" && !deskAttrDef.GetDef(k).IsPrimary() {
+			v.(IField).setParent(k, (*attr.StrMap)(a))
+		}
+		return true
+	})
+	return nil
+}
+func (a *DeskDef) MarshalBSON() ([]byte, error) {
+	return bson.Marshal((*attr.StrMap)(a).ToMap())
+}
+func (a *DeskDef) UnmarshalBSON(b []byte) error {
+	mm, err := deskAttrDef.UnmarshalBson(b)
 	if err != nil {
 		return err
 	}

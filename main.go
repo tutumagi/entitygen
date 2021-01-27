@@ -250,32 +250,8 @@ func generate(sourceTypeName string, structType *types.Struct) error {
 			convertThisFn().Dot("ForEach").Call(Id("fn")),
 		)
 
-	// 6. 写 json marshal & unmarshal
-	// marshal
-	f.Func().Params(thisFn()).Id("MarshalJSON").Params().Params(Index().Byte(), Error()).
-		Block(
-			Return(Qual("encoding/json", "Marshal").Call(convertThisFn().Dot("ToMap").Params())),
-		)
-	// unmarshal
-	f.Func().Params(thisFn()).Id("UnmarshalJSON").Params(Id("b").Index().Byte()).Error().
-		BlockFunc(func(g *Group) {
-			g.Id("mm").Id(",").Id("err").Op(":=").Id(attrDefName).Dot("UnmarshalJson").Params(Id("b"))
-			g.If(Id("err").Op("!=").Nil()).Block(
-				Return(Id("err")),
-			)
-			g.Add(convertThisFn().Dot("SetData").Params(Id("mm")))
-			g.Add(convertThisFn().Dot("ForEach").Params(
-				Func().Params(Id("k").String(), Id("v").Interface()).Bool().
-					BlockFunc(func(g *Group) {
-						g.If(Id("k").Op("!=").Lit("id").Op("&&").Op("!").Id(attrDefName).Dot("GetDef").Params(Id("k")).Dot("IsPrimary").Params().Block(
-							Id("v").Dot("").Parens(Id("IField")).Dot("setParent").Params(Id("k"), convertThisFn()),
-						))
-						g.Return(True())
-					}),
-			))
-			g.Return(Nil())
-		},
-		)
+	// 6. 写 marshal & unmarshal
+	writeEncodeDecode(f, thisFn, convertThisFn, attrDefName)
 
 	goFile := os.Getenv("GOFILE")
 	ext := filepath.Ext(goFile)
@@ -425,4 +401,72 @@ func getEmptyValue(typ types.Type) Code {
 	default:
 		return Lit(nil)
 	}
+}
+
+func writeEncodeDecode(f *File, thisFn func() *Statement, convertThisFn func() *Statement, attrDefName string) {
+	writer := func(encodeFnName string, encodePackageFn *Statement, decodeFnName string, decodePackageFn *Statement) {
+		// marshal
+		f.Func().Params(thisFn()).Id(encodeFnName).Params().Params(Index().Byte(), Error()).
+			Block(
+				Return(encodePackageFn.Call(convertThisFn().Dot("ToMap").Call())),
+			)
+		// unmarshal
+		f.Func().Params(thisFn()).Id(decodeFnName).Params(Id("b").Index().Byte()).Error().
+			BlockFunc(func(g *Group) {
+				g.Id("mm").Id(",").Id("err").Op(":=").Add(decodePackageFn.Call(Id("b")))
+				g.If(Id("err").Op("!=").Nil()).Block(
+					Return(Id("err")),
+				)
+				g.Add(convertThisFn().Dot("SetData").Params(Id("mm")))
+				g.Add(convertThisFn().Dot("ForEach").Params(
+					Func().Params(Id("k").String(), Id("v").Interface()).Bool().
+						BlockFunc(func(g *Group) {
+							g.If(Id("k").Op("!=").Lit("id").Op("&&").Op("!").Id(attrDefName).Dot("GetDef").Params(Id("k")).Dot("IsPrimary").Params().Block(
+								Id("v").Dot("").Parens(Id("IField")).Dot("setParent").Params(Id("k"), convertThisFn()),
+							))
+							g.Return(True())
+						}),
+				))
+				g.Return(Nil())
+			},
+			)
+	}
+	writer(
+		"MarshalJSON",
+		Qual("encoding/json", "Marshal"),
+		"UnmarshalJSON",
+		Id(attrDefName).Dot("UnmarshalJson"),
+	)
+
+	writer(
+		"MarshalBSON",
+		Qual("go.mongodb.org/mongo-driver/bson", "Marshal"),
+		"UnmarshalBSON",
+		Id(attrDefName).Dot("UnmarshalBson"),
+	)
+	// // marshal
+	// f.Func().Params(thisFn()).Id("MarshalJSON").Params().Params(Index().Byte(), Error()).
+	// 	Block(
+	// 		Return(Qual("encoding/json", "Marshal").Call(convertThisFn().Dot("ToMap").Params())),
+	// 	)
+	// // unmarshal
+	// f.Func().Params(thisFn()).Id("UnmarshalJSON").Params(Id("b").Index().Byte()).Error().
+	// 	BlockFunc(func(g *Group) {
+	// 		g.Id("mm").Id(",").Id("err").Op(":=").Id(attrDefName).Dot("UnmarshalJson").Params(Id("b"))
+	// 		g.If(Id("err").Op("!=").Nil()).Block(
+	// 			Return(Id("err")),
+	// 		)
+	// 		g.Add(convertThisFn().Dot("SetData").Params(Id("mm")))
+	// 		g.Add(convertThisFn().Dot("ForEach").Params(
+	// 			Func().Params(Id("k").String(), Id("v").Interface()).Bool().
+	// 				BlockFunc(func(g *Group) {
+	// 					g.If(Id("k").Op("!=").Lit("id").Op("&&").Op("!").Id(attrDefName).Dot("GetDef").Params(Id("k")).Dot("IsPrimary").Params().Block(
+	// 						Id("v").Dot("").Parens(Id("IField")).Dot("setParent").Params(Id("k"), convertThisFn()),
+	// 					))
+	// 					g.Return(True())
+	// 				}),
+	// 		))
+	// 		g.Return(Nil())
+	// 	},
+	// 	)
 }
