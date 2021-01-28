@@ -7,16 +7,16 @@ import (
 	. "github.com/dave/jennifer/jen"
 )
 
-func writeAttrDef(f *File, attrDefName string, fields []*structField) {
+func writeAttrMeta(f *File, attrMetaName string, fields []*structField) {
 	// *attr.Def
-	attrDef := func() *Statement { return Id("*").Qual("entitygen/attr", "Meta") }
+	attrMeta := func() *Statement { return Id("*").Qual("entitygen/attr", "Meta") }
 
 	// var xxxAttrDef *attr.Def
-	f.Var().Id(attrDefName).Add(attrDef())
+	f.Var().Id(attrMetaName).Add(attrMeta())
 	f.Func().Id("init").Params().
 		BlockFunc(
 			func(g *Group) {
-				g.Id(attrDefName).Op("=").Op("&").Qual("entitygen/attr", "Meta").Block()
+				g.Id(attrMetaName).Op("=").Op("&").Qual("entitygen/attr", "Meta").Block()
 				g.Line()
 
 				for i := 0; i < len(fields); i++ {
@@ -24,7 +24,7 @@ func writeAttrDef(f *File, attrDefName string, fields []*structField) {
 
 					switch v := field.typ.(type) {
 					case *types.Basic:
-						g.Id(attrDefName).Dot("DefAttr").CallFunc(func(ig *Group) {
+						g.Id(attrMetaName).Dot("DefAttr").CallFunc(func(ig *Group) {
 							ig.Lit(field.key)
 							ig.Qual("entitygen/attr", strings.Title(v.Name()))
 

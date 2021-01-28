@@ -4,7 +4,7 @@ import (
 	. "github.com/dave/jennifer/jen"
 )
 
-func writeEncodeDecode(f *File, thisFn func() *Statement, convertThisFn func() *Statement, attrDefName string) {
+func writeEncodeDecode(f *File, thisFn func() *Statement, convertThisFn func() *Statement, attrMetaName string) {
 	writer := func(encodeFnName string, encodePackageFn *Statement, decodeFnName string, decodePackageFn *Statement) {
 		// marshal
 		f.Func().Params(thisFn()).Id(encodeFnName).Params().Params(Index().Byte(), Error()).
@@ -22,7 +22,7 @@ func writeEncodeDecode(f *File, thisFn func() *Statement, convertThisFn func() *
 				g.Add(convertThisFn().Dot("ForEach").Params(
 					Func().Params(Id("k").String(), Id("v").Interface()).Bool().
 						BlockFunc(func(g *Group) {
-							g.If(Id("k").Op("!=").Lit("id").Op("&&").Op("!").Id(attrDefName).Dot("GetDef").Params(Id("k")).Dot("IsPrimary").Params().Block(
+							g.If(Id("k").Op("!=").Lit("id").Op("&&").Op("!").Id(attrMetaName).Dot("GetDef").Params(Id("k")).Dot("IsPrimary").Params().Block(
 								Id("v").Dot("").Parens(Id("IField")).Dot("setParent").Params(Id("k"), convertThisFn()),
 							))
 							g.Return(True())
@@ -36,14 +36,14 @@ func writeEncodeDecode(f *File, thisFn func() *Statement, convertThisFn func() *
 		"MarshalJSON",
 		Qual("encoding/json", "Marshal"),
 		"UnmarshalJSON",
-		Id(attrDefName).Dot("UnmarshalJson"),
+		Id(attrMetaName).Dot("UnmarshalJson"),
 	)
 
 	writer(
 		"MarshalBSON",
 		Qual("go.mongodb.org/mongo-driver/bson", "Marshal"),
 		"UnmarshalBSON",
-		Id(attrDefName).Dot("UnmarshalBson"),
+		Id(attrMetaName).Dot("UnmarshalBson"),
 	)
 	// // marshal
 	// f.Func().Params(thisFn()).Id("MarshalJSON").Params().Params(Index().Byte(), Error()).
@@ -53,7 +53,7 @@ func writeEncodeDecode(f *File, thisFn func() *Statement, convertThisFn func() *
 	// // unmarshal
 	// f.Func().Params(thisFn()).Id("UnmarshalJSON").Params(Id("b").Index().Byte()).Error().
 	// 	BlockFunc(func(g *Group) {
-	// 		g.Id("mm").Id(",").Id("err").Op(":=").Id(attrDefName).Dot("UnmarshalJson").Params(Id("b"))
+	// 		g.Id("mm").Id(",").Id("err").Op(":=").Id(attrMetaName).Dot("UnmarshalJson").Params(Id("b"))
 	// 		g.If(Id("err").Op("!=").Nil()).Block(
 	// 			Return(Id("err")),
 	// 		)
@@ -61,7 +61,7 @@ func writeEncodeDecode(f *File, thisFn func() *Statement, convertThisFn func() *
 	// 		g.Add(convertThisFn().Dot("ForEach").Params(
 	// 			Func().Params(Id("k").String(), Id("v").Interface()).Bool().
 	// 				BlockFunc(func(g *Group) {
-	// 					g.If(Id("k").Op("!=").Lit("id").Op("&&").Op("!").Id(attrDefName).Dot("GetDef").Params(Id("k")).Dot("IsPrimary").Params().Block(
+	// 					g.If(Id("k").Op("!=").Lit("id").Op("&&").Op("!").Id(attrMetaName).Dot("GetDef").Params(Id("k")).Dot("IsPrimary").Params().Block(
 	// 						Id("v").Dot("").Parens(Id("IField")).Dot("setParent").Params(Id("k"), convertThisFn()),
 	// 					))
 	// 					g.Return(True())

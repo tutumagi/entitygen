@@ -14,7 +14,7 @@ func writeStruct(f *File, sourceTypeName string, structType *types.Struct) {
 	// 生成的结构体名字 XXXDef
 	structName := genStructName(sourceTypeName)
 	// 生成的对应的数据结构描述的名字 XXXAttrDef
-	attrDefName := genMetaName(sourceTypeName)
+	attrMetaName := genMetaName(sourceTypeName)
 
 	// 一些预设的类型或者关键字
 	// *attr.StrMap
@@ -29,7 +29,7 @@ func writeStruct(f *File, sourceTypeName string, structType *types.Struct) {
 	convertThisFn := func() *Statement { return convertAttrStrMap("a") }
 
 	// 2. 写 attrDef
-	writeAttrDef(f, attrDefName, fields)
+	writeAttrMeta(f, attrMetaName, fields)
 
 	// 3. 写定义  type XXXDef attr.StrMap
 	f.Type().Id(structName).Qual(
@@ -50,5 +50,5 @@ func writeStruct(f *File, sourceTypeName string, structType *types.Struct) {
 	writeCustomMethod(f, structName, attrField, thisFn, convertThisFn, convertAttrStrMap)
 
 	// 7. 写 marshal & unmarshal
-	writeEncodeDecode(f, thisFn, convertThisFn, attrDefName)
+	writeEncodeDecode(f, thisFn, convertThisFn, attrMetaName)
 }
