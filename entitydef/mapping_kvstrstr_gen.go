@@ -15,3 +15,31 @@ func NewKVStrStr(data map[string]string) *KVStrStr {
 	}
 	return (*KVStrStr)(attr.NewStrMap(convertData))
 }
+func (a *KVStrStr) Set(k string, v string) {
+	(*attr.StrMap)(a).Set(k, v)
+}
+func (a *KVStrStr) Get(k string) string {
+	return (*attr.StrMap)(a).Str(k)
+}
+func (a *KVStrStr) Delete(k string) bool {
+	return (*attr.StrMap)(a).Delete(k)
+}
+func (a *KVStrStr) setParent(k string, parent attr.Field) {
+	(*attr.StrMap)(a).SetParent(k, parent)
+}
+func (a *KVStrStr) ForEach(fn func(k string, v string) bool) {
+	(*attr.StrMap)(a).ForEach(func(k string, v interface{}) bool {
+		return fn(k, v.(string))
+	})
+}
+func (a *KVStrStr) Equal(other *KVStrStr) bool {
+	return (*attr.StrMap)(a).Equal((*attr.StrMap)(other))
+}
+func (a *KVStrStr) data() map[string]string {
+	dd := map[string]string{}
+	a.ForEach(func(k string, v string) bool {
+		dd[k] = v
+		return true
+	})
+	return dd
+}

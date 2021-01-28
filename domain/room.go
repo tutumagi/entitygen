@@ -23,9 +23,9 @@ type Room struct {
 
 	Extends3 map[string]string `key:"extends3" flag:"cell" client:"true" storedb:"true"`
 
-	Desk111 *Desk `key:"desk" flag:"cell" client:"true" storedb:"true"`
+	Desk111 *Desk `key:"desk888" flag:"cell" client:"true" storedb:"true"`
 
-	Desks222 map[int32]*Desk `key:"desks" flag:"cell" client:"true" storedb:"true"`
+	Desks222 map[int32]*Desk `key:"desks999" flag:"cell" client:"true" storedb:"true"`
 }
 
 // 桌子

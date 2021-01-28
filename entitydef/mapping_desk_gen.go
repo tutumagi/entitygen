@@ -72,11 +72,19 @@ func (a *DeskDef) ClearChangeKey() {
 func (a *DeskDef) setParent(k string, parent attr.Field) {
 	(*attr.StrMap)(a).SetParent(k, parent)
 }
-func (a *DeskDef) ForEach(fn func(s string, v interface{}) bool) {
+func (a *DeskDef) ForEach(fn func(k string, v interface{}) bool) {
 	(*attr.StrMap)(a).ForEach(fn)
 }
 func (a *DeskDef) Equal(other *DeskDef) bool {
 	return (*attr.StrMap)(a).Equal((*attr.StrMap)(other))
+}
+func (a *DeskDef) data() map[string]interface{} {
+	dd := map[string]interface{}{}
+	a.ForEach(func(k string, v interface{}) bool {
+		dd[k] = v
+		return true
+	})
+	return dd
 }
 func (a *DeskDef) MarshalJSON() ([]byte, error) {
 	return json.Marshal((*attr.StrMap)(a).ToMap())

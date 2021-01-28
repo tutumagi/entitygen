@@ -43,8 +43,8 @@ func writeChangeKey(
 func writeParentForEachEqual(
 	f *File,
 	structName string,
-	keyTyp string,
-	valTyp string,
+	keyTypStr string,
+	valTypStr string,
 	attrField func() *Statement,
 	thisFn func() *Statement,
 	convertThisFn func() *Statement,
@@ -58,18 +58,18 @@ func writeParentForEachEqual(
 
 	// 5. ForEach
 	// func(k [KeyType], v [ValType])bool
-	forEachParamSign := Func().Params(Id("k").Add(Id(keyTyp)), Id("v").Add(Id(valTyp))).Bool()
-	forEachUnderlyingSign := Func().Params(Id("k").Add(Id(keyTyp)), Id("v").Interface()).Bool()
+	forEachParamSign := Func().Params(Id("k").Add(Id(keyTypStr)), Id("v").Add(Id(valTypStr))).Bool()
+	forEachUnderlyingSign := Func().Params(Id("k").Add(Id(keyTypStr)), Id("v").Interface()).Bool()
 	f.Func().Params(thisFn()).Id("ForEach").Params(Id("fn").Add(forEachParamSign)).
 		BlockFunc(func(g *Group) {
 			statement := g.Add(convertThisFn()).Dot("ForEach")
-			if valTyp == "interface{}" {
+			if valTypStr == "interface{}" {
 				// 如果 val 是 interface{} ，则直接 call 底层 map 的 ForEach 方法
 				statement.Call(Id("fn"))
 			} else {
 				// 否则做一层类型转换
 				statement.Call(forEachUnderlyingSign.Block(
-					Return(Id("fn").Call(Id("k"), Id("v").Dot("").Parens(Id(valTyp)))),
+					Return(Id("fn").Call(Id("k"), Id("v").Dot("").Parens(Id(valTypStr)))),
 				))
 			}
 		})
@@ -78,4 +78,14 @@ func writeParentForEachEqual(
 	f.Func().Params(thisFn()).Id("Equal").Params(Id("other").Op("*").Id(structName)).Bool().Block(
 		Return(convertThisFn().Dot("Equal").Call(convertAttrStrMap("other"))),
 	)
+
+	f.Func().Params(thisFn()).Id("data").Params().Map(Id(keyTypStr)).Id(valTypStr).
+		BlockFunc(func(g *Group) {
+			g.Id("dd").Op(":=").Map(Id(keyTypStr)).Id(valTypStr).Block()
+			g.Id(thisKeyword).Dot("ForEach").Call(Func().Params(Id("k").Id(keyTypStr), Id("v").Id(valTypStr)).Bool().Block(
+				Id("dd").Index(Id("k")).Op("=").Id("v"),
+				Return(True()),
+			))
+			g.Return(Id("dd"))
+		})
 }

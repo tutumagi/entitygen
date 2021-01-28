@@ -7,27 +7,30 @@ import (
 	bson "go.mongodb.org/mongo-driver/bson"
 )
 
-var roomAttrDef *attr.Def
+var roomMeta *attr.Meta
 
 func init() {
-	roomAttrDef = &attr.Def{}
+	roomMeta = &attr.Meta{}
 
-	roomAttrDef.DefAttr("csv_pos", attr.Int32, attr.AfCell, true)
-	roomAttrDef.DefAttr("build_id", attr.String, attr.AfCell, true)
+	roomMeta.DefAttr("csv_pos", attr.Int32, attr.AfCell, true)
+	roomMeta.DefAttr("build_id", attr.String, attr.AfCell, true)
 }
 
 type RoomDef attr.StrMap
 
 func EmptyRoomDef() *RoomDef {
-	return NewRoomDef(0, "", nil, nil, nil)
+	return NewRoomDef(0, "", nil, nil, nil, nil, nil, nil)
 }
-func NewRoomDef(csv_pos int32, build_id string, extends2 *KVStrInt32, extends3 *KVStrStr, desk *DeskDef) *RoomDef {
+func NewRoomDef(csv_pos int32, build_id string, extends *KVInt32Int32, extends1 *KVInt32Str, extends2 *KVStrInt32, extends3 *KVStrStr, desk888 *DeskDef, desks999 *KVInt32DeskDef) *RoomDef {
 	m := (*RoomDef)(attr.NewStrMap(nil))
 	m.SetCsvPos(csv_pos)
 	m.SetBuildID(build_id)
+	m.SetExtends(extends)
+	m.SetExtends1(extends1)
 	m.SetExtends2(extends2)
 	m.SetExtends3(extends3)
-	m.SetDesk111(desk)
+	m.SetDesk111(desk888)
+	m.SetDesks222(desks999)
 	m.ClearChangeKey()
 	return m
 }
@@ -45,10 +48,27 @@ func (a *RoomDef) SetBuildID(build_id string) {
 	(*attr.StrMap)(a).Set("build_id", build_id)
 }
 
+func (a *RoomDef) GetExtends() *KVInt32Int32 {
+	return (*attr.StrMap)(a).Value("extends").(*KVInt32Int32)
+}
+func (a *RoomDef) SetExtends(extends *KVInt32Int32) {
+	extends.setParent("extends", (*attr.StrMap)(a))
+	(*attr.StrMap)(a).Set("extends", extends)
+}
+
+func (a *RoomDef) GetExtends1() *KVInt32Str {
+	return (*attr.StrMap)(a).Value("extends1").(*KVInt32Str)
+}
+func (a *RoomDef) SetExtends1(extends1 *KVInt32Str) {
+	extends1.setParent("extends1", (*attr.StrMap)(a))
+	(*attr.StrMap)(a).Set("extends1", extends1)
+}
+
 func (a *RoomDef) GetExtends2() *KVStrInt32 {
 	return (*attr.StrMap)(a).Value("extends2").(*KVStrInt32)
 }
 func (a *RoomDef) SetExtends2(extends2 *KVStrInt32) {
+	extends2.setParent("extends2", (*attr.StrMap)(a))
 	(*attr.StrMap)(a).Set("extends2", extends2)
 }
 
@@ -56,14 +76,24 @@ func (a *RoomDef) GetExtends3() *KVStrStr {
 	return (*attr.StrMap)(a).Value("extends3").(*KVStrStr)
 }
 func (a *RoomDef) SetExtends3(extends3 *KVStrStr) {
+	extends3.setParent("extends3", (*attr.StrMap)(a))
 	(*attr.StrMap)(a).Set("extends3", extends3)
 }
 
 func (a *RoomDef) GetDesk111() *DeskDef {
-	return (*attr.StrMap)(a).Value("desk").(*DeskDef)
+	return (*attr.StrMap)(a).Value("desk888").(*DeskDef)
 }
-func (a *RoomDef) SetDesk111(desk *DeskDef) {
-	(*attr.StrMap)(a).Set("desk", desk)
+func (a *RoomDef) SetDesk111(desk888 *DeskDef) {
+	desk888.setParent("desk888", (*attr.StrMap)(a))
+	(*attr.StrMap)(a).Set("desk888", desk888)
+}
+
+func (a *RoomDef) GetDesks222() *KVInt32DeskDef {
+	return (*attr.StrMap)(a).Value("desks999").(*KVInt32DeskDef)
+}
+func (a *RoomDef) SetDesks222(desks999 *KVInt32DeskDef) {
+	desks999.setParent("desks999", (*attr.StrMap)(a))
+	(*attr.StrMap)(a).Set("desks999", desks999)
 }
 
 func (a *RoomDef) HasChange() bool {
@@ -78,23 +108,31 @@ func (a *RoomDef) ClearChangeKey() {
 func (a *RoomDef) setParent(k string, parent attr.Field) {
 	(*attr.StrMap)(a).SetParent(k, parent)
 }
-func (a *RoomDef) ForEach(fn func(s string, v interface{}) bool) {
+func (a *RoomDef) ForEach(fn func(k string, v interface{}) bool) {
 	(*attr.StrMap)(a).ForEach(fn)
 }
 func (a *RoomDef) Equal(other *RoomDef) bool {
 	return (*attr.StrMap)(a).Equal((*attr.StrMap)(other))
 }
+func (a *RoomDef) data() map[string]interface{} {
+	dd := map[string]interface{}{}
+	a.ForEach(func(k string, v interface{}) bool {
+		dd[k] = v
+		return true
+	})
+	return dd
+}
 func (a *RoomDef) MarshalJSON() ([]byte, error) {
 	return json.Marshal((*attr.StrMap)(a).ToMap())
 }
 func (a *RoomDef) UnmarshalJSON(b []byte) error {
-	mm, err := roomAttrDef.UnmarshalJson(b)
+	mm, err := roomMeta.UnmarshalJson(b)
 	if err != nil {
 		return err
 	}
 	(*attr.StrMap)(a).SetData(mm)
 	(*attr.StrMap)(a).ForEach(func(k string, v interface{}) bool {
-		if k != "id" && !roomAttrDef.GetDef(k).IsPrimary() {
+		if k != "id" && !roomMeta.GetDef(k).IsPrimary() {
 			v.(IField).setParent(k, (*attr.StrMap)(a))
 		}
 		return true
@@ -105,13 +143,13 @@ func (a *RoomDef) MarshalBSON() ([]byte, error) {
 	return bson.Marshal((*attr.StrMap)(a).ToMap())
 }
 func (a *RoomDef) UnmarshalBSON(b []byte) error {
-	mm, err := roomAttrDef.UnmarshalBson(b)
+	mm, err := roomMeta.UnmarshalBson(b)
 	if err != nil {
 		return err
 	}
 	(*attr.StrMap)(a).SetData(mm)
 	(*attr.StrMap)(a).ForEach(func(k string, v interface{}) bool {
-		if k != "id" && !roomAttrDef.GetDef(k).IsPrimary() {
+		if k != "id" && !roomMeta.GetDef(k).IsPrimary() {
 			v.(IField).setParent(k, (*attr.StrMap)(a))
 		}
 		return true

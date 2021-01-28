@@ -35,9 +35,12 @@ func writeGetterSetter(f *File, fields []*structField, thisFn func() *Statement,
 
 			//  写 setter
 			f.Func().Params(thisFn()).Add(field.setter).Params(field.setParam).
-				Block(
-					convertThisFn().Dot("Set").Params(Lit(field.key), Id(field.key)),
-				)
+				BlockFunc(func(g *Group) {
+					if !isBasic {
+						g.Id(field.key).Dot("setParent").Call(Lit(field.key), convertThisFn())
+					}
+					g.Add(convertThisFn()).Dot("Set").Params(Lit(field.key), Id(field.key))
+				})
 
 			// 换行符
 			f.Line()

@@ -10,6 +10,8 @@ import (
 	. "github.com/dave/jennifer/jen"
 )
 
+const thisKeyword = "a"
+
 // 通过原始 struct 名字，获取生成的 struct 名字
 func genStructName(srcName string) string {
 	return srcName + "Def"

@@ -70,9 +70,9 @@ func writeMap(f *File, v *types.Map) error {
 	// 将 name 变量转为 *attr.StrMap类型: (*attr.StrMap)(name)
 	convertAttrStrMap := func(name string) *Statement { return Parens(attrStrMap()).Parens(Id(name)) }
 	// a *XXXDef
-	thisFn := func() *Statement { return Id("a").Op("*").Id(structName) }
+	thisFn := func() *Statement { return Id(thisKeyword).Op("*").Id(structName) }
 	// 将 "a" 转为 *attr.StrMap 类型：(*attr.StrMap)(a)
-	convertThisFn := func() *Statement { return convertAttrStrMap("a") }
+	convertThisFn := func() *Statement { return convertAttrStrMap(thisKeyword) }
 
 	// 3. 写定义  type XXXDef attr.StrMap
 	f.Type().Id(structName).Qual("entitygen/attr", attrTypName)
@@ -110,7 +110,7 @@ func writeMap(f *File, v *types.Map) error {
 	// 写 setParent ForEach Equal
 	writeParentForEachEqual(f, structName, keyTypStr, valTypStr, attrField, thisFn, convertThisFn, convertAttrStrMap)
 
-	// // 7. 写 marshal & unmarshal
-	// writeEncodeDecode(f, thisFn, convertThisFn, attrDefName)
+	// 7. 写 marshal & unmarshal
+	// writeEncodeDecode(f, thisFn, convertThisFn, attrMetaName)
 	return nil
 }
