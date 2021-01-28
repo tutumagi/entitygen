@@ -331,32 +331,26 @@ func (a *Int32Map) Equal(other *Int32Map) bool {
 	}
 	equal := true
 	for k, v := range a.data {
-		switch vv := v.(type) {
-		case *Int32Map:
+		if im, ok := v.(*Int32Map); ok {
 			if otherVV, ok := other.Value(k).(*Int32Map); ok {
-				if vv.Equal(otherVV) {
+				if im.Equal(otherVV) {
 					continue
 				}
 			}
-			equal = false
-			goto exit
-		case *StrMap:
+			break
+		}
+		if sm, ok := v.(*StrMap); ok {
 			if otherVV, ok := other.Value(k).(*StrMap); ok {
-				if vv.Equal(otherVV) {
+				if sm.Equal(otherVV) {
 					continue
 				}
 			}
-			equal = false
-			goto exit
-		default:
-			if v == other.Value(k) {
-				continue
-			}
-			equal = false
-			goto exit
+			break
 		}
 
-	exit:
+		if v == other.Value(k) {
+			continue
+		}
 		break
 	}
 
