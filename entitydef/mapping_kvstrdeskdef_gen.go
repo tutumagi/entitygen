@@ -20,6 +20,7 @@ func NewKVStrDeskDef(data map[string]*DeskDef) *KVStrDeskDef {
 	return (*KVStrDeskDef)(attr.NewStrMap(convertData))
 }
 func (a *KVStrDeskDef) Set(k string, v *DeskDef) {
+	v.setParent(k, (*attr.StrMap)(a))
 	(*attr.StrMap)(a).Set(k, v)
 }
 func (a *KVStrDeskDef) Get(k string) *DeskDef {
@@ -57,11 +58,10 @@ func (a *KVStrDeskDef) UnmarshalJSON(b []byte) error {
 		return err
 	}
 	convertData := map[string]interface{}{}
-	a.ForEach(func(k string, v *DeskDef) bool {
+	for k, v := range dd {
 		v.setParent(k, (*attr.StrMap)(a))
 		convertData[k] = v
-		return true
-	})
+	}
 	(*attr.StrMap)(a).SetData(convertData)
 	return nil
 }
@@ -75,11 +75,10 @@ func (a *KVStrDeskDef) UnmarshalBSON(b []byte) error {
 		return err
 	}
 	convertData := map[string]interface{}{}
-	a.ForEach(func(k string, v *DeskDef) bool {
+	for k, v := range dd {
 		v.setParent(k, (*attr.StrMap)(a))
 		convertData[k] = v
-		return true
-	})
+	}
 	(*attr.StrMap)(a).SetData(convertData)
 	return nil
 }

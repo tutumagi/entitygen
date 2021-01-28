@@ -26,6 +26,8 @@ type Room struct {
 	Desk111 *Desk `key:"desk888" flag:"cell" client:"true" storedb:"true"`
 
 	Desks222 map[int32]*Desk `key:"desks999" flag:"cell" client:"true" storedb:"true"`
+
+	Desks333 map[string]*Desk `key:"desks321" flag:"cell" client:"true" storedb:"true"`
 }
 
 // 桌子

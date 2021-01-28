@@ -27,17 +27,34 @@ func mockRoom() (*RoomDef, *domain.Room) {
 			Width:  1024,
 			Height: 768,
 			Name:   "我是一张桌子",
+			CsvID:  2048,
 		},
 		Desks222: map[int32]*domain.Desk{
 			101: {
 				Width:  101,
 				Height: 1010,
 				Name:   "desk one",
+				CsvID:  10101,
 			},
 			102: {
 				Width:  102,
 				Height: 1020,
 				Name:   "desk two",
+				CsvID:  10201,
+			},
+		},
+		Desks333: map[string]*domain.Desk{
+			"mine": &domain.Desk{
+				Width:  2001,
+				Height: 3001,
+				Name:   "uber",
+				CsvID:  4001,
+			},
+			"your": &domain.Desk{
+				Width:  5001,
+				Height: 6001,
+				Name:   "didi",
+				CsvID:  7001,
 			},
 		},
 	}
@@ -49,9 +66,14 @@ func mockRoom() (*RoomDef, *domain.Room) {
 		roomModel.Desk111.CsvID,
 	)
 
-	deskss := EmptyKVInt32DeskDef()
+	int32desks := EmptyKVInt32DeskDef()
 	for k, v := range roomModel.Desks222 {
-		deskss.Set(k, NewDeskDef(v.Width, v.Height, v.Name, v.CsvID))
+		int32desks.Set(k, NewDeskDef(v.Width, v.Height, v.Name, v.CsvID))
+	}
+
+	strdesks := EmptyKVStrDeskDef()
+	for k, v := range roomModel.Desks333 {
+		strdesks.Set(k, NewDeskDef(v.Width, v.Height, v.Name, v.CsvID))
 	}
 
 	room := NewRoomDef(
@@ -62,7 +84,8 @@ func mockRoom() (*RoomDef, *domain.Room) {
 		NewKVStrInt32(roomModel.Extends2),
 		NewKVStrStr(roomModel.Extends3),
 		desk,
-		deskss,
+		int32desks,
+		strdesks,
 	)
 
 	return room, roomModel

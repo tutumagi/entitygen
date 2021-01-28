@@ -2,6 +2,7 @@ package entitydef
 
 import (
 	"encoding/json"
+	"entitygen/domain"
 	"testing"
 
 	. "github.com/go-playground/assert/v2"
@@ -9,8 +10,45 @@ import (
 )
 
 func TestData(t *testing.T) {
-	room, roomModel := mockRoom()
+
 	// 检查 数据
+	t.Run("equal", func(t *testing.T) {
+		room, roomModel := mockRoom()
+		testEqualSource(t, room, roomModel)
+	})
+
+	// 检查 changekey
+	t.Run("data-changekey", func(t *testing.T) {
+		room, _ := mockRoom()
+		testChangeKey(t, room)
+	})
+
+	t.Run("json-equal", func(t *testing.T) {
+		room, roomModel := mockRoom()
+
+		bb, err := json.Marshal(room)
+		Equal(t, err, nil)
+		newRoom := EmptyRoomDef()
+		err = json.Unmarshal(bb, newRoom)
+		Equal(t, err, nil)
+
+		testEqualSource(t, newRoom, roomModel)
+	})
+}
+
+func TestMarshalUnmarshal(t *testing.T) {
+	t.Run("json", func(t *testing.T) {
+		room, roomModel := mockRoom()
+		testMarshalUnMarshal(t, json.Marshal, json.Unmarshal, room, roomModel)
+	})
+
+	t.Run("bson", func(t *testing.T) {
+		room, roomModel := mockRoom()
+		testMarshalUnMarshal(t, bson.Marshal, bson.Unmarshal, room, roomModel)
+	})
+}
+
+func testEqualSource(t *testing.T, room *RoomDef, roomModel *domain.Room) {
 	Equal(t, room.GetCsvPos(), roomModel.CsvPos)
 	Equal(t, room.GetBuildID(), roomModel.BuildID)
 	Equal(t, room.GetExtends().data(), roomModel.Extends)
@@ -30,10 +68,27 @@ func TestData(t *testing.T) {
 		Equal(t, d.GetCsvID(), v.CsvID)
 	}
 
-	// 检查 changekey
-	t.Run("data-changekey", func(t *testing.T) {
-		testChangeKey(t, room)
-	})
+	for k, v := range roomModel.Desks333 {
+		d := room.GetDesks333().Get(k)
+		Equal(t, d.GetHeight(), v.Height)
+		Equal(t, d.GetWidth(), v.Width)
+		Equal(t, d.GetName(), v.Name)
+		Equal(t, d.GetCsvID(), v.CsvID)
+	}
+}
+
+func testEqualDef(t *testing.T, left *RoomDef, right *RoomDef) {
+	Equal(t, left.GetCsvPos(), right.GetCsvPos())
+	Equal(t, left.GetBuildID(), right.GetBuildID())
+	Equal(t, left.GetExtends().Equal(right.GetExtends()), true)
+	Equal(t, left.GetExtends1().Equal(right.GetExtends1()), true)
+	Equal(t, left.GetExtends2().Equal(right.GetExtends2()), true)
+	Equal(t, left.GetExtends3().Equal(right.GetExtends3()), true)
+	Equal(t, left.GetDesk111().Equal(right.GetDesk111()), true)
+	Equal(t, left.GetDesks222().Equal(right.GetDesks222()), true)
+	Equal(t, left.GetDesks333().Equal(right.GetDesks333()), true)
+
+	Equal(t, left.Equal(right), true)
 }
 
 func testChangeKey(t *testing.T, room *RoomDef) {
@@ -99,63 +154,37 @@ func testChangeKey(t *testing.T, room *RoomDef) {
 	Equal(t, room.ChangeKey(), map[string]struct{}{"desks999": {}})
 }
 
-func TestMarshalUnmarshal(t *testing.T) {
-	t.Run("json", func(t *testing.T) {
-		room, _ := mockRoom()
+func testMarshalUnMarshal(
+	t *testing.T,
+	marshal func(v interface{}) ([]byte, error),
+	unmarshal func([]byte, interface{}) error,
+	room *RoomDef,
+	model *domain.Room,
+) {
+	bbs, err := marshal(room)
+	Equal(t, err, nil)
 
-		bbs, err := json.Marshal(room)
-		Equal(t, err, nil)
+	newRoom := EmptyRoomDef()
+	err = unmarshal(bbs, newRoom)
+	Equal(t, err, nil)
 
-		newRoom := EmptyRoomDef()
-		err = json.Unmarshal(bbs, newRoom)
-		Equal(t, err, nil)
-
-		Equal(t, newRoom.GetCsvPos(), room.GetCsvPos())
-		Equal(t, newRoom.GetBuildID(), room.GetBuildID())
-		Equal(t, newRoom.GetExtends().Equal(room.GetExtends()), true)
-		Equal(t, newRoom.GetExtends1().Equal(room.GetExtends1()), true)
-		Equal(t, newRoom.GetExtends2().Equal(room.GetExtends2()), true)
-		Equal(t, newRoom.GetExtends3().Equal(room.GetExtends3()), true)
-		Equal(t, newRoom.GetDesk111().Equal(room.GetDesk111()), true)
-		Equal(t, newRoom.GetDesks222().Equal(room.GetDesks222()), true)
-
-		Equal(t, room.ChangeKey(), map[string]struct{}{})
-		Equal(t, newRoom.ChangeKey(), map[string]struct{}{})
-
-		t.Run("oldroom", func(t *testing.T) {
-			testChangeKey(t, room)
-		})
-
-		t.Run("newroom", func(t *testing.T) {
-			testChangeKey(t, newRoom)
-		})
+	t.Run("equal", func(t *testing.T) {
+		testEqualDef(t, room, newRoom)
 	})
 
-	t.Run("bson", func(t *testing.T) {
-		room, _ := mockRoom()
+	t.Run("equal-old", func(t *testing.T) {
+		testEqualSource(t, room, model)
+	})
 
-		bbs, err := bson.Marshal(room)
-		Equal(t, err, nil)
+	t.Run("equal-new", func(t *testing.T) {
+		testEqualSource(t, newRoom, model)
+	})
 
-		newRoom := EmptyRoomDef()
-		err = bson.Unmarshal(bbs, newRoom)
-		Equal(t, err, nil)
+	t.Run("oldroom", func(t *testing.T) {
+		testChangeKey(t, room)
+	})
 
-		Equal(t, newRoom.GetCsvPos(), room.GetCsvPos())
-		Equal(t, newRoom.GetBuildID(), room.GetBuildID())
-		Equal(t, newRoom.GetExtends().Equal(room.GetExtends()), true)
-		Equal(t, newRoom.GetExtends1().Equal(room.GetExtends1()), true)
-		Equal(t, newRoom.GetExtends2().Equal(room.GetExtends2()), true)
-		Equal(t, newRoom.GetExtends3().Equal(room.GetExtends3()), true)
-		Equal(t, newRoom.GetDesk111().Equal(room.GetDesk111()), true)
-		Equal(t, newRoom.GetDesks222().Equal(room.GetDesks222()), true)
-
-		t.Run("oldroom", func(t *testing.T) {
-			testChangeKey(t, room)
-		})
-
-		t.Run("newroom", func(t *testing.T) {
-			testChangeKey(t, newRoom)
-		})
+	t.Run("newroom", func(t *testing.T) {
+		testChangeKey(t, newRoom)
 	})
 }
