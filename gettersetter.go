@@ -64,14 +64,18 @@ func writeMapGetSetDel(
 	keyTypStr string,
 	valTypStr string,
 	valTyp types.Type,
+	isBasicVal bool,
 	thisFn func() *Statement,
 	convertThisFn func() *Statement,
 ) {
 	// 写 Set
 	f.Func().Params(thisFn()).Id("Set").Params(Id("k").Add(Id(keyTypStr)), Id("v").Add(Id(valTypStr))).
-		Block(
-			convertThisFn().Dot("Set").Call(Id("k"), Id("v")),
-		)
+		BlockFunc(func(g *Group) {
+			if !isBasicVal {
+				g.Add(setParenctCode("k", "v", keyTypStr, convertThisFn))
+			}
+			g.Add(convertThisFn().Dot("Set").Call(Id("k"), Id("v")))
+		})
 
 	// 写 Get
 	attrGetter, shouldReturnConvert := getFieldAttrGetterFnName(valTyp)

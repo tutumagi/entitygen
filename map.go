@@ -61,6 +61,7 @@ func writeMap(f *File, v *types.Map) error {
 	keyTypStr := v.Key().String()
 	valTypStr := getTypString(v.Elem())
 	valTyp := v.Elem()
+	_, isBasicVal := valTyp.(*types.Basic)
 
 	// 一些预设的类型或者关键字
 	// *attr.StrMap
@@ -104,13 +105,27 @@ func writeMap(f *File, v *types.Map) error {
 		})
 
 	// 5. 写所有字段的 getter/setter
-	writeMapGetSetDel(f, keyTypStr, valTypStr, valTyp, thisFn, convertThisFn)
+	writeMapGetSetDel(f, keyTypStr, valTypStr, valTyp, isBasicVal, thisFn, convertThisFn)
 
 	// 6. 写自定义方法
 	// 写 setParent ForEach Equal
 	writeParentForEachEqual(f, structName, keyTypStr, valTypStr, attrField, thisFn, convertThisFn, convertAttrStrMap)
 
 	// 7. 写 marshal & unmarshal
-	// writeEncodeDecode(f, thisFn, convertThisFn, attrMetaName)
+	writeMapEncodeDecode(f, keyTypStr, valTypStr, isBasicVal, thisFn, convertThisFn)
 	return nil
+}
+
+func setParenctCode(
+	keyParamName string,
+	valParamName string,
+	keyTypStr string,
+	convertThisFn func() *Statement,
+) *Statement {
+	parentKey := Id(keyParamName)
+	// NOTE: 这里写死了 key 是 int32 的类型
+	if keyTypStr == "int32" {
+		parentKey = Qual("fmt", "Sprintf").Call(Lit("idx%d").Op(",").Id(keyParamName))
+	}
+	return Id(valParamName).Dot("setParent").Call(parentKey, convertThisFn())
 }
