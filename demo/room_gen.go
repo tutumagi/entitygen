@@ -114,10 +114,10 @@ func (m *Desks) data() map[int32]*DeskDef {
 	return dd
 }
 
-var roomAttrDef *attr.Def
+var roomAttrDef *attr.Meta
 
 func init() {
-	roomAttrDef = &attr.Def{}
+	roomAttrDef = &attr.Meta{}
 
 	roomAttrDef.DefAttr("csv_pos", attr.Int32, attr.AfBase, true)
 	roomAttrDef.DefAttr("build_id", attr.String, attr.AfBase, true)

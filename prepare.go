@@ -5,6 +5,7 @@ import (
 	"go/types"
 	"reflect"
 	"strings"
+	"unicode"
 
 	. "github.com/dave/jennifer/jen"
 )
@@ -16,12 +17,12 @@ func genStructName(srcName string) string {
 
 // 通过原始 struct 名字，获取生成的 struct 的 meta 变量名字
 func genMetaName(srcName string) string {
-	return strings.ToLower(srcName) + "AttrDef"
+	return strings.ToLower(srcName) + "Meta"
 }
 
 type structField struct {
-	name       string
-	key        string
+	name       string // 字段名
+	key        string // 字段存储在 map 中的 key，目前的规则是字段名首字母小写
 	typ        types.Type
 	storeDB    bool
 	base       bool
@@ -59,7 +60,14 @@ func getStructFields(structType *types.Struct) []*structField {
 		tagValue := reflect.StructTag(structType.Tag(i))
 		key, ok := tagValue.Lookup("key")
 		if !ok {
-			failErr(fmt.Errorf("field:%s 必须有tag:key", name))
+
+			key = func() string {
+				for _, c := range name {
+					return string(unicode.ToLower(c)) + name[1:]
+				}
+				return name
+			}()
+			fmt.Printf("field:%s 没有 key，使用 name 作为 key(%s) \n", name, key)
 		}
 		{
 			storeDBStr, ok := tagValue.Lookup("storedb")

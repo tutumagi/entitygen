@@ -7,10 +7,10 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 )
 
-var deskAttrDef *attr.Def
+var deskAttrDef *attr.Meta
 
 func init() {
-	deskAttrDef = &attr.Def{}
+	deskAttrDef = &attr.Meta{}
 
 	deskAttrDef.DefAttr("width", attr.Int32, attr.AfCell, true)
 	deskAttrDef.DefAttr("height", attr.Int32, attr.AfCell, true)

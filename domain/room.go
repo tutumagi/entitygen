@@ -15,9 +15,9 @@ type Room struct {
 	// Front   string `key:"front" flag:"cell" client:"true" storedb:"true"`
 	// Behind  string `key:"behind" flag:"cell" client:"true" storedb:"true"`
 
-	// Extends map[int32]int32 `key:"extends" flag:"cell" client:"true" storedb:"true"`
+	Extends map[int32]int32 `key:"extends" flag:"cell" client:"true" storedb:"true"`
 
-	// Extends1 map[int32]string `key:"extends1" flag:"cell" client:"true" storedb:"true"`
+	Extends1 map[int32]string `key:"extends1" flag:"cell" client:"true" storedb:"true"`
 
 	Extends2 map[string]int32 `key:"extends2" flag:"cell" client:"true" storedb:"true"`
 
@@ -25,7 +25,7 @@ type Room struct {
 
 	Desk111 *Desk `key:"desk" flag:"cell" client:"true" storedb:"true"`
 
-	// Desks222 map[int32]*Desk `key:"desks" flag:"cell" client:"true" storedb:"true"`
+	Desks222 map[int32]*Desk `key:"desks" flag:"cell" client:"true" storedb:"true"`
 }
 
 // 桌子
@@ -33,5 +33,5 @@ type Desk struct {
 	Width  int32  `key:"width" flag:"cell" client:"true" storedb:"true"`
 	Height int32  `key:"height" flag:"cell" client:"true" storedb:"true"`
 	Name   string `key:"name" flag:"cell" client:"true" storedb:"true"`
-	// CsvID  int32  `key:"csv_id" flag:"cell" client:"true" storedb:"true"`
+	CsvID  int32  `key:"csv_id" flag:"cell" client:"true" storedb:"true"`
 }

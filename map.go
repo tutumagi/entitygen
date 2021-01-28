@@ -57,6 +57,10 @@ func writeMap(f *File, v *types.Map) error {
 	// 生成的Map 名字 KV{Key}{Val}
 	structName := genMapTypName(v)
 
+	// key type 名字
+	keyTyp := v.Key().String()
+	valTyp := getTypString(v.Elem())
+
 	// 一些预设的类型或者关键字
 	// *attr.StrMap
 	// attrStrMap := func() *Statement { return Id("*").Qual("entitygen/attr", attrTypName) }
@@ -85,10 +89,10 @@ func writeMap(f *File, v *types.Map) error {
 		)
 	// 写 NewXXX
 	f.Func().Id(normalCtorName).ParamsFunc(func(g *Group) {
-		g.Id("data").Map(Id(v.Key().String())).Id(getTypString(v.Elem()))
+		g.Id("data").Map(Id(keyTyp)).Id(valTyp)
 	}).Op("*").Id(structName).
 		BlockFunc(func(g *Group) {
-			g.Var().Id("convertData").Map(Id(v.Key().String())).Interface().Op("=").Map(Id(v.Key().String())).Interface().Block()
+			g.Var().Id("convertData").Map(Id(keyTyp)).Interface().Op("=").Map(Id(keyTyp)).Interface().Block()
 			g.For().Id("k").Op(",").Id("v").Op(":=").Range().Id("data").BlockFunc(
 				func(ig *Group) {
 					ig.Id("convertData").Index(Id("k")).Op("=").Id("v")
@@ -104,10 +108,43 @@ func writeMap(f *File, v *types.Map) error {
 	// 	failErr(err)
 	// }
 
-	// // 6. 写自定义方法
-	// writeCustomMethod(f, structName, attrField, thisFn, convertThisFn, convertAttrStrMap)
+	// 6. 写自定义方法
+	// writeMapCustomMethod(f, structName, keyTyp, valTyp, attrField, thisFn, convertThisFn, convertAttrStrMap)
 
 	// // 7. 写 marshal & unmarshal
 	// writeEncodeDecode(f, thisFn, convertThisFn, attrDefName)
 	return nil
+}
+
+func writeMapCustomMethod(
+	f *File,
+	structName string,
+	keyTyp string,
+	valTyp string,
+	attrField func() *Statement,
+	thisFn func() *Statement,
+	convertThisFn func() *Statement,
+	convertAttrStrMap func(string) *Statement,
+) {
+	// 4. 写 setParent
+	f.Func().Params(thisFn()).Id("setParent").Params(Id("k").String(), Id("parent").Add(attrField())).
+		Block(
+			convertThisFn().Dot("SetParent").Call(Id("k"), Id("parent")),
+		)
+
+	// 5. ForEach
+	f.Func().Params(thisFn()).Id("ForEach").Params(Id("fn").Func().Params(Id("s").Add(Id(keyTyp)), Id("v").Add(Id(valTyp))).Bool()).
+		BlockFunc(func(g *Group) {
+			statement := g.Add(convertThisFn()).Dot("ForEach")
+			if valTyp == Interface().GoString() {
+				statement.Call(Id("fn"))
+			} else {
+				statement.Call(Id("fn"))
+			}
+		})
+
+	// 写 Equal
+	f.Func().Params(thisFn()).Id("Equal").Params(Id("other").Op("*").Id(structName)).Bool().Block(
+		Return(convertThisFn().Dot("Equal").Call(convertAttrStrMap("other"))),
+	)
 }

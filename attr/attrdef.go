@@ -111,6 +111,7 @@ var (
 )
 
 type FieldDef struct {
+	// 该字段的 flag
 	flag AttrFlag
 	// 是否需要存储到 db 里面
 	storeDB bool
@@ -134,17 +135,17 @@ func (f *FieldDef) IsPrimary() bool {
 	return f.primary
 }
 
-type Def struct {
-	attrDefs map[string]*FieldDef
+type Meta struct {
+	fields map[string]*FieldDef
 
 	dynStruct dynamicstruct.DynamicStruct
 }
 
-func (desc *Def) DefAttr(key string, typ AttrTyp, flag AttrFlag, storeDB bool) {
-	if desc.attrDefs == nil {
-		desc.attrDefs = make(map[string]*FieldDef, 10)
+func (meta *Meta) DefAttr(key string, typ AttrTyp, flag AttrFlag, storeDB bool) {
+	if meta.fields == nil {
+		meta.fields = make(map[string]*FieldDef, 10)
 	}
-	desc.attrDefs[key] = &FieldDef{
+	meta.fields[key] = &FieldDef{
 		flag:    flag,
 		typv:    typ,
 		typp:    reflect.TypeOf(typ),
@@ -153,24 +154,24 @@ func (desc *Def) DefAttr(key string, typ AttrTyp, flag AttrFlag, storeDB bool) {
 	}
 }
 
-func (desc *Def) GetDef(key string) *FieldDef {
-	return desc.attrDefs[key]
+func (meta *Meta) GetDef(key string) *FieldDef {
+	return meta.fields[key]
 }
 
-func (desc *Def) DynamicStruct() interface{} {
-	return desc.builder().New()
+func (meta *Meta) DynamicStruct() interface{} {
+	return meta.builder().New()
 }
 
-func (desc *Def) DynamicSliceOfStruct() interface{} {
+func (meta *Meta) DynamicSliceOfStruct() interface{} {
 	// TODO 有没有可能构造Slice时 加cap
-	return desc.builder().NewSliceOfStructs()
+	return meta.builder().NewSliceOfStructs()
 }
 
-func (desc *Def) builder() dynamicstruct.DynamicStruct {
-	if desc.dynStruct == nil {
+func (meta *Meta) builder() dynamicstruct.DynamicStruct {
+	if meta.dynStruct == nil {
 		// builder := dynamicstruct.ExtendStruct(_Empty{})	// 这个是默认数据结构中都有一个 ID("id")
 		builder := dynamicstruct.NewStruct()
-		for k, v := range desc.attrDefs {
+		for k, v := range meta.fields {
 			tagStr := "-"
 			if v.storeDB {
 				tagStr = k
@@ -185,29 +186,29 @@ func (desc *Def) builder() dynamicstruct.DynamicStruct {
 			)
 		}
 
-		desc.dynStruct = builder.Build()
+		meta.dynStruct = builder.Build()
 	}
-	return desc.dynStruct
+	return meta.dynStruct
 }
 
 // 通过 dynamicStruct 解析到的struct，转为 map[string]interface{}
-func (desc *Def) unmarshal(srcStruct interface{}) map[string]interface{} {
-	return desc.readerToMap(dynamicstruct.NewReader(srcStruct))
+func (meta *Meta) unmarshal(srcStruct interface{}) map[string]interface{} {
+	return meta.readerToMap(dynamicstruct.NewReader(srcStruct))
 }
 
 // 通过 dynamicStruct 解析到的struct，转为 map[string]interface{}
-func (desc *Def) unmarshalSlice(srcStruct interface{}) []map[string]interface{} {
+func (meta *Meta) unmarshalSlice(srcStruct interface{}) []map[string]interface{} {
 	var attrs = []map[string]interface{}{}
 	readers := dynamicstruct.NewReader(srcStruct).ToSliceOfReaders()
 	for _, r := range readers {
-		attrs = append(attrs, desc.readerToMap(r))
+		attrs = append(attrs, meta.readerToMap(r))
 	}
 
 	return attrs
 }
 
 // 将 dynamicstruct.Reader 转为 map[string]interface{}
-func (desc *Def) readerToMap(r dynamicstruct.Reader) map[string]interface{} {
+func (meta *Meta) readerToMap(r dynamicstruct.Reader) map[string]interface{} {
 	var attrs = map[string]interface{}{}
 	for _, field := range r.GetAllFields() {
 		name := strings.ToLower(field.Name()) // TODO 这里有性能瓶颈，可以考虑 修改dynamicstruct 的源码，去缓存这个 小写开头的字符串
@@ -217,20 +218,20 @@ func (desc *Def) readerToMap(r dynamicstruct.Reader) map[string]interface{} {
 	return attrs
 }
 
-func (desc *Def) UnmarshalBson(bytes []byte) (map[string]interface{}, error) {
-	dynStruct := desc.DynamicStruct()
+func (meta *Meta) UnmarshalBson(bytes []byte) (map[string]interface{}, error) {
+	dynStruct := meta.DynamicStruct()
 	err := bson.Unmarshal(bytes, dynStruct)
 	if err != nil {
 		return nil, err
 	}
-	return desc.unmarshal(dynStruct), nil
+	return meta.unmarshal(dynStruct), nil
 }
 
-func (desc *Def) UnmarshalJson(bytes []byte) (map[string]interface{}, error) {
-	dynStruct := desc.DynamicStruct()
+func (meta *Meta) UnmarshalJson(bytes []byte) (map[string]interface{}, error) {
+	dynStruct := meta.DynamicStruct()
 	err := json.Unmarshal(bytes, dynStruct)
 	if err != nil {
 		return nil, err
 	}
-	return desc.unmarshal(dynStruct), nil
+	return meta.unmarshal(dynStruct), nil
 }

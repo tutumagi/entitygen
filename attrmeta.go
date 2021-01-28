@@ -9,14 +9,14 @@ import (
 
 func writeAttrDef(f *File, attrDefName string, fields []*structField) {
 	// *attr.Def
-	attrDef := func() *Statement { return Id("*").Qual("entitygen/attr", "Def") }
+	attrDef := func() *Statement { return Id("*").Qual("entitygen/attr", "Meta") }
 
 	// var xxxAttrDef *attr.Def
 	f.Var().Id(attrDefName).Add(attrDef())
 	f.Func().Id("init").Params().
 		BlockFunc(
 			func(g *Group) {
-				g.Id(attrDefName).Op("=").Op("&").Qual("entitygen/attr", "Def").Block()
+				g.Id(attrDefName).Op("=").Op("&").Qual("entitygen/attr", "Meta").Block()
 				g.Line()
 
 				for i := 0; i < len(fields); i++ {
