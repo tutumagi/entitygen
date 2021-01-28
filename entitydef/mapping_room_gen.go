@@ -14,12 +14,18 @@ func init() {
 
 	roomMeta.DefAttr("csv_pos", attr.Int32, attr.AfCell, true)
 	roomMeta.DefAttr("build_id", attr.String, attr.AfCell, true)
+	roomMeta.DefAttr("extends", &KVInt32Int32{}, attr.AfCell, true)
+	roomMeta.DefAttr("extends1", &KVInt32Str{}, attr.AfCell, true)
+	roomMeta.DefAttr("extends2", &KVStrInt32{}, attr.AfCell, true)
+	roomMeta.DefAttr("extends3", &KVStrStr{}, attr.AfCell, true)
+	roomMeta.DefAttr("desk888", &DeskDef{}, attr.AfCell, true)
+	roomMeta.DefAttr("desks999", &KVInt32DeskDef{}, attr.AfCell, true)
 }
 
 type RoomDef attr.StrMap
 
 func EmptyRoomDef() *RoomDef {
-	return NewRoomDef(0, "", nil, nil, nil, nil, nil, nil)
+	return NewRoomDef(0, "", EmptyKVInt32Int32(), EmptyKVInt32Str(), EmptyKVStrInt32(), EmptyKVStrStr(), EmptyDeskDef(), EmptyKVInt32DeskDef())
 }
 func NewRoomDef(csv_pos int32, build_id string, extends *KVInt32Int32, extends1 *KVInt32Str, extends2 *KVStrInt32, extends3 *KVStrStr, desk888 *DeskDef, desks999 *KVInt32DeskDef) *RoomDef {
 	m := (*RoomDef)(attr.NewStrMap(nil))
