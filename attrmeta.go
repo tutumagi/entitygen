@@ -22,26 +22,30 @@ func writeAttrMeta(f *File, attrMetaName string, fields []*structField) {
 				for i := 0; i < len(fields); i++ {
 					field := fields[i]
 
-					switch v := field.typ.(type) {
-					case *types.Basic:
-						g.Id(attrMetaName).Dot("DefAttr").CallFunc(func(ig *Group) {
-							ig.Lit(field.key)
+					g.Id(attrMetaName).Dot("DefAttr").CallFunc(func(ig *Group) {
+						ig.Lit(field.key)
+						switch v := field.typ.(type) {
+						case *types.Basic:
 							ig.Qual("entitygen/attr", strings.Title(v.Name()))
+						default:
+							ig.Op("&").Id(trimHeadStar(getTypString(v))).Block()
+						}
 
-							if field.cell {
-								ig.Qual("entitygen/attr", "AfCell")
-							} else {
-								ig.Qual("entitygen/attr", "AfBase")
-							}
+						if field.cell {
+							ig.Qual("entitygen/attr", "AfCell")
+						} else {
+							ig.Qual("entitygen/attr", "AfBase")
+						}
 
-							if field.storeDB {
-								ig.True()
-							} else {
-								ig.False()
-							}
-						})
-					}
+						if field.storeDB {
+							ig.True()
+						} else {
+							ig.False()
+						}
+					})
+
 				}
+
 			},
 		)
 }

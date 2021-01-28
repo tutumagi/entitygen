@@ -3,27 +3,9 @@ package main
 import (
 	"fmt"
 	"go/types"
-	"strings"
 
 	. "github.com/dave/jennifer/jen"
 )
-
-func genMapTypName(v *types.Map) string {
-	key := strings.Title(v.Key().String())
-	if key == "String" {
-		key = "Str"
-	}
-
-	val := getTypString(v.Elem())
-	if strings.HasPrefix(val, "*") {
-		val = strings.TrimLeft(val, "*")
-	}
-	val = strings.Title(val)
-	if val == "String" {
-		val = "Str"
-	}
-	return fmt.Sprintf("KV%s%s", key, val)
-}
 
 func checkMapKey(v *types.Map) error {
 	switch mapK := v.Key().(type) {
@@ -55,7 +37,7 @@ func writeMap(f *File, v *types.Map) error {
 	// 1. 对 struct 做一些准备工作
 
 	// 生成的Map 名字 KV{Key}{Val}
-	structName := genMapTypName(v)
+	structName := MapTypeName(v)
 
 	// key type 名字
 	keyTypStr := v.Key().String()
@@ -80,17 +62,16 @@ func writeMap(f *File, v *types.Map) error {
 
 	// 4. 写构造函数
 	// EmptyXXXX 和 NewXXX
-	emptyCtorName := fmt.Sprintf("Empty%s", structName)
-	normalCtorName := fmt.Sprintf("New%s", structName)
+
 	// 写 EmptyXXX
-	f.Func().Id(emptyCtorName).Params().Op("*").Id(structName).
+	f.Func().Id(EmptyCtor(structName)).Params().Op("*").Id(structName).
 		Block(
-			Return(Id(normalCtorName).CallFunc(func(g *Group) {
+			Return(Id(NormalCtor(structName)).CallFunc(func(g *Group) {
 				g.Nil()
 			})),
 		)
 	// 写 NewXXX
-	f.Func().Id(normalCtorName).ParamsFunc(func(g *Group) {
+	f.Func().Id(NormalCtor(structName)).ParamsFunc(func(g *Group) {
 		g.Id("data").Map(Id(keyTypStr)).Id(valTypStr)
 	}).Op("*").Id(structName).
 		BlockFunc(func(g *Group) {

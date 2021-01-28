@@ -10,18 +10,6 @@ import (
 	. "github.com/dave/jennifer/jen"
 )
 
-const thisKeyword = "a"
-
-// 通过原始 struct 名字，获取生成的 struct 名字
-func genStructName(srcName string) string {
-	return srcName + "Def"
-}
-
-// 通过原始 struct 名字，获取生成的 struct 的 meta 变量名字
-func genMetaName(srcName string) string {
-	return strings.ToLower(srcName) + "Meta"
-}
-
 type structField struct {
 	name       string // 字段名
 	key        string // 字段存储在 map 中的 key，目前的规则是字段名首字母小写
@@ -37,7 +25,7 @@ type structField struct {
 	// 该字段类型 转换后的字符串
 	// 比如 string 就是 string， int8 就是  int8
 	// 自定义类型就要转一下 加一个 Def 后面，比如 Desk 就是 DeskDef
-	typString string
+	typName string
 	// zero value 对应的 Code
 	emptyValue Code
 }
@@ -110,6 +98,7 @@ func getStructFields(structType *types.Struct) []*structField {
 			}
 		}
 
+		typName := getTypString(typ)
 		attrGetter, _ := getFieldAttrGetterFnName(typ)
 		result = append(result, &structField{
 			name:       name,
@@ -119,18 +108,18 @@ func getStructFields(structType *types.Struct) []*structField {
 			base:       flagBase,
 			cell:       flagCell,
 			client:     client,
-			emptyValue: getEmptyValue(typ),
+			emptyValue: getEmptyValue(typName, typ),
 			getter:     Id(fmt.Sprintf("Get%s", name)),
 			setter:     Id(fmt.Sprintf("Set%s", name)),
-			setParam:   Id(key).Id(getTypString(typ)),
-			typString:  getTypString(typ),
+			setParam:   Id(key).Id(typName),
+			typName:    typName,
 			attrGetter: attrGetter,
 		})
 	}
 	return result
 }
 
-func getEmptyValue(typ types.Type) Code {
+func getEmptyValue(typName string, typ types.Type) Code {
 	switch v := typ.(type) {
 	case *types.Basic:
 		switch v.Kind() {
@@ -143,12 +132,37 @@ func getEmptyValue(typ types.Type) Code {
 		default:
 			return Nil()
 		}
+	case *types.Map:
+		return Id(EmptyCtor(trimHeadStar(typName))).Call()
+	case *types.Struct:
+		return Id(EmptyCtor(trimHeadStar(typName))).Call()
+	case *types.Named:
+		return Id(EmptyCtor(trimHeadStar(typName))).Call()
+	case *types.Pointer:
+		return getEmptyValue(trimHeadStar(typName), v.Elem())
 	default:
-		return Nil()
+		failErr(fmt.Errorf("空值 Code 获取失败, 不支持的 type:%s", typ))
 	}
+	return Id("")
 }
 
 func getTypString(typ types.Type) string {
+	// 获取命名字段的类型字符串，如果是基础类型, 则直接返回对应的类型字符串（比如 int, uint, string, bool...）
+	// 如果是结构体，则是 name + "Def"
+	// 如果是 Map，这是 "KV" + Key + Value
+	getNamedTypName := func(name string, typ types.Type) string {
+		switch v := typ.(type) {
+		case *types.Basic:
+			return name
+		case *types.Struct:
+			return StructTypeName(name)
+		case *types.Map:
+			return MapTypeName(v)
+		default:
+			return name
+		}
+	}
+
 	switch v := typ.(type) {
 	case *types.Basic:
 		return v.String()
@@ -163,27 +177,11 @@ func getTypString(typ types.Type) string {
 		// types.Named 就用 .Underlying 获取引用的类型
 		return fmt.Sprintf("*%s", getTypString(v.Elem()))
 	case *types.Map:
-		return fmt.Sprintf("*%s", genMapTypName(v))
+		return fmt.Sprintf("*%s", MapTypeName(v))
 	default:
-		failErr(fmt.Errorf("3 不支持的类型 %s", v.String()))
+		failErr(fmt.Errorf("不支持的类型 %s", v.String()))
 	}
 	return ""
-}
-
-// 获取命名字段的类型字符串，如果是基础类型, 则直接返回对应的类型字符串（比如 int, uint, string, bool...）
-// 如果是结构体，则是 name + "Def"
-// 如果是 Map，这是 "KV" + Key + Value
-func getNamedTypName(name string, typ types.Type) string {
-	switch v := typ.(type) {
-	case *types.Basic:
-		return name
-	case *types.Struct:
-		return genStructName(name)
-	case *types.Map:
-		return fmt.Sprintf("KV%s%s", v.Key().String(), getTypString(v.Elem()))
-	default:
-		return name
-	}
 }
 
 // 获取 attr.StrMap 或者 attr.Int32Map 的 getter 方法名

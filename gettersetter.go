@@ -22,13 +22,13 @@ func writeGetterSetter(f *File, fields []*structField, thisFn func() *Statement,
 				}
 			}
 			// func (a *XXXDef) GetField() FieldType
-			f.Func().Params(thisFn()).Add(field.getter).Params().Id(field.typString).
+			f.Func().Params(thisFn()).Add(field.getter).Params().Id(field.typName).
 				Block(
 					ReturnFunc(func(g *Group) {
 						statement := g.Add(convertThisFn()).Dot(field.attrGetter).Params(Lit(field.key))
 						// 如果不是基础类型，则加上类型转换
 						if !isBasic {
-							statement.Dot("").Parens(Id(field.typString))
+							statement.Dot("").Parens(Id(field.typName))
 						}
 					}),
 				)

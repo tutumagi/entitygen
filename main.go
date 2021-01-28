@@ -68,7 +68,7 @@ func main() {
 				case *types.Map:
 					fmt.Printf("collect types name:%s type:%s. \n", tt.Name(), tt.Type())
 					allStructs = append(allStructs, ssInfo{
-						name: genMapTypName(v),
+						name: MapTypeName(v),
 						typ:  v,
 					})
 				case *types.Struct:

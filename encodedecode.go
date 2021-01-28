@@ -97,18 +97,16 @@ func writeMapEncodeDecode(
 				)
 
 				g.Id("convertData").Op(":=").Map(Id(keyTypStr)).Interface().Block()
-				g.Id(thisKeyword).Dot("ForEach").Params(
-					Func().Params(Id("k").Id(keyTypStr), Id("v").Id(valTypStr)).Bool().
-						BlockFunc(func(g *Group) {
-							// val 不是基础类型，就需要设置一下 parent
-							if !isBasicVal {
-								g.Add(setParenctCode("k", "v", keyTypStr, convertThisFn))
-							}
-							g.Id("convertData").Index(Id("k")).Op("=").Id("v")
-							g.Return(True())
-						}),
-				)
 
+				g.For().Id("k").Op(",").Id("v").Op(":=").Range().Id("dd").BlockFunc(
+					func(ig *Group) {
+						// val 不是基础类型，就需要设置一下 parent
+						if !isBasicVal {
+							ig.Add(setParenctCode("k", "v", keyTypStr, convertThisFn))
+						}
+						ig.Id("convertData").Index(Id("k")).Op("=").Id("v")
+					},
+				)
 				g.Add(convertThisFn().Dot("SetData").Params(Id("convertData")))
 
 				g.Return(Nil())

@@ -1,26 +1,22 @@
 package main
 
 import (
-	"fmt"
-
 	. "github.com/dave/jennifer/jen"
 )
 
 func writeCtor(f *File, structName string, fields []*structField) {
-	// EmptyXXXX 和 NewXXX
-	emptyCtorName := fmt.Sprintf("Empty%s", structName)
-	normalCtorName := fmt.Sprintf("New%s", structName)
+
 	// 写 EmptyXXX
-	f.Func().Id(emptyCtorName).Params().Op("*").Id(structName).
+	f.Func().Id(EmptyCtor(structName)).Params().Op("*").Id(structName).
 		Block(
-			Return(Id(normalCtorName).CallFunc(func(g *Group) {
+			Return(Id(NormalCtor(structName)).CallFunc(func(g *Group) {
 				for _, field := range fields {
 					g.Add(field.emptyValue)
 				}
 			})),
 		)
 	// 写 NewXXX
-	f.Func().Id(normalCtorName).ParamsFunc(func(g *Group) {
+	f.Func().Id(NormalCtor(structName)).ParamsFunc(func(g *Group) {
 		for _, field := range fields {
 			g.Add(field.setParam)
 		}

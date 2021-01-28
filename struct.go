@@ -12,9 +12,9 @@ func writeStruct(f *File, sourceTypeName string, structType *types.Struct) {
 	fields := getStructFields(structType)
 
 	// 生成的结构体名字 XXXDef
-	structName := genStructName(sourceTypeName)
+	structName := StructTypeName(sourceTypeName)
 	// 生成的对应的数据结构描述的名字 XXXAttrDef
-	attrMetaName := genMetaName(sourceTypeName)
+	attrMetaName := StructMetaName(sourceTypeName)
 
 	// 一些预设的类型或者关键字
 	// *attr.StrMap
