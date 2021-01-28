@@ -55,3 +55,34 @@ func writeGetterSetter(f *File, fields []*structField, thisFn func() *Statement,
 	}
 	return nil
 }
+
+func writeMapGetSetDel(
+	f *File,
+	keyTypStr string,
+	valTypStr string,
+	valTyp types.Type,
+	thisFn func() *Statement,
+	convertThisFn func() *Statement,
+) {
+	// 写 Set
+	f.Func().Params(thisFn()).Id("Set").Params(Id("k").Add(Id(keyTypStr)), Id("v").Add(Id(valTypStr))).
+		Block(
+			convertThisFn().Dot("Set").Call(Id("k"), Id("v")),
+		)
+
+	// 写 Get
+	attrGetter, shouldReturnConvert := getFieldAttrGetterFnName(valTyp)
+	f.Func().Params(thisFn()).Id("Get").Params(Id("k").Add(Id(keyTypStr))).Id(valTypStr).
+		BlockFunc(func(g *Group) {
+			statement := g.Return(Add(convertThisFn()).Dot(attrGetter).Call(Id("k")))
+			if shouldReturnConvert {
+				statement.Dot("").Parens(Id(valTypStr)) // 做类型转换
+			}
+		})
+
+	// 写 Delete
+	f.Func().Params(thisFn()).Id("Delete").Params(Id("k").Add(Id(keyTypStr))).Bool().
+		Block(
+			Return(convertThisFn().Dot("Delete").Call(Id("k"))),
+		)
+}

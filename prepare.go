@@ -108,6 +108,7 @@ func getStructFields(structType *types.Struct) []*structField {
 			}
 		}
 
+		attrGetter, _ := getFieldAttrGetterFnName(typ)
 		result = append(result, &structField{
 			name:       name,
 			key:        key,
@@ -121,7 +122,7 @@ func getStructFields(structType *types.Struct) []*structField {
 			setter:     Id(fmt.Sprintf("Set%s", name)),
 			setParam:   Id(key).Id(getTypString(typ)),
 			typString:  getTypString(typ),
-			attrGetter: getFieldAttrGetterFnName(typ),
+			attrGetter: attrGetter,
 		})
 	}
 	return result
@@ -184,7 +185,8 @@ func getNamedTypName(name string, typ types.Type) string {
 }
 
 // 获取 attr.StrMap 或者 attr.Int32Map 的 getter 方法名
-func getFieldAttrGetterFnName(typ types.Type) string {
+// bool 返回 当使用了 strMap.${Getter} 后， 是否需要类型转换
+func getFieldAttrGetterFnName(typ types.Type) (string, bool) {
 	switch v := typ.(type) {
 	case *types.Basic:
 		// attr.StrMap 的 get 方法
@@ -195,8 +197,8 @@ func getFieldAttrGetterFnName(typ types.Type) string {
 		case types.String, types.UntypedString:
 			attrGetFuncName = "Str"
 		}
-		return attrGetFuncName
+		return attrGetFuncName, false
 	default:
-		return "Value"
+		return "Value", true
 	}
 }

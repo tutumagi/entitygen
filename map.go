@@ -58,20 +58,21 @@ func writeMap(f *File, v *types.Map) error {
 	structName := genMapTypName(v)
 
 	// key type 名字
-	keyTyp := v.Key().String()
-	valTyp := getTypString(v.Elem())
+	keyTypStr := v.Key().String()
+	valTypStr := getTypString(v.Elem())
+	valTyp := v.Elem()
 
 	// 一些预设的类型或者关键字
 	// *attr.StrMap
-	// attrStrMap := func() *Statement { return Id("*").Qual("entitygen/attr", attrTypName) }
-	// // attr.Field
-	// attrField := func() *Statement { return Qual("entitygen/attr", "Field") }
-	// // 将 name 变量转为 *attr.StrMap类型: (*attr.StrMap)(name)
-	// convertAttrStrMap := func(name string) *Statement { return Parens(attrStrMap()).Parens(Id(name)) }
-	// // a *XXXDef
-	// thisFn := func() *Statement { return Id("a").Op("*").Id(structName) }
-	// // 将 "a" 转为 *attr.StrMap 类型：(*attr.StrMap)(a)
-	// convertThisFn := func() *Statement { return convertAttrStrMap("a") }
+	attrStrMap := func() *Statement { return Id("*").Qual("entitygen/attr", attrTypName) }
+	// attr.Field
+	attrField := func() *Statement { return Qual("entitygen/attr", "Field") }
+	// 将 name 变量转为 *attr.StrMap类型: (*attr.StrMap)(name)
+	convertAttrStrMap := func(name string) *Statement { return Parens(attrStrMap()).Parens(Id(name)) }
+	// a *XXXDef
+	thisFn := func() *Statement { return Id("a").Op("*").Id(structName) }
+	// 将 "a" 转为 *attr.StrMap 类型：(*attr.StrMap)(a)
+	convertThisFn := func() *Statement { return convertAttrStrMap("a") }
 
 	// 3. 写定义  type XXXDef attr.StrMap
 	f.Type().Id(structName).Qual("entitygen/attr", attrTypName)
@@ -89,10 +90,10 @@ func writeMap(f *File, v *types.Map) error {
 		)
 	// 写 NewXXX
 	f.Func().Id(normalCtorName).ParamsFunc(func(g *Group) {
-		g.Id("data").Map(Id(keyTyp)).Id(valTyp)
+		g.Id("data").Map(Id(keyTypStr)).Id(valTypStr)
 	}).Op("*").Id(structName).
 		BlockFunc(func(g *Group) {
-			g.Var().Id("convertData").Map(Id(keyTyp)).Interface().Op("=").Map(Id(keyTyp)).Interface().Block()
+			g.Var().Id("convertData").Map(Id(keyTypStr)).Interface().Op("=").Map(Id(keyTypStr)).Interface().Block()
 			g.For().Id("k").Op(",").Id("v").Op(":=").Range().Id("data").BlockFunc(
 				func(ig *Group) {
 					ig.Id("convertData").Index(Id("k")).Op("=").Id("v")
@@ -102,49 +103,14 @@ func writeMap(f *File, v *types.Map) error {
 			g.Return(Parens(Op("*").Id(structName)).Params(Qual("entitygen/attr", fmt.Sprintf("New%s", attrTypName)).Call(Id("convertData"))))
 		})
 
-	// // 5. 写所有字段的 getter/setter
-	// err := writeGetterSetter(f, fields, thisFn, convertThisFn)
-	// if err != nil {
-	// 	failErr(err)
-	// }
+	// 5. 写所有字段的 getter/setter
+	writeMapGetSetDel(f, keyTypStr, valTypStr, valTyp, thisFn, convertThisFn)
 
 	// 6. 写自定义方法
-	// writeMapCustomMethod(f, structName, keyTyp, valTyp, attrField, thisFn, convertThisFn, convertAttrStrMap)
+	// 写 setParent ForEach Equal
+	writeParentForEachEqual(f, structName, keyTypStr, valTypStr, attrField, thisFn, convertThisFn, convertAttrStrMap)
 
 	// // 7. 写 marshal & unmarshal
 	// writeEncodeDecode(f, thisFn, convertThisFn, attrDefName)
 	return nil
-}
-
-func writeMapCustomMethod(
-	f *File,
-	structName string,
-	keyTyp string,
-	valTyp string,
-	attrField func() *Statement,
-	thisFn func() *Statement,
-	convertThisFn func() *Statement,
-	convertAttrStrMap func(string) *Statement,
-) {
-	// 4. 写 setParent
-	f.Func().Params(thisFn()).Id("setParent").Params(Id("k").String(), Id("parent").Add(attrField())).
-		Block(
-			convertThisFn().Dot("SetParent").Call(Id("k"), Id("parent")),
-		)
-
-	// 5. ForEach
-	f.Func().Params(thisFn()).Id("ForEach").Params(Id("fn").Func().Params(Id("s").Add(Id(keyTyp)), Id("v").Add(Id(valTyp))).Bool()).
-		BlockFunc(func(g *Group) {
-			statement := g.Add(convertThisFn()).Dot("ForEach")
-			if valTyp == Interface().GoString() {
-				statement.Call(Id("fn"))
-			} else {
-				statement.Call(Id("fn"))
-			}
-		})
-
-	// 写 Equal
-	f.Func().Params(thisFn()).Id("Equal").Params(Id("other").Op("*").Id(structName)).Bool().Block(
-		Return(convertThisFn().Dot("Equal").Call(convertAttrStrMap("other"))),
-	)
 }

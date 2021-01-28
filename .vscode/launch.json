@@ -9,7 +9,7 @@
             "type": "go",
             "request": "launch",
             "mode": "auto",
-            "program": "${workspaceFolder}/main.go",
+            "program": "${workspaceFolder}",
             "args": [
                 "entitygen/domain.DeskXXX"
             ],
@@ -24,7 +24,7 @@
             "type": "go",
             "request": "launch",
             "mode": "auto",
-            "program": "${workspaceFolder}/main.go",
+            "program": "${workspaceFolder}",
             "args": [
                 "entitygen/domain"
             ],
