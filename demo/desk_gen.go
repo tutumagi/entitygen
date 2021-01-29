@@ -2,7 +2,8 @@ package demo
 
 import (
 	"encoding/json"
-	"entitygen/attr"
+
+	"gitlab.gamesword.com/nut/entitygen/attr"
 
 	"go.mongodb.org/mongo-driver/bson"
 )

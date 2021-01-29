@@ -47,9 +47,9 @@ func writeMap(f *File, v *types.Map) error {
 
 	// 一些预设的类型或者关键字
 	// *attr.StrMap
-	attrStrMap := func() *Statement { return Id("*").Qual("entitygen/attr", attrTypName) }
+	attrStrMap := func() *Statement { return Id("*").Qual("gitlab.gamesword.com/nut/entitygen/attr", attrTypName) }
 	// attr.Field
-	attrField := func() *Statement { return Qual("entitygen/attr", "Field") }
+	attrField := func() *Statement { return Qual("gitlab.gamesword.com/nut/entitygen/attr", "Field") }
 	// 将 name 变量转为 *attr.StrMap类型: (*attr.StrMap)(name)
 	convertAttrStrMap := func(name string) *Statement { return Parens(attrStrMap()).Parens(Id(name)) }
 	// a *XXXDef
@@ -58,7 +58,7 @@ func writeMap(f *File, v *types.Map) error {
 	convertThisFn := func() *Statement { return convertAttrStrMap(thisKeyword) }
 
 	// 3. 写定义  type XXXDef attr.StrMap
-	f.Type().Id(structName).Qual("entitygen/attr", attrTypName)
+	f.Type().Id(structName).Qual("gitlab.gamesword.com/nut/entitygen/attr", attrTypName)
 
 	// 4. 写构造函数
 	// EmptyXXXX 和 NewXXX
@@ -82,7 +82,7 @@ func writeMap(f *File, v *types.Map) error {
 				},
 			)
 
-			g.Return(Parens(Op("*").Id(structName)).Params(Qual("entitygen/attr", fmt.Sprintf("New%s", attrTypName)).Call(Id("convertData"))))
+			g.Return(Parens(Op("*").Id(structName)).Params(Qual("gitlab.gamesword.com/nut/entitygen/attr", fmt.Sprintf("New%s", attrTypName)).Call(Id("convertData"))))
 		})
 
 	// 5. 写所有字段的 getter/setter

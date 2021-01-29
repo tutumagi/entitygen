@@ -18,9 +18,9 @@ func writeStruct(f *File, sourceTypeName string, structType *types.Struct) {
 
 	// 一些预设的类型或者关键字
 	// *attr.StrMap
-	attrStrMap := func() *Statement { return Id("*").Qual("entitygen/attr", "StrMap") }
+	attrStrMap := func() *Statement { return Id("*").Qual("gitlab.gamesword.com/nut/entitygen/attr", "StrMap") }
 	// attr.Field
-	attrField := func() *Statement { return Qual("entitygen/attr", "Field") }
+	attrField := func() *Statement { return Qual("gitlab.gamesword.com/nut/entitygen/attr", "Field") }
 	// 将 name 变量转为 *attr.StrMap类型: (*attr.StrMap)(name)
 	convertAttrStrMap := func(name string) *Statement { return Parens(attrStrMap()).Parens(Id(name)) }
 	// a *XXXDef
@@ -33,7 +33,7 @@ func writeStruct(f *File, sourceTypeName string, structType *types.Struct) {
 
 	// 3. 写定义  type XXXDef attr.StrMap
 	f.Type().Id(structName).Qual(
-		"entitygen/attr",
+		"gitlab.gamesword.com/nut/entitygen/attr",
 		"StrMap",
 	)
 

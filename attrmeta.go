@@ -9,14 +9,14 @@ import (
 
 func writeAttrMeta(f *File, attrMetaName string, fields []*structField) {
 	// *attr.Def
-	attrMeta := func() *Statement { return Id("*").Qual("entitygen/attr", "Meta") }
+	attrMeta := func() *Statement { return Id("*").Qual("gitlab.gamesword.com/nut/entitygen/attr", "Meta") }
 
 	// var xxxAttrDef *attr.Def
 	f.Var().Id(attrMetaName).Add(attrMeta())
 	f.Func().Id("init").Params().
 		BlockFunc(
 			func(g *Group) {
-				g.Id(attrMetaName).Op("=").Op("&").Qual("entitygen/attr", "Meta").Block()
+				g.Id(attrMetaName).Op("=").Op("&").Qual("gitlab.gamesword.com/nut/entitygen/attr", "Meta").Block()
 				g.Line()
 
 				for i := 0; i < len(fields); i++ {
@@ -26,15 +26,15 @@ func writeAttrMeta(f *File, attrMetaName string, fields []*structField) {
 						ig.Lit(field.key)
 						switch v := field.typ.(type) {
 						case *types.Basic:
-							ig.Qual("entitygen/attr", strings.Title(v.Name()))
+							ig.Qual("gitlab.gamesword.com/nut/entitygen/attr", strings.Title(v.Name()))
 						default:
 							ig.Op("&").Id(trimHeadStar(getTypString(v))).Block()
 						}
 
 						if field.cell {
-							ig.Qual("entitygen/attr", "AfCell")
+							ig.Qual("gitlab.gamesword.com/nut/entitygen/attr", "AfCell")
 						} else {
-							ig.Qual("entitygen/attr", "AfBase")
+							ig.Qual("gitlab.gamesword.com/nut/entitygen/attr", "AfBase")
 						}
 
 						if field.storeDB {

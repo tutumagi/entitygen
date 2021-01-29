@@ -1,6 +1,6 @@
 package entitydef
 
-import "entitygen/domain"
+import "gitlab.gamesword.com/nut/entitygen/domain"
 
 func mockRoom() (*RoomDef, *domain.Room) {
 	roomModel := &domain.Room{

@@ -23,7 +23,7 @@ func writeCtor(f *File, structName string, fields []*structField) {
 	}).Op("*").Id(structName).
 		BlockFunc(func(g *Group) {
 
-			g.Id("m").Op(":=").Parens(Op("*").Id(structName)).Parens(Qual("entitygen/attr", "NewStrMap").Call(Nil()))
+			g.Id("m").Op(":=").Parens(Op("*").Id(structName)).Parens(Qual("gitlab.gamesword.com/nut/entitygen/attr", "NewStrMap").Call(Nil()))
 
 			for _, field := range fields {
 				g.Id("m").Dot("").Add(field.setter).Call(Id(field.key))

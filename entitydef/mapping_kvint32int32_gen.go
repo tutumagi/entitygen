@@ -3,7 +3,7 @@ package entitydef
 
 import (
 	"encoding/json"
-	attr "entitygen/attr"
+	attr "gitlab.gamesword.com/nut/entitygen/attr"
 	bson "go.mongodb.org/mongo-driver/bson"
 )
 

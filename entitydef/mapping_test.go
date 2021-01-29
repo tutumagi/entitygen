@@ -2,8 +2,9 @@ package entitydef
 
 import (
 	"encoding/json"
-	"entitygen/domain"
 	"testing"
+
+	"gitlab.gamesword.com/nut/entitygen/domain"
 
 	. "github.com/go-playground/assert/v2"
 	"go.mongodb.org/mongo-driver/bson"
