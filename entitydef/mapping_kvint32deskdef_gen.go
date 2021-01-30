@@ -21,7 +21,7 @@ func NewKVInt32DeskDef(data map[int32]*DeskDef) *KVInt32DeskDef {
 	return (*KVInt32DeskDef)(attr.NewInt32Map(convertData))
 }
 func (a *KVInt32DeskDef) Set(k int32, v *DeskDef) {
-	v.setParent(fmt.Sprintf("idx%d", k), (*attr.Int32Map)(a))
+	v.setParent(fmt.Sprintf("mk%d", k), (*attr.Int32Map)(a))
 	(*attr.Int32Map)(a).Set(k, v)
 }
 func (a *KVInt32DeskDef) Get(k int32) *DeskDef {
@@ -60,7 +60,7 @@ func (a *KVInt32DeskDef) UnmarshalJSON(b []byte) error {
 	}
 	convertData := map[int32]interface{}{}
 	for k, v := range dd {
-		v.setParent(fmt.Sprintf("idx%d", k), (*attr.Int32Map)(a))
+		v.setParent(fmt.Sprintf("mk%d", k), (*attr.Int32Map)(a))
 		convertData[k] = v
 	}
 	(*attr.Int32Map)(a).SetData(convertData)
@@ -77,7 +77,7 @@ func (a *KVInt32DeskDef) UnmarshalBSON(b []byte) error {
 	}
 	convertData := map[int32]interface{}{}
 	for k, v := range dd {
-		v.setParent(fmt.Sprintf("idx%d", k), (*attr.Int32Map)(a))
+		v.setParent(fmt.Sprintf("mk%d", k), (*attr.Int32Map)(a))
 		convertData[k] = v
 	}
 	(*attr.Int32Map)(a).SetData(convertData)
