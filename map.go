@@ -106,7 +106,8 @@ func setParenctCode(
 	parentKey := Id(keyParamName)
 	// NOTE: 这里写死了 key 是 int32 的类型
 	if keyTypStr == "int32" {
-		parentKey = Qual("fmt", "Sprintf").Call(Lit("idx%d").Op(",").Id(keyParamName))
+		// mk 表示 map key :)
+		parentKey = Qual("fmt", "Sprintf").Call(Lit("mk%d").Op(",").Id(keyParamName))
 	}
 	return Id(valParamName).Dot("setParent").Call(parentKey, convertThisFn())
 }

@@ -44,13 +44,13 @@ func mockRoom() (*RoomDef, *domain.Room) {
 			},
 		},
 		Desks333: map[string]*domain.Desk{
-			"mine": &domain.Desk{
+			"mine": {
 				Width:  2001,
 				Height: 3001,
 				Name:   "uber",
 				CsvID:  4001,
 			},
-			"your": &domain.Desk{
+			"your": {
 				Width:  5001,
 				Height: 6001,
 				Name:   "didi",
