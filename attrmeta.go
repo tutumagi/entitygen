@@ -32,7 +32,7 @@ func writeAttrMeta(f *File, attrMetaName string, fields []*structField) {
 						}
 
 						if field.cell {
-							ig.Qual(attrPackageName, "AfCell")
+							ig.Qual(attrPackageName, "AfOtherClients")
 						} else {
 							ig.Qual(attrPackageName, "AfBase")
 						}

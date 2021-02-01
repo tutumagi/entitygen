@@ -23,10 +23,15 @@ type _Empty struct {
 type AttrFlag uint16
 
 const (
+	// 属性变化时，会通知给对应的客户端
 	afClient AttrFlag = 1 << iota
+	// 属性变化时，会通知给关心它的周围的客户端
 	afOtherClient
+	// 默认所有属性都会在 base 里面
 	afBase
+	// 属性变化时，会通知到对应 cell
 	afCell
+	// 属性变化时，会通知到对应 cell，并通知给关心它的其他实体
 	afOtherCell
 
 	// AfAllClients       = afOtherCell | afCell | afClient | afOtherClient
@@ -38,9 +43,10 @@ const (
 	// AfOtherClients     = afOtherCell | afCell | afOtherClient
 	// AfOwnClient        = afCell | afClient
 
-	AfBase        = afBase
-	AfCell        = afCell
-	AfBaseAndCell = afBase | afCell
+	AfBase = afBase
+	// AfCell         = afCell
+	AfBaseAndCell  = afBase | afCell
+	AfOtherClients = AfBaseAndCell | afOtherClient
 )
 
 type AttrTyp interface{}
@@ -78,19 +84,6 @@ var (
 	UInt16 AttrTyp = uint16(0)
 	UInt32 AttrTyp = uint32(0)
 	UInt64 AttrTyp = uint64(0)
-	// 这样做的原因，会导致内存增长，
-	// 但对业务方来说，使用起来不容易出bug，
-	// 否则，在定义属性，写属性，读属性时 都必须保持类型一致，否则就会导致同一个属性key，拿到的值不一致的bug
-	// IntAttr    AttrTyp = float64(0)
-	// UIntAttr   AttrTyp = float64(0)
-	// Int8Attr   AttrTyp = float64(0)
-	// Int16Attr  AttrTyp = float64(0)
-	// Int32Attr  AttrTyp = float64(0)
-	// Int64Attr  AttrTyp = float64(0)
-	// UInt8Attr  AttrTyp = float64(0)
-	// UInt16Attr AttrTyp = float64(0)
-	// UInt32Attr AttrTyp = float64(0)
-	// UInt64Attr AttrTyp = float64(0)
 
 	Float32 AttrTyp = float32(0)
 	Float64 AttrTyp = float64(0)
@@ -98,17 +91,6 @@ var (
 	Bool AttrTyp = bool(false)
 
 	String AttrTyp = string("")
-
-	MapStrStrAttr   AttrTyp = map[string]string{}
-	MapStrInt32Attr AttrTyp = map[string]int32{}
-
-	MapInt32StrAttr   AttrTyp = map[int32]string{}
-	MapInt32Int32Attr AttrTyp = map[int32]int32{}
-
-	SliceStrAttr   AttrTyp = []string{}
-	SliceInt32Attr AttrTyp = []int32{}
-	// 如果不是基础类型，则自己传入 值类型
-	// InterfaceAttr AttrTyp =
 )
 
 type FieldDef struct {
@@ -126,6 +108,22 @@ type FieldDef struct {
 
 func (f *FieldDef) Flag() AttrFlag {
 	return f.flag
+}
+
+func (f *FieldDef) HasCell() bool {
+	return f.flag&afCell > 0
+}
+
+func (f *FieldDef) HasClient() bool {
+	return f.flag&afClient > 0
+}
+
+func (f *FieldDef) HasOtherCell() bool {
+	return f.flag&afOtherCell > 0
+}
+
+func (f *FieldDef) HasOtherClient() bool {
+	return f.flag&afOtherClient > 0
 }
 
 func (f *FieldDef) StoreDB() bool {

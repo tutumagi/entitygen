@@ -12,17 +12,17 @@ var roomMeta *attr.Meta
 func init() {
 	roomMeta = &attr.Meta{}
 
-	roomMeta.DefAttr("csvPos", attr.Int32, attr.AfCell, true)
-	roomMeta.DefAttr("buildID", attr.String, attr.AfCell, true)
-	roomMeta.DefAttr("extends", &KVInt32Int32{}, attr.AfCell, true)
-	roomMeta.DefAttr("extends1", &KVInt32Str{}, attr.AfCell, true)
-	roomMeta.DefAttr("extends2", &KVStrInt32{}, attr.AfCell, true)
-	roomMeta.DefAttr("extends3", &KVStrStr{}, attr.AfCell, true)
-	roomMeta.DefAttr("desk111", &DeskDef{}, attr.AfCell, true)
-	roomMeta.DefAttr("desks222", &KVInt32DeskDef{}, attr.AfCell, true)
-	roomMeta.DefAttr("desks333", &KVStrDeskDef{}, attr.AfCell, true)
-	roomMeta.DefAttr("desksArr", &DeskDefSlice{}, attr.AfCell, true)
-	roomMeta.DefAttr("int8ss", &Int8Slice{}, attr.AfCell, true)
+	roomMeta.DefAttr("csvPos", attr.Int32, attr.AfOtherClients, true)
+	roomMeta.DefAttr("buildID", attr.String, attr.AfOtherClients, true)
+	roomMeta.DefAttr("extends", &KVInt32Int32{}, attr.AfOtherClients, true)
+	roomMeta.DefAttr("extends1", &KVInt32Str{}, attr.AfOtherClients, true)
+	roomMeta.DefAttr("extends2", &KVStrInt32{}, attr.AfOtherClients, true)
+	roomMeta.DefAttr("extends3", &KVStrStr{}, attr.AfOtherClients, true)
+	roomMeta.DefAttr("desk111", &DeskDef{}, attr.AfOtherClients, true)
+	roomMeta.DefAttr("desks222", &KVInt32DeskDef{}, attr.AfOtherClients, true)
+	roomMeta.DefAttr("desks333", &KVStrDeskDef{}, attr.AfOtherClients, true)
+	roomMeta.DefAttr("desksArr", &DeskDefSlice{}, attr.AfOtherClients, true)
+	roomMeta.DefAttr("int8ss", &Int8Slice{}, attr.AfOtherClients, true)
 }
 
 type RoomDef attr.StrMap

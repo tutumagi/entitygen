@@ -12,10 +12,10 @@ var deskMeta *attr.Meta
 func init() {
 	deskMeta = &attr.Meta{}
 
-	deskMeta.DefAttr("width", attr.Int32, attr.AfCell, true)
-	deskMeta.DefAttr("height", attr.Int32, attr.AfCell, true)
-	deskMeta.DefAttr("name", attr.String, attr.AfCell, true)
-	deskMeta.DefAttr("csvID", attr.Int32, attr.AfCell, true)
+	deskMeta.DefAttr("width", attr.Int32, attr.AfOtherClients, true)
+	deskMeta.DefAttr("height", attr.Int32, attr.AfOtherClients, true)
+	deskMeta.DefAttr("name", attr.String, attr.AfOtherClients, true)
+	deskMeta.DefAttr("csvID", attr.Int32, attr.AfOtherClients, true)
 }
 
 type DeskDef attr.StrMap

@@ -13,9 +13,9 @@ var deskAttrDef *attr.Meta
 func init() {
 	deskAttrDef = &attr.Meta{}
 
-	deskAttrDef.DefAttr("width", attr.Int32, attr.AfCell, true)
-	deskAttrDef.DefAttr("height", attr.Int32, attr.AfCell, true)
-	deskAttrDef.DefAttr("name", attr.String, attr.AfCell, true)
+	deskAttrDef.DefAttr("width", attr.Int32, attr.AfOtherClients, true)
+	deskAttrDef.DefAttr("height", attr.Int32, attr.AfOtherClients, true)
+	deskAttrDef.DefAttr("name", attr.String, attr.AfOtherClients, true)
 }
 
 type DeskDef attr.StrMap
