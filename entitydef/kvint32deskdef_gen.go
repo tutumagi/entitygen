@@ -41,6 +41,9 @@ func (a *KVInt32DeskDef) ForEach(fn func(k int32, v *DeskDef) bool) {
 func (a *KVInt32DeskDef) Equal(other *KVInt32DeskDef) bool {
 	return (*attr.Int32Map)(a).Equal((*attr.Int32Map)(other))
 }
+func (a *KVInt32DeskDef) Has(k int32) bool {
+	return (*attr.Int32Map)(a).Has(k)
+}
 func (a *KVInt32DeskDef) data() map[int32]*DeskDef {
 	dd := map[int32]*DeskDef{}
 	a.ForEach(func(k int32, v *DeskDef) bool {
@@ -48,9 +51,6 @@ func (a *KVInt32DeskDef) data() map[int32]*DeskDef {
 		return true
 	})
 	return dd
-}
-func (a *KVInt32DeskDef) Has(k int32) bool {
-	return (*attr.Int32Map)(a).Has(k)
 }
 func (a *KVInt32DeskDef) MarshalJSON() ([]byte, error) {
 	return json.Marshal((*attr.Int32Map)(a).ToMap())

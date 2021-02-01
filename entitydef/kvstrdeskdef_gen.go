@@ -40,6 +40,9 @@ func (a *KVStrDeskDef) ForEach(fn func(k string, v *DeskDef) bool) {
 func (a *KVStrDeskDef) Equal(other *KVStrDeskDef) bool {
 	return (*attr.StrMap)(a).Equal((*attr.StrMap)(other))
 }
+func (a *KVStrDeskDef) Has(k string) bool {
+	return (*attr.StrMap)(a).Has(k)
+}
 func (a *KVStrDeskDef) data() map[string]*DeskDef {
 	dd := map[string]*DeskDef{}
 	a.ForEach(func(k string, v *DeskDef) bool {
@@ -47,9 +50,6 @@ func (a *KVStrDeskDef) data() map[string]*DeskDef {
 		return true
 	})
 	return dd
-}
-func (a *KVStrDeskDef) Has(k string) bool {
-	return (*attr.StrMap)(a).Has(k)
 }
 func (a *KVStrDeskDef) MarshalJSON() ([]byte, error) {
 	return json.Marshal((*attr.StrMap)(a).ToMap())

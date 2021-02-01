@@ -39,6 +39,9 @@ func (a *KVInt32Str) ForEach(fn func(k int32, v string) bool) {
 func (a *KVInt32Str) Equal(other *KVInt32Str) bool {
 	return (*attr.Int32Map)(a).Equal((*attr.Int32Map)(other))
 }
+func (a *KVInt32Str) Has(k int32) bool {
+	return (*attr.Int32Map)(a).Has(k)
+}
 func (a *KVInt32Str) data() map[int32]string {
 	dd := map[int32]string{}
 	a.ForEach(func(k int32, v string) bool {
@@ -46,9 +49,6 @@ func (a *KVInt32Str) data() map[int32]string {
 		return true
 	})
 	return dd
-}
-func (a *KVInt32Str) Has(k int32) bool {
-	return (*attr.Int32Map)(a).Has(k)
 }
 func (a *KVInt32Str) MarshalJSON() ([]byte, error) {
 	return json.Marshal((*attr.Int32Map)(a).ToMap())

@@ -39,6 +39,9 @@ func (a *KVStrStr) ForEach(fn func(k string, v string) bool) {
 func (a *KVStrStr) Equal(other *KVStrStr) bool {
 	return (*attr.StrMap)(a).Equal((*attr.StrMap)(other))
 }
+func (a *KVStrStr) Has(k string) bool {
+	return (*attr.StrMap)(a).Has(k)
+}
 func (a *KVStrStr) data() map[string]string {
 	dd := map[string]string{}
 	a.ForEach(func(k string, v string) bool {
@@ -46,9 +49,6 @@ func (a *KVStrStr) data() map[string]string {
 		return true
 	})
 	return dd
-}
-func (a *KVStrStr) Has(k string) bool {
-	return (*attr.StrMap)(a).Has(k)
 }
 func (a *KVStrStr) MarshalJSON() ([]byte, error) {
 	return json.Marshal((*attr.StrMap)(a).ToMap())

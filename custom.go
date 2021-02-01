@@ -17,6 +17,8 @@ func writeStructCustomMethod(
 	writeChangeKey(f, thisFn, convertThisFn)
 	// 写 setParent ForEach Equal
 	writeParentForEachEqual(f, structName, "string", "interface{}", attrField, thisFn, convertThisFn, convertAttrStrMap)
+
+	writeMapData(f, "string", "interface{}", thisFn)
 }
 
 func writeMapCustomMethod(
@@ -32,6 +34,8 @@ func writeMapCustomMethod(
 	writeParentForEachEqual(f, structName, keyTypStr, valTypStr, attrField, thisFn, convertThisFn, convertAttrStrMap)
 
 	writeHas(f, keyTypStr, thisFn, convertThisFn)
+
+	writeMapData(f, keyTypStr, valTypStr, thisFn)
 }
 
 func writeSliceCustomMethod(
@@ -45,6 +49,7 @@ func writeSliceCustomMethod(
 	convertAttrStrMap func(string) *Statement,
 ) {
 	writeParentForEachEqual(f, structName, keyTypStr, valTypStr, attrField, thisFn, convertThisFn, convertAttrStrMap)
+	writeSliceData(f, valTypStr, thisFn)
 }
 
 func writeChangeKey(
@@ -107,15 +112,6 @@ func writeParentForEachEqual(
 		Return(convertThisFn().Dot("Equal").Call(convertAttrStrMap("other"))),
 	)
 
-	f.Func().Params(thisFn()).Id("data").Params().Map(Id(keyTypStr)).Id(valTypStr).
-		BlockFunc(func(g *Group) {
-			g.Id("dd").Op(":=").Map(Id(keyTypStr)).Id(valTypStr).Block()
-			g.Id(thisKeyword).Dot("ForEach").Call(Func().Params(Id("k").Id(keyTypStr), Id("v").Id(valTypStr)).Bool().Block(
-				Id("dd").Index(Id("k")).Op("=").Id("v"),
-				Return(True()),
-			))
-			g.Return(Id("dd"))
-		})
 }
 
 func writeHas(
@@ -129,4 +125,38 @@ func writeHas(
 		Block(
 			Return(convertThisFn().Dot("Has").Call(Id("k"))),
 		)
+}
+
+func writeSliceData(
+	f *File,
+	valTypStr string,
+	thisFn func() *Statement,
+) {
+	f.Func().Params(thisFn()).Id("data").Params().Index().Id(valTypStr).
+		BlockFunc(func(g *Group) {
+			g.Id("dd").Op(":=").Index().Id(valTypStr).Block()
+			g.Id(thisKeyword).Dot("ForEach").Call(Func().Params(Id("idx").Int(), Id("v").Id(valTypStr)).Bool().Block(
+				Id("dd").Op("=").Append(Id("dd"), Id("v")),
+
+				Return(True()),
+			))
+			g.Return(Id("dd"))
+		})
+}
+
+func writeMapData(
+	f *File,
+	keyTypStr string,
+	valTypStr string,
+	thisFn func() *Statement,
+) {
+	f.Func().Params(thisFn()).Id("data").Params().Map(Id(keyTypStr)).Id(valTypStr).
+		BlockFunc(func(g *Group) {
+			g.Id("dd").Op(":=").Map(Id(keyTypStr)).Id(valTypStr).Block()
+			g.Id(thisKeyword).Dot("ForEach").Call(Func().Params(Id("k").Id(keyTypStr), Id("v").Id(valTypStr)).Bool().Block(
+				Id("dd").Index(Id("k")).Op("=").Id("v"),
+				Return(True()),
+			))
+			g.Return(Id("dd"))
+		})
 }

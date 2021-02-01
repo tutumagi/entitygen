@@ -42,10 +42,10 @@ func (a *Int8Slice) ForEach(fn func(k int, v int8) bool) {
 func (a *Int8Slice) Equal(other *Int8Slice) bool {
 	return (*attr.Slice)(a).Equal((*attr.Slice)(other))
 }
-func (a *Int8Slice) data() map[int]int8 {
-	dd := map[int]int8{}
-	a.ForEach(func(k int, v int8) bool {
-		dd[k] = v
+func (a *Int8Slice) data() []int8 {
+	dd := []int8{}
+	a.ForEach(func(idx int, v int8) bool {
+		dd = append(dd, v)
 		return true
 	})
 	return dd
