@@ -113,6 +113,9 @@ func (a *Int32Map) setChangeKey(k string) {
 }
 
 func (a *Int32Map) SetParent(k string, parent Field) {
+	if a == nil {
+		return
+	}
 	if (a.parentKey != "" && a.parentKey != k) || (a.parent != nil && a.parent != parent) {
 		panic(
 			fmt.Sprintf(

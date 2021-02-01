@@ -81,21 +81,22 @@ func mockRoom() (*RoomDef, *domain.Room) {
 		roomModel.Desk111.Height,
 		roomModel.Desk111.Name,
 		roomModel.Desk111.CsvID,
+		EmptyDeskDef(),
 	)
 
 	int32desks := EmptyKVInt32DeskDef()
 	for k, v := range roomModel.Desks222 {
-		int32desks.Set(k, NewDeskDef(v.Width, v.Height, v.Name, v.CsvID))
+		int32desks.Set(k, NewDeskDef(v.Width, v.Height, v.Name, v.CsvID, EmptyDeskDef()))
 	}
 
 	strdesks := EmptyKVStrDeskDef()
 	for k, v := range roomModel.Desks333 {
-		strdesks.Set(k, NewDeskDef(v.Width, v.Height, v.Name, v.CsvID))
+		strdesks.Set(k, NewDeskDef(v.Width, v.Height, v.Name, v.CsvID, EmptyDeskDef()))
 	}
 
 	deskArr := EmptyDeskDefSlice()
 	for _, v := range roomModel.DesksArr {
-		deskArr.Add(NewDeskDef(v.Width, v.Height, v.Name, v.CsvID))
+		deskArr.Add(NewDeskDef(v.Width, v.Height, v.Name, v.CsvID, EmptyDeskDef()))
 	}
 
 	room := NewRoomDef(

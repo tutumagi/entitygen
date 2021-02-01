@@ -81,6 +81,9 @@ func (a *Slice) setChangeKey(k string) {
 }
 
 func (a *Slice) SetParent(k string, parent Field) {
+	if a == nil {
+		return
+	}
 	if (a.parentKey != "" && a.parentKey != k) || (a.parent != nil && a.parent != parent) {
 		panic(
 			fmt.Sprintf(

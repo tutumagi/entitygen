@@ -41,4 +41,5 @@ type Desk struct {
 	Height int32  `flag:"cell" client:"true" storedb:"true"`
 	Name   string `flag:"cell" client:"true" storedb:"true"`
 	CsvID  int32  `flag:"cell" client:"true" storedb:"true"`
+	Below  *Desk  `flag:"base" client:"true" storedb:"true"`
 }

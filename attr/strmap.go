@@ -55,6 +55,9 @@ func ReleaseStrMap(strMap *StrMap) {
 }
 
 func (a *StrMap) SetParent(k string, parent Field) {
+	if a == nil {
+		return
+	}
 	if (a.parentKey != "" && a.parentKey != k) || (a.parent != nil && a.parent != parent) {
 		panic(
 			fmt.Sprintf(
@@ -70,6 +73,9 @@ func (a *StrMap) SetParent(k string, parent Field) {
 
 // func (a *StrMap) ToMap(filter ...func(k string) bool) map[string]interface{} {
 func (a *StrMap) ToMap() map[string]interface{} {
+	if a == nil {
+		return nil
+	}
 	// result := map[string]interface{}{}
 	// var f func(k string) bool = nil
 	// if len(filter) > 0 {

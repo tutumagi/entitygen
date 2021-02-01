@@ -28,7 +28,7 @@ func init() {
 type RoomDef attr.StrMap
 
 func EmptyRoomDef() *RoomDef {
-	return NewRoomDef(0, "", EmptyKVInt32Int32(), EmptyKVInt32Str(), EmptyKVStrInt32(), EmptyKVStrStr(), EmptyDeskDef(), EmptyKVInt32DeskDef(), EmptyKVStrDeskDef(), EmptyDeskDefSlice(), EmptyInt8Slice())
+	return NewRoomDef(0, "", nil, nil, nil, nil, nil, nil, nil, nil, nil)
 }
 func NewRoomDef(csvPos int32, buildID string, extends *KVInt32Int32, extends1 *KVInt32Str, extends2 *KVStrInt32, extends3 *KVStrStr, desk111 *DeskDef, desks222 *KVInt32DeskDef, desks333 *KVStrDeskDef, desksArr *DeskDefSlice, int8ss *Int8Slice) *RoomDef {
 	m := (*RoomDef)(attr.NewStrMap(nil))

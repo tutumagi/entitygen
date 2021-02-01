@@ -16,19 +16,21 @@ func init() {
 	deskMeta.DefAttr("height", attr.Int32, attr.AfOtherClients, true)
 	deskMeta.DefAttr("name", attr.String, attr.AfOtherClients, true)
 	deskMeta.DefAttr("csvID", attr.Int32, attr.AfOtherClients, true)
+	deskMeta.DefAttr("below", &DeskDef{}, attr.AfBase, true)
 }
 
 type DeskDef attr.StrMap
 
 func EmptyDeskDef() *DeskDef {
-	return NewDeskDef(0, 0, "", 0)
+	return NewDeskDef(0, 0, "", 0, nil)
 }
-func NewDeskDef(width int32, height int32, name string, csvID int32) *DeskDef {
+func NewDeskDef(width int32, height int32, name string, csvID int32, below *DeskDef) *DeskDef {
 	m := (*DeskDef)(attr.NewStrMap(nil))
 	m.SetWidth(width)
 	m.SetHeight(height)
 	m.SetName(name)
 	m.SetCsvID(csvID)
+	m.SetBelow(below)
 	m.ClearChangeKey()
 	return m
 }
@@ -58,6 +60,14 @@ func (a *DeskDef) GetCsvID() int32 {
 }
 func (a *DeskDef) SetCsvID(csvID int32) {
 	(*attr.StrMap)(a).Set("csvID", csvID)
+}
+
+func (a *DeskDef) GetBelow() *DeskDef {
+	return (*attr.StrMap)(a).Value("below").(*DeskDef)
+}
+func (a *DeskDef) SetBelow(below *DeskDef) {
+	below.setParent("below", (*attr.StrMap)(a))
+	(*attr.StrMap)(a).Set("below", below)
 }
 
 func (a *DeskDef) HasChange() bool {

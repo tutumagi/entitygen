@@ -136,18 +136,22 @@ func getEmptyValue(typName string, typ types.Type) Code {
 		default:
 			return Nil()
 		}
-	case *types.Map:
-		return Id(EmptyCtor(trimHeadStar(typName))).Call()
-	case *types.Struct:
-		return Id(EmptyCtor(trimHeadStar(typName))).Call()
-	case *types.Named:
-		return Id(EmptyCtor(trimHeadStar(typName))).Call()
-	case *types.Pointer:
-		return getEmptyValue(trimHeadStar(typName), v.Elem())
-	case *types.Slice:
-		return Id(EmptyCtor(trimHeadStar(typName))).Call()
+		// 如果这里的空值，返回的仍然是空值的构造方法的话，如果某个自定义类型的字段也是该类型，就会无限递归构造，所以空值构造器，自定义类型使用 nil 值
+		// 这样的话在 attr 中 SetParent 和 ToMap 这些方法中要对 `this` 是否为空做判断
+	// case *types.Map:
+	// 	return Id(EmptyCtor(trimHeadStar(typName))).Call()
+	// case *types.Struct:
+	// 	return Id(EmptyCtor(trimHeadStar(typName))).Call()
+	// case *types.Named:
+	// 	return Id(EmptyCtor(trimHeadStar(typName))).Call()
+	// case *types.Slice:
+	// 	return Id(EmptyCtor(trimHeadStar(typName))).Call()
+	// case *types.Pointer:
+	// 	return getEmptyValue(trimHeadStar(typName), v.Elem())
+	// default:
+	// 	failErr(fmt.Errorf("空值 Code 获取失败, 不支持的 type:%s", typ))
 	default:
-		failErr(fmt.Errorf("空值 Code 获取失败, 不支持的 type:%s", typ))
+		return Nil()
 	}
 	return Id("")
 }
