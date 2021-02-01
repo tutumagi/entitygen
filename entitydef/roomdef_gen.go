@@ -12,16 +12,16 @@ var roomMeta *attr.Meta
 func init() {
 	roomMeta = &attr.Meta{}
 
-	roomMeta.DefAttr("csv_pos", attr.Int32, attr.AfCell, true)
-	roomMeta.DefAttr("build_id", attr.String, attr.AfCell, true)
+	roomMeta.DefAttr("csvPos", attr.Int32, attr.AfCell, true)
+	roomMeta.DefAttr("buildID", attr.String, attr.AfCell, true)
 	roomMeta.DefAttr("extends", &KVInt32Int32{}, attr.AfCell, true)
 	roomMeta.DefAttr("extends1", &KVInt32Str{}, attr.AfCell, true)
 	roomMeta.DefAttr("extends2", &KVStrInt32{}, attr.AfCell, true)
 	roomMeta.DefAttr("extends3", &KVStrStr{}, attr.AfCell, true)
-	roomMeta.DefAttr("desk888", &DeskDef{}, attr.AfCell, true)
-	roomMeta.DefAttr("desks999", &KVInt32DeskDef{}, attr.AfCell, true)
-	roomMeta.DefAttr("desks321", &KVStrDeskDef{}, attr.AfCell, true)
-	roomMeta.DefAttr("desks", &DeskDefSlice{}, attr.AfCell, true)
+	roomMeta.DefAttr("desk111", &DeskDef{}, attr.AfCell, true)
+	roomMeta.DefAttr("desks222", &KVInt32DeskDef{}, attr.AfCell, true)
+	roomMeta.DefAttr("desks333", &KVStrDeskDef{}, attr.AfCell, true)
+	roomMeta.DefAttr("desksArr", &DeskDefSlice{}, attr.AfCell, true)
 	roomMeta.DefAttr("int8ss", &Int8Slice{}, attr.AfCell, true)
 }
 
@@ -30,34 +30,34 @@ type RoomDef attr.StrMap
 func EmptyRoomDef() *RoomDef {
 	return NewRoomDef(0, "", EmptyKVInt32Int32(), EmptyKVInt32Str(), EmptyKVStrInt32(), EmptyKVStrStr(), EmptyDeskDef(), EmptyKVInt32DeskDef(), EmptyKVStrDeskDef(), EmptyDeskDefSlice(), EmptyInt8Slice())
 }
-func NewRoomDef(csv_pos int32, build_id string, extends *KVInt32Int32, extends1 *KVInt32Str, extends2 *KVStrInt32, extends3 *KVStrStr, desk888 *DeskDef, desks999 *KVInt32DeskDef, desks321 *KVStrDeskDef, desks *DeskDefSlice, int8ss *Int8Slice) *RoomDef {
+func NewRoomDef(csvPos int32, buildID string, extends *KVInt32Int32, extends1 *KVInt32Str, extends2 *KVStrInt32, extends3 *KVStrStr, desk111 *DeskDef, desks222 *KVInt32DeskDef, desks333 *KVStrDeskDef, desksArr *DeskDefSlice, int8ss *Int8Slice) *RoomDef {
 	m := (*RoomDef)(attr.NewStrMap(nil))
-	m.SetCsvPos(csv_pos)
-	m.SetBuildID(build_id)
+	m.SetCsvPos(csvPos)
+	m.SetBuildID(buildID)
 	m.SetExtends(extends)
 	m.SetExtends1(extends1)
 	m.SetExtends2(extends2)
 	m.SetExtends3(extends3)
-	m.SetDesk111(desk888)
-	m.SetDesks222(desks999)
-	m.SetDesks333(desks321)
-	m.SetDesksArr(desks)
+	m.SetDesk111(desk111)
+	m.SetDesks222(desks222)
+	m.SetDesks333(desks333)
+	m.SetDesksArr(desksArr)
 	m.SetInt8ss(int8ss)
 	m.ClearChangeKey()
 	return m
 }
 func (a *RoomDef) GetCsvPos() int32 {
-	return (*attr.StrMap)(a).Int32("csv_pos")
+	return (*attr.StrMap)(a).Int32("csvPos")
 }
-func (a *RoomDef) SetCsvPos(csv_pos int32) {
-	(*attr.StrMap)(a).Set("csv_pos", csv_pos)
+func (a *RoomDef) SetCsvPos(csvPos int32) {
+	(*attr.StrMap)(a).Set("csvPos", csvPos)
 }
 
 func (a *RoomDef) GetBuildID() string {
-	return (*attr.StrMap)(a).Str("build_id")
+	return (*attr.StrMap)(a).Str("buildID")
 }
-func (a *RoomDef) SetBuildID(build_id string) {
-	(*attr.StrMap)(a).Set("build_id", build_id)
+func (a *RoomDef) SetBuildID(buildID string) {
+	(*attr.StrMap)(a).Set("buildID", buildID)
 }
 
 func (a *RoomDef) GetExtends() *KVInt32Int32 {
@@ -93,35 +93,35 @@ func (a *RoomDef) SetExtends3(extends3 *KVStrStr) {
 }
 
 func (a *RoomDef) GetDesk111() *DeskDef {
-	return (*attr.StrMap)(a).Value("desk888").(*DeskDef)
+	return (*attr.StrMap)(a).Value("desk111").(*DeskDef)
 }
-func (a *RoomDef) SetDesk111(desk888 *DeskDef) {
-	desk888.setParent("desk888", (*attr.StrMap)(a))
-	(*attr.StrMap)(a).Set("desk888", desk888)
+func (a *RoomDef) SetDesk111(desk111 *DeskDef) {
+	desk111.setParent("desk111", (*attr.StrMap)(a))
+	(*attr.StrMap)(a).Set("desk111", desk111)
 }
 
 func (a *RoomDef) GetDesks222() *KVInt32DeskDef {
-	return (*attr.StrMap)(a).Value("desks999").(*KVInt32DeskDef)
+	return (*attr.StrMap)(a).Value("desks222").(*KVInt32DeskDef)
 }
-func (a *RoomDef) SetDesks222(desks999 *KVInt32DeskDef) {
-	desks999.setParent("desks999", (*attr.StrMap)(a))
-	(*attr.StrMap)(a).Set("desks999", desks999)
+func (a *RoomDef) SetDesks222(desks222 *KVInt32DeskDef) {
+	desks222.setParent("desks222", (*attr.StrMap)(a))
+	(*attr.StrMap)(a).Set("desks222", desks222)
 }
 
 func (a *RoomDef) GetDesks333() *KVStrDeskDef {
-	return (*attr.StrMap)(a).Value("desks321").(*KVStrDeskDef)
+	return (*attr.StrMap)(a).Value("desks333").(*KVStrDeskDef)
 }
-func (a *RoomDef) SetDesks333(desks321 *KVStrDeskDef) {
-	desks321.setParent("desks321", (*attr.StrMap)(a))
-	(*attr.StrMap)(a).Set("desks321", desks321)
+func (a *RoomDef) SetDesks333(desks333 *KVStrDeskDef) {
+	desks333.setParent("desks333", (*attr.StrMap)(a))
+	(*attr.StrMap)(a).Set("desks333", desks333)
 }
 
 func (a *RoomDef) GetDesksArr() *DeskDefSlice {
-	return (*attr.StrMap)(a).Value("desks").(*DeskDefSlice)
+	return (*attr.StrMap)(a).Value("desksArr").(*DeskDefSlice)
 }
-func (a *RoomDef) SetDesksArr(desks *DeskDefSlice) {
-	desks.setParent("desks", (*attr.StrMap)(a))
-	(*attr.StrMap)(a).Set("desks", desks)
+func (a *RoomDef) SetDesksArr(desksArr *DeskDefSlice) {
+	desksArr.setParent("desksArr", (*attr.StrMap)(a))
+	(*attr.StrMap)(a).Set("desksArr", desksArr)
 }
 
 func (a *RoomDef) GetInt8ss() *Int8Slice {

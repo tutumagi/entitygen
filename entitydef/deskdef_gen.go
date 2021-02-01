@@ -15,7 +15,7 @@ func init() {
 	deskMeta.DefAttr("width", attr.Int32, attr.AfCell, true)
 	deskMeta.DefAttr("height", attr.Int32, attr.AfCell, true)
 	deskMeta.DefAttr("name", attr.String, attr.AfCell, true)
-	deskMeta.DefAttr("csv_id", attr.Int32, attr.AfCell, true)
+	deskMeta.DefAttr("csvID", attr.Int32, attr.AfCell, true)
 }
 
 type DeskDef attr.StrMap
@@ -23,12 +23,12 @@ type DeskDef attr.StrMap
 func EmptyDeskDef() *DeskDef {
 	return NewDeskDef(0, 0, "", 0)
 }
-func NewDeskDef(width int32, height int32, name string, csv_id int32) *DeskDef {
+func NewDeskDef(width int32, height int32, name string, csvID int32) *DeskDef {
 	m := (*DeskDef)(attr.NewStrMap(nil))
 	m.SetWidth(width)
 	m.SetHeight(height)
 	m.SetName(name)
-	m.SetCsvID(csv_id)
+	m.SetCsvID(csvID)
 	m.ClearChangeKey()
 	return m
 }
@@ -54,10 +54,10 @@ func (a *DeskDef) SetName(name string) {
 }
 
 func (a *DeskDef) GetCsvID() int32 {
-	return (*attr.StrMap)(a).Int32("csv_id")
+	return (*attr.StrMap)(a).Int32("csvID")
 }
-func (a *DeskDef) SetCsvID(csv_id int32) {
-	(*attr.StrMap)(a).Set("csv_id", csv_id)
+func (a *DeskDef) SetCsvID(csvID int32) {
+	(*attr.StrMap)(a).Set("csvID", csvID)
 }
 
 func (a *DeskDef) HasChange() bool {

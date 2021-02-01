@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"reflect"
 	"strings"
+	"unicode"
 
 	dynamicstruct "github.com/ompluscator/dynamic-struct"
 	"go.mongodb.org/mongo-driver/bson"
@@ -211,7 +212,7 @@ func (meta *Meta) unmarshalSlice(srcStruct interface{}) []map[string]interface{}
 func (meta *Meta) readerToMap(r dynamicstruct.Reader) map[string]interface{} {
 	var attrs = map[string]interface{}{}
 	for _, field := range r.GetAllFields() {
-		name := strings.ToLower(field.Name()) // TODO 这里有性能瓶颈，可以考虑 修改dynamicstruct 的源码，去缓存这个 小写开头的字符串
+		name := lowerFirst(field.Name())
 		attrs[name] = field.Interface()
 	}
 
@@ -234,4 +235,11 @@ func (meta *Meta) UnmarshalJson(bytes []byte) (map[string]interface{}, error) {
 		return nil, err
 	}
 	return meta.unmarshal(dynStruct), nil
+}
+
+func lowerFirst(s string) string {
+	for _, c := range s {
+		return string(unicode.ToLower(c)) + s[1:]
+	}
+	return s
 }

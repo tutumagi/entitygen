@@ -2,44 +2,43 @@ package domain
 
 // Room model
 type Room struct {
-	// ID string `key:"id" flag:"cell" client:"true" storedb:"true"`
+	// ID string `flag:"cell" client:"true" storedb:"true"`
 	// CsvPos 是指配置表里面的pos，表示房间在整个建筑结构里面的方位
-	CsvPos int32 `key:"csv_pos" flag:"cell" client:"true" storedb:"true"`
+	CsvPos int32 `flag:"cell" client:"true" storedb:"true"`
 	// 所属建筑的id
-	BuildID string `key:"build_id" flag:"cell" client:"true" storedb:"true"`
-	// CsvID   int32  `key:"csv_id" flag:"cell" client:"true" storedb:"true"`
-	// Left    string `key:"left" flag:"cell" client:"true" storedb:"true"`
-	// Right   string `key:"right" flag:"cell" client:"true" storedb:"true"`
-	// Top     string `key:"top" flag:"cell" client:"true" storedb:"true"`
-	// Bottom  string `key:"bottom" flag:"cell" client:"true" storedb:"true"`
-	// Front   string `key:"front" flag:"cell" client:"true" storedb:"true"`
-	// Behind  string `key:"behind" flag:"cell" client:"true" storedb:"true"`
+	BuildID string `flag:"cell" client:"true" storedb:"true"`
+	// CsvID   int32  `flag:"cell" client:"true" storedb:"true"`
+	// Left    string `flag:"cell" client:"true" storedb:"true"`
+	// Right   string `flag:"cell" client:"true" storedb:"true"`
+	// Top     string `flag:"cell" client:"true" storedb:"true"`
+	// Bottom  string `flag:"cell" client:"true" storedb:"true"`
+	// Front   string `flag:"cell" client:"true" storedb:"true"`
+	// Behind  string `flag:"cell" client:"true" storedb:"true"`
 
-	Extends map[int32]int32 `key:"extends" flag:"cell" client:"true" storedb:"true"`
+	Extends map[int32]int32 `flag:"cell" client:"true" storedb:"true"`
 
-	Extends1 map[int32]string `key:"extends1" flag:"cell" client:"true" storedb:"true"`
+	Extends1 map[int32]string `flag:"cell" client:"true" storedb:"true"`
 
-	Extends2 map[string]int32 `key:"extends2" flag:"cell" client:"true" storedb:"true"`
+	Extends2 map[string]int32 `flag:"cell" client:"true" storedb:"true"`
 
-	Extends3 map[string]string `key:"extends3" flag:"cell" client:"true" storedb:"true"`
+	Extends3 map[string]string `flag:"cell" client:"true" storedb:"true"`
 
-	Desk111 *Desk `key:"desk888" flag:"cell" client:"true" storedb:"true"`
+	Desk111 *Desk `flag:"cell" client:"true" storedb:"true"`
 
-	Desks222 map[int32]*Desk `key:"desks999" flag:"cell" client:"true" storedb:"true"`
+	Desks222 map[int32]*Desk `flag:"cell" client:"true" storedb:"true"`
 
-	Desks333 map[string]*Desk `key:"desks321" flag:"cell" client:"true" storedb:"true"`
+	Desks333 map[string]*Desk `flag:"cell" client:"true" storedb:"true"`
 
-	DesksArr []*Desk `key:"desks" flag:"cell" client:"true" storedb:"true"`
+	DesksArr []*Desk `flag:"cell" client:"true" storedb:"true"`
+	// Strss []string `flag:"cell" client:"true" storedb:"true"`
 
-	// Strss []string `key:"strss" flag:"cell" client:"true" storedb:"true"`
-
-	Int8ss []int8 `key:"int8ss" flag:"cell" client:"true" storedb:"true"`
+	Int8ss []int8 `flag:"cell" client:"true" storedb:"true"`
 }
 
 // 桌子
 type Desk struct {
-	Width  int32  `key:"width" flag:"cell" client:"true" storedb:"true"`
-	Height int32  `key:"height" flag:"cell" client:"true" storedb:"true"`
-	Name   string `key:"name" flag:"cell" client:"true" storedb:"true"`
-	CsvID  int32  `key:"csv_id" flag:"cell" client:"true" storedb:"true"`
+	Width  int32  `flag:"cell" client:"true" storedb:"true"`
+	Height int32  `flag:"cell" client:"true" storedb:"true"`
+	Name   string `flag:"cell" client:"true" storedb:"true"`
+	CsvID  int32  `flag:"cell" client:"true" storedb:"true"`
 }

@@ -50,7 +50,9 @@ func getStructFields(structType *types.Struct) []*structField {
 		tagValue := reflect.StructTag(structType.Tag(i))
 		key, ok := tagValue.Lookup("key")
 		if !ok {
-
+			// 如果 tag 没有 key，则使用 fieldName，并把第一个字母小写作为 key
+			// 比如 fieldName 为 Desk，则 key 为 desk
+			// 对应的 Getter Setter 方法名为 GetDesk, SetDesk
 			key = func() string {
 				for _, c := range name {
 					return string(unicode.ToLower(c)) + name[1:]
@@ -59,6 +61,7 @@ func getStructFields(structType *types.Struct) []*structField {
 			}()
 			fmt.Printf("field:%s 没有 key，使用 name 作为 key(%s) \n", name, key)
 		}
+		getterSetterName := strings.Title(key)
 		{
 			storeDBStr, ok := tagValue.Lookup("storedb")
 			if !ok {
@@ -109,8 +112,8 @@ func getStructFields(structType *types.Struct) []*structField {
 			cell:       flagCell,
 			client:     client,
 			emptyValue: getEmptyValue(typName, typ),
-			getter:     Id(fmt.Sprintf("Get%s", name)),
-			setter:     Id(fmt.Sprintf("Set%s", name)),
+			getter:     Id(fmt.Sprintf("Get%s", getterSetterName)),
+			setter:     Id(fmt.Sprintf("Set%s", getterSetterName)),
 			setParam:   Id(key).Id(typName),
 			typName:    typName,
 			attrGetter: attrGetter,
@@ -149,25 +152,25 @@ func getEmptyValue(typName string, typ types.Type) Code {
 	return Id("")
 }
 
-// 获取 nil 值，基础类型就是和空值一样，非基础类型就是 nil
-func getNilValue(typ types.Type) Code {
-	switch v := typ.(type) {
-	case *types.Basic:
-		switch v.Kind() {
-		case types.String, types.UntypedString:
-			return Lit("")
-		case types.Int, types.Uint, types.Int8, types.Uint8, types.Int16, types.Uint16, types.Int32, types.Uint32, types.Int64, types.Uint64, types.Float32, types.Float64:
-			return Lit(0)
-		case types.Bool:
-			return Lit(false)
-		default:
-			return Nil()
-		}
-	default:
-		return Nil()
-	}
-	return Nil()
-}
+// // 获取 nil 值，基础类型就是和空值一样，非基础类型就是 nil
+// func getNilValue(typ types.Type) Code {
+// 	switch v := typ.(type) {
+// 	case *types.Basic:
+// 		switch v.Kind() {
+// 		case types.String, types.UntypedString:
+// 			return Lit("")
+// 		case types.Int, types.Uint, types.Int8, types.Uint8, types.Int16, types.Uint16, types.Int32, types.Uint32, types.Int64, types.Uint64, types.Float32, types.Float64:
+// 			return Lit(0)
+// 		case types.Bool:
+// 			return Lit(false)
+// 		default:
+// 			return Nil()
+// 		}
+// 	default:
+// 		return Nil()
+// 	}
+// }
+
 func getTypString(typ types.Type) string {
 	// 获取命名字段的类型字符串，如果是基础类型, 则直接返回对应的类型字符串（比如 int, uint, string, bool...）
 	// 如果是结构体，则是 name + "Def"

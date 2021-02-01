@@ -115,25 +115,25 @@ func testChangeKey(t *testing.T, room *RoomDef) {
 
 	room.SetCsvPos(100)
 	Equal(t, room.HasChange(), true)
-	Equal(t, room.ChangeKey(), map[string]struct{}{"csv_pos": {}})
+	Equal(t, room.ChangeKey(), map[string]struct{}{"csvPos": {}})
 	room.SetBuildID("xxaabbcc")
 	Equal(t, room.GetBuildID(), "xxaabbcc")
 	Equal(t, room.ChangeKey(), map[string]struct{}{
-		"csv_pos":  {},
-		"build_id": {},
+		"csvPos":  {},
+		"buildID": {},
 	})
 	room.SetExtends(NewKVInt32Int32(map[int32]int32{888: 999}))
 	Equal(t, room.GetExtends().data(), map[int32]int32{888: 999})
 	Equal(t, room.ChangeKey(), map[string]struct{}{
-		"csv_pos":  {},
-		"build_id": {},
-		"extends":  {},
+		"csvPos":  {},
+		"buildID": {},
+		"extends": {},
 	})
 	room.GetExtends1().Set(999, "money")
 	Equal(t, room.GetExtends1().Get(999), "money")
 	Equal(t, room.ChangeKey(), map[string]struct{}{
-		"csv_pos":  {},
-		"build_id": {},
+		"csvPos":   {},
+		"buildID":  {},
 		"extends":  {},
 		"extends1": {},
 	})
@@ -163,20 +163,20 @@ func testChangeKey(t *testing.T, room *RoomDef) {
 	room.ClearChangeKey()
 	room.GetDesk111().SetHeight(200)
 	Equal(t, room.GetDesk111().GetHeight(), int32(200))
-	Equal(t, room.ChangeKey(), map[string]struct{}{"desk888": {}})
+	Equal(t, room.ChangeKey(), map[string]struct{}{"desk111": {}})
 
 	room.ClearChangeKey()
 	Equal(t, room.ChangeKey(), map[string]struct{}{})
 	room.GetDesks222().Get(101).SetWidth(500)
-	Equal(t, room.ChangeKey(), map[string]struct{}{"desks999": {}})
+	Equal(t, room.ChangeKey(), map[string]struct{}{"desks222": {}})
 
 	room.ClearChangeKey()
 	Equal(t, room.ChangeKey(), map[string]struct{}{})
 	room.GetDesksArr().At(0).SetHeight(3000)
-	Equal(t, room.ChangeKey(), map[string]struct{}{"desks": {}})
+	Equal(t, room.ChangeKey(), map[string]struct{}{"desksArr": {}})
 
 	room.GetInt8ss().Set(3, 100)
-	Equal(t, room.ChangeKey(), map[string]struct{}{"int8ss": {}, "desks": {}})
+	Equal(t, room.ChangeKey(), map[string]struct{}{"int8ss": {}, "desksArr": {}})
 
 }
 
