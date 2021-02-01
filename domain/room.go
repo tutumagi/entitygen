@@ -29,7 +29,7 @@ type Room struct {
 
 	Desks333 map[string]*Desk `key:"desks321" flag:"cell" client:"true" storedb:"true"`
 
-	// DesksArr []*Desk `key:"desks" flag:"cell" client:"true" storedb:"true"`
+	DesksArr []*Desk `key:"desks" flag:"cell" client:"true" storedb:"true"`
 
 	// Strss []string `key:"strss" flag:"cell" client:"true" storedb:"true"`
 

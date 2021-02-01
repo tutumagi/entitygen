@@ -21,15 +21,16 @@ func init() {
 	roomMeta.DefAttr("desk888", &DeskDef{}, attr.AfCell, true)
 	roomMeta.DefAttr("desks999", &KVInt32DeskDef{}, attr.AfCell, true)
 	roomMeta.DefAttr("desks321", &KVStrDeskDef{}, attr.AfCell, true)
+	roomMeta.DefAttr("desks", &DeskDefSlice{}, attr.AfCell, true)
 	roomMeta.DefAttr("int8ss", &Int8Slice{}, attr.AfCell, true)
 }
 
 type RoomDef attr.StrMap
 
 func EmptyRoomDef() *RoomDef {
-	return NewRoomDef(0, "", EmptyKVInt32Int32(), EmptyKVInt32Str(), EmptyKVStrInt32(), EmptyKVStrStr(), EmptyDeskDef(), EmptyKVInt32DeskDef(), EmptyKVStrDeskDef(), 0)
+	return NewRoomDef(0, "", EmptyKVInt32Int32(), EmptyKVInt32Str(), EmptyKVStrInt32(), EmptyKVStrStr(), EmptyDeskDef(), EmptyKVInt32DeskDef(), EmptyKVStrDeskDef(), EmptyDeskDefSlice(), 0)
 }
-func NewRoomDef(csv_pos int32, build_id string, extends *KVInt32Int32, extends1 *KVInt32Str, extends2 *KVStrInt32, extends3 *KVStrStr, desk888 *DeskDef, desks999 *KVInt32DeskDef, desks321 *KVStrDeskDef, int8ss *Int8Slice) *RoomDef {
+func NewRoomDef(csv_pos int32, build_id string, extends *KVInt32Int32, extends1 *KVInt32Str, extends2 *KVStrInt32, extends3 *KVStrStr, desk888 *DeskDef, desks999 *KVInt32DeskDef, desks321 *KVStrDeskDef, desks *DeskDefSlice, int8ss *Int8Slice) *RoomDef {
 	m := (*RoomDef)(attr.NewStrMap(nil))
 	m.SetCsvPos(csv_pos)
 	m.SetBuildID(build_id)
@@ -40,6 +41,7 @@ func NewRoomDef(csv_pos int32, build_id string, extends *KVInt32Int32, extends1 
 	m.SetDesk111(desk888)
 	m.SetDesks222(desks999)
 	m.SetDesks333(desks321)
+	m.SetDesksArr(desks)
 	m.SetInt8ss(int8ss)
 	m.ClearChangeKey()
 	return m
@@ -112,6 +114,14 @@ func (a *RoomDef) GetDesks333() *KVStrDeskDef {
 func (a *RoomDef) SetDesks333(desks321 *KVStrDeskDef) {
 	desks321.setParent("desks321", (*attr.StrMap)(a))
 	(*attr.StrMap)(a).Set("desks321", desks321)
+}
+
+func (a *RoomDef) GetDesksArr() *DeskDefSlice {
+	return (*attr.StrMap)(a).Value("desks").(*DeskDefSlice)
+}
+func (a *RoomDef) SetDesksArr(desks *DeskDefSlice) {
+	desks.setParent("desks", (*attr.StrMap)(a))
+	(*attr.StrMap)(a).Set("desks", desks)
 }
 
 func (a *RoomDef) GetInt8ss() *Int8Slice {

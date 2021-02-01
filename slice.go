@@ -67,8 +67,8 @@ func writeSlice(f *File, v *types.Slice) (string, error) {
 	// 写 setParent ForEach Equal, data
 	writeSliceCustomMethod(f, structName, "int", valTypStr, attrField, thisFn, convertThisFn, convertAttrStrMap)
 
-	// // 7. 写 marshal & unmarshal
-	// writeMapEncodeDecode(f, keyTypStr, valTypStr, isBasicVal, thisFn, convertThisFn)
+	// 7. 写 marshal & unmarshal
+	writeSliceEncodeDecode(f, valTypStr, isBasicVal, thisFn, convertThisFn)
 	return structName, nil
 }
 
