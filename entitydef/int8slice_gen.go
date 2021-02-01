@@ -21,3 +21,13 @@ func (a *Int8Slice) Set(idx int, item int8) {
 func (a *Int8Slice) Add(item int8) {
 	(*attr.Slice)(a).Add(item)
 }
+func (a *Int8Slice) At(idx int) int8 {
+	val := (*attr.Slice)(a).Int8(idx)
+	return val
+}
+func (a *Int8Slice) DelAt(idx int) bool {
+	return (*attr.Slice)(a).DeleteAt(idx)
+}
+func (a *Int8Slice) Count() int {
+	return (*attr.Slice)(a).Len()
+}

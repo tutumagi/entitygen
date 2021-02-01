@@ -32,7 +32,7 @@ func (a *Int8Arr) Set(idx int, item int8) {
 	(*attr.Slice)(a).Set(idx, item)
 }
 
-func (a *Int8Arr) DelIndex(idx int) bool {
+func (a *Int8Arr) DelAt(idx int) bool {
 	return (*attr.Slice)(a).DeleteAt(idx)
 }
 

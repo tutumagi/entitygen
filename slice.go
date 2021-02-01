@@ -99,19 +99,30 @@ func writeSliceGetSetDel(
 			g.Add(convertThisFn().Dot("Add").Call(Id("item")))
 		})
 
-	// // 写 Get
-	// attrGetter, shouldReturnConvert := getFieldAttrGetterFnName(valTyp)
-	// f.Func().Params(thisFn()).Id("Get").Params(Id("idx").Int()).Parens(Id(valTypStr), Bool()).
-	// 	BlockFunc(func(g *Group) {
-	// 		statement := g.Return(Add(convertThisFn()).Dot(attrGetter).Call(Id("k")))
-	// 		if shouldReturnConvert {
-	// 			statement.Dot("").Parens(Id(valTypStr)) // 做类型转换
-	// 		}
-	// 	})
+	// 写 At
+	attrGetter, shouldReturnConvert := getFieldAttrGetterFnName(valTyp)
+	f.Func().Params(thisFn()).Id("At").Params(Id("idx").Int()).Parens(Id(valTypStr)).
+		BlockFunc(func(g *Group) {
+			g.Id("val").Op(":=").Add(convertThisFn()).Dot(attrGetter).Call(Id("idx"))
+			// g.If(Id("val").Op("==").Nil()).Block(
+			// 	Return(getNilValue(valTyp), False()),
+			// )
+			if shouldReturnConvert {
+				g.Return(Id("val").Dot("").Parens(Id(valTypStr))) // 做类型转换
+			} else {
+				g.Return(Id("val"))
+			}
+		})
 
-	// // 写 Delete
-	// f.Func().Params(thisFn()).Id("Delete").Params(Id("k").Add(Id(keyTypStr))).Bool().
-	// 	Block(
-	// 		Return(convertThisFn().Dot("Delete").Call(Id("k"))),
-	// 	)
+	// 写 Delete
+	f.Func().Params(thisFn()).Id("DelAt").Params(Id("idx").Int()).Bool().
+		Block(
+			Return(convertThisFn().Dot("DeleteAt").Call(Id("idx"))),
+		)
+
+		// 写 Count
+	f.Func().Params(thisFn()).Id("Count").Params().Int().
+		Block(
+			Return(convertThisFn().Dot("Len").Call()),
+		)
 }

@@ -119,6 +119,7 @@ func getStructFields(structType *types.Struct) []*structField {
 	return result
 }
 
+// 获取类型的空值
 func getEmptyValue(typName string, typ types.Type) Code {
 	switch v := typ.(type) {
 	case *types.Basic:
@@ -148,6 +149,25 @@ func getEmptyValue(typName string, typ types.Type) Code {
 	return Id("")
 }
 
+// 获取 nil 值，基础类型就是和空值一样，非基础类型就是 nil
+func getNilValue(typ types.Type) Code {
+	switch v := typ.(type) {
+	case *types.Basic:
+		switch v.Kind() {
+		case types.String, types.UntypedString:
+			return Lit("")
+		case types.Int, types.Uint, types.Int8, types.Uint8, types.Int16, types.Uint16, types.Int32, types.Uint32, types.Int64, types.Uint64, types.Float32, types.Float64:
+			return Lit(0)
+		case types.Bool:
+			return Lit(false)
+		default:
+			return Nil()
+		}
+	default:
+		return Nil()
+	}
+	return Nil()
+}
 func getTypString(typ types.Type) string {
 	// 获取命名字段的类型字符串，如果是基础类型, 则直接返回对应的类型字符串（比如 int, uint, string, bool...）
 	// 如果是结构体，则是 name + "Def"
