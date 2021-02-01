@@ -61,13 +61,13 @@ func mockRoom() (*RoomDef, *domain.Room) {
 			1, 2, 3, 4, 5, 6, 7, 8,
 		},
 		DesksArr: []*domain.Desk{
-			&domain.Desk{
+			{
 				Width:  333,
 				Height: 444,
 				Name:   "innerdesk",
 				CsvID:  333444,
 			},
-			&domain.Desk{
+			{
 				Width:  555,
 				Height: 666,
 				Name:   "wahaheihei",
