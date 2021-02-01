@@ -20,10 +20,10 @@ func checkMapKey(v *types.Map) error {
 	return nil
 }
 
-func writeMap(f *File, v *types.Map) error {
+func writeMap(f *File, v *types.Map) (string, error) {
 	err := checkMapKey(v)
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	attrTypName := ""
@@ -94,7 +94,7 @@ func writeMap(f *File, v *types.Map) error {
 
 	// 7. 写 marshal & unmarshal
 	writeMapEncodeDecode(f, keyTypStr, valTypStr, isBasicVal, thisFn, convertThisFn)
-	return nil
+	return structName, nil
 }
 
 func setParenctCode(

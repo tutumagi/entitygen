@@ -6,7 +6,7 @@ import (
 	. "github.com/dave/jennifer/jen"
 )
 
-func writeStruct(f *File, sourceTypeName string, structType *types.Struct) {
+func writeStruct(f *File, sourceTypeName string, structType *types.Struct) string {
 	// 1. 对 struct 做一些准备工作
 	// 读取 types.Struct 所有字段信息，计算出我们要的信息，并做合法性判断
 	fields := getStructFields(structType)
@@ -51,4 +51,6 @@ func writeStruct(f *File, sourceTypeName string, structType *types.Struct) {
 
 	// 7. 写 marshal & unmarshal
 	writeEncodeDecode(f, thisFn, convertThisFn, attrMetaName)
+
+	return structName
 }
