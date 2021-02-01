@@ -7,7 +7,6 @@ import (
 func writeStructCustomMethod(
 	f *File,
 	structName string,
-	attrField func() *Statement,
 	thisFn func() *Statement,
 	convertThisFn func() *Statement,
 	convertAttrStrMap func(string) *Statement,
@@ -16,7 +15,7 @@ func writeStructCustomMethod(
 	// 写 changekey 相关的
 	writeChangeKey(f, thisFn, convertThisFn)
 	// 写 setParent ForEach Equal
-	writeParentForEachEqual(f, structName, "string", "interface{}", attrField, thisFn, convertThisFn, convertAttrStrMap)
+	writeParentForEachEqual(f, structName, "string", "interface{}", thisFn, convertThisFn, convertAttrStrMap)
 
 	writeMapData(f, "string", "interface{}", thisFn)
 }
@@ -26,12 +25,11 @@ func writeMapCustomMethod(
 	structName string,
 	keyTypStr string,
 	valTypStr string,
-	attrField func() *Statement,
 	thisFn func() *Statement,
 	convertThisFn func() *Statement,
 	convertAttrStrMap func(string) *Statement,
 ) {
-	writeParentForEachEqual(f, structName, keyTypStr, valTypStr, attrField, thisFn, convertThisFn, convertAttrStrMap)
+	writeParentForEachEqual(f, structName, keyTypStr, valTypStr, thisFn, convertThisFn, convertAttrStrMap)
 
 	writeHas(f, keyTypStr, thisFn, convertThisFn)
 
@@ -43,12 +41,11 @@ func writeSliceCustomMethod(
 	structName string,
 	keyTypStr string,
 	valTypStr string,
-	attrField func() *Statement,
 	thisFn func() *Statement,
 	convertThisFn func() *Statement,
 	convertAttrStrMap func(string) *Statement,
 ) {
-	writeParentForEachEqual(f, structName, keyTypStr, valTypStr, attrField, thisFn, convertThisFn, convertAttrStrMap)
+	writeParentForEachEqual(f, structName, keyTypStr, valTypStr, thisFn, convertThisFn, convertAttrStrMap)
 	writeSliceData(f, valTypStr, thisFn)
 }
 
@@ -78,7 +75,6 @@ func writeParentForEachEqual(
 	structName string,
 	keyTypStr string,
 	valTypStr string,
-	attrField func() *Statement,
 	thisFn func() *Statement,
 	convertThisFn func() *Statement,
 	convertAttrStrMap func(string) *Statement,

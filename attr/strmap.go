@@ -406,3 +406,8 @@ func (a *StrMap) Equal(other *StrMap) bool {
 
 	return equal
 }
+
+// 返回值只读，由外部自己保证不要去改这里面的东西
+func (a *StrMap) Data() map[string]interface{} {
+	return a.data
+}

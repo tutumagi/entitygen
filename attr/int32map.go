@@ -369,3 +369,8 @@ func (a *Int32Map) Equal(other *Int32Map) bool {
 
 	return equal
 }
+
+// 返回值只读，由外部自己保证不要去改这里面的东西
+func (a *Int32Map) Data() map[int32]interface{} {
+	return a.data
+}

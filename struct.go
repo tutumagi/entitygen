@@ -16,26 +16,14 @@ func writeStruct(f *File, sourceTypeName string, structType *types.Struct) strin
 	// 生成的对应的数据结构描述的名字 XXXAttrDef
 	attrMetaName := StructMetaName(sourceTypeName)
 
-	// 一些预设的类型或者关键字
-	// *attr.StrMap
-	attrStrMap := func() *Statement { return Id("*").Qual("gitlab.gamesword.com/nut/entitygen/attr", "StrMap") }
-	// attr.Field
-	attrField := func() *Statement { return Qual("gitlab.gamesword.com/nut/entitygen/attr", "Field") }
-	// 将 name 变量转为 *attr.StrMap类型: (*attr.StrMap)(name)
-	convertAttrStrMap := func(name string) *Statement { return Parens(attrStrMap()).Parens(Id(name)) }
 	// a *XXXDef
-	thisFn := func() *Statement { return Id(thisKeyword).Op("*").Id(structName) }
-	// 将 "a" 转为 *attr.StrMap 类型：(*attr.StrMap)(a)
-	convertThisFn := func() *Statement { return convertAttrStrMap(thisKeyword) }
+	attrType, thisFn, convertThisFn, convertAttrType := aboutThisCode(structName, "StrMap")
 
 	// 2. 写 attrDef
 	writeAttrMeta(f, attrMetaName, fields)
 
 	// 3. 写定义  type XXXDef attr.StrMap
-	f.Type().Id(structName).Qual(
-		"gitlab.gamesword.com/nut/entitygen/attr",
-		"StrMap",
-	)
+	f.Type().Id(structName).Add(attrType())
 
 	// 4. 写构造函数
 	writeCtor(f, structName, fields)
@@ -47,7 +35,7 @@ func writeStruct(f *File, sourceTypeName string, structType *types.Struct) strin
 	}
 
 	// 6. 写自定义方法
-	writeStructCustomMethod(f, structName, attrField, thisFn, convertThisFn, convertAttrStrMap)
+	writeStructCustomMethod(f, structName, thisFn, convertThisFn, convertAttrType)
 
 	// 7. 写 marshal & unmarshal
 	writeEncodeDecode(f, thisFn, convertThisFn, attrMetaName)

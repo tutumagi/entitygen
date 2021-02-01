@@ -352,3 +352,8 @@ func (a *Slice) Equal(other *Slice) bool {
 
 	return true
 }
+
+// 返回值只读，由外部自己保证不要去改这里面的东西
+func (a *Slice) Data() []interface{} {
+	return a.data
+}

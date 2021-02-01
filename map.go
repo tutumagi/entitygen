@@ -26,14 +26,6 @@ func writeMap(f *File, v *types.Map) (string, error) {
 		return "", err
 	}
 
-	attrTypName := ""
-	basicInfo := v.Key().(*types.Basic)
-	if basicInfo.Kind() == types.Int32 {
-		attrTypName = "Int32Map"
-	} else if basicInfo.Kind() == types.String {
-		attrTypName = "StrMap"
-	}
-
 	// 1. 对 struct 做一些准备工作
 
 	// 生成的Map 名字 KV{Key}{Val}
@@ -46,19 +38,21 @@ func writeMap(f *File, v *types.Map) (string, error) {
 	_, isBasicVal := valTyp.(*types.Basic)
 
 	// 一些预设的类型或者关键字
-	// *attr.StrMap
-	attrStrMap := func() *Statement { return Id("*").Qual("gitlab.gamesword.com/nut/entitygen/attr", attrTypName) }
-	// attr.Field
-	attrField := func() *Statement { return Qual("gitlab.gamesword.com/nut/entitygen/attr", "Field") }
-	// 将 name 变量转为 *attr.StrMap类型: (*attr.StrMap)(name)
-	convertAttrStrMap := func(name string) *Statement { return Parens(attrStrMap()).Parens(Id(name)) }
-	// a *XXXDef
-	thisFn := func() *Statement { return Id(thisKeyword).Op("*").Id(structName) }
-	// 将 "a" 转为 *attr.StrMap 类型：(*attr.StrMap)(a)
-	convertThisFn := func() *Statement { return convertAttrStrMap(thisKeyword) }
+
+	attrTypName := ""
+	basicInfo := v.Key().(*types.Basic)
+	if basicInfo.Kind() == types.Int32 {
+		attrTypName = "Int32Map"
+	} else if basicInfo.Kind() == types.String {
+		attrTypName = "StrMap"
+	} else {
+		failErr(fmt.Errorf("不支持 int32,string 之外作为 key 的 map(key:%s)", basicInfo.Name()))
+	}
+
+	attrType, thisFn, convertThisFn, convertAttrType := aboutThisCode(structName, attrTypName)
 
 	// 3. 写定义  type XXXDef attr.StrMap
-	f.Type().Id(structName).Qual("gitlab.gamesword.com/nut/entitygen/attr", attrTypName)
+	f.Type().Id(structName).Add(attrType())
 
 	// 4. 写构造函数
 	// EmptyXXXX 和 NewXXX
@@ -90,7 +84,7 @@ func writeMap(f *File, v *types.Map) (string, error) {
 
 	// 6. 写自定义方法
 	// 写 setParent ForEach Equal
-	writeMapCustomMethod(f, structName, keyTypStr, valTypStr, attrField, thisFn, convertThisFn, convertAttrStrMap)
+	writeMapCustomMethod(f, structName, keyTypStr, valTypStr, thisFn, convertThisFn, convertAttrType)
 
 	// 7. 写 marshal & unmarshal
 	writeMapEncodeDecode(f, keyTypStr, valTypStr, isBasicVal, thisFn, convertThisFn)

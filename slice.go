@@ -21,19 +21,12 @@ func writeSlice(f *File, v *types.Slice) (string, error) {
 	_, isBasicVal := valTyp.(*types.Basic)
 
 	// 一些预设的类型或者关键字
-	// *attr.StrMap
-	attrStrMap := func() *Statement { return Id("*").Qual("gitlab.gamesword.com/nut/entitygen/attr", attrTypName) }
-	// attr.Field
-	attrField := func() *Statement { return Qual("gitlab.gamesword.com/nut/entitygen/attr", "Field") }
+
 	// 将 name 变量转为 *attr.StrMap类型: (*attr.StrMap)(name)
-	convertAttrStrMap := func(name string) *Statement { return Parens(attrStrMap()).Parens(Id(name)) }
-	// a *XXXDef
-	thisFn := func() *Statement { return Id(thisKeyword).Op("*").Id(structName) }
-	// 将 "a" 转为 *attr.StrMap 类型：(*attr.StrMap)(a)
-	convertThisFn := func() *Statement { return convertAttrStrMap(thisKeyword) }
+	attrType, thisFn, convertThisFn, convertAttrType := aboutThisCode(structName, "Slice")
 
 	// 3. 写定义  type XXXDef attr.StrMap
-	f.Type().Id(structName).Qual("gitlab.gamesword.com/nut/entitygen/attr", attrTypName)
+	f.Type().Id(structName).Add(attrType())
 
 	// 4. 写构造函数
 	// EmptyXXXX 和 NewXXX
@@ -65,7 +58,7 @@ func writeSlice(f *File, v *types.Slice) (string, error) {
 
 	// 6. 写自定义方法
 	// 写 setParent ForEach Equal, data
-	writeSliceCustomMethod(f, structName, "int", valTypStr, attrField, thisFn, convertThisFn, convertAttrStrMap)
+	writeSliceCustomMethod(f, structName, "int", valTypStr, thisFn, convertThisFn, convertAttrType)
 
 	// 7. 写 marshal & unmarshal
 	writeSliceEncodeDecode(f, valTypStr, isBasicVal, thisFn, convertThisFn)

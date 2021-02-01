@@ -4,18 +4,41 @@ import (
 	"fmt"
 	"go/types"
 	"strings"
+
+	. "github.com/dave/jennifer/jen"
 )
 
 const (
-	thisKeyword = "a"
+	thisKeyword     = "a"
+	attrPackageName = "gitlab.gamesword.com/nut/entitygen/attr"
 )
 
+// 一些预设的类型或者关键字
 var (
-
-// 	zeroTypeCtor = func(v types.Type) Code {
-
-// 	}
+	// attr.Field
+	attrField = func() *Statement { return Qual(attrPackageName, "Field") }
 )
+
+// 根据 要生成的类型名字，和依赖的 attr 里面的名字生成一些预设的 statement
+func aboutThisCode(
+	structName string,
+	attrTypeName string,
+) (
+	attrType func() *Statement,
+	thisFn func() *Statement,
+	convertThis func() *Statement,
+	convertAttrType func(string) *Statement,
+) {
+	// 比如 attr.Int32Map attr.StrMap attr.Slice
+	attrType = func() *Statement { return Qual(attrPackageName, attrTypeName) }
+	// 比如 a *XXXX （主要用在类方法时的 this 定义）
+	thisFn = func() *Statement { return Id(thisKeyword).Op("*").Id(structName) }
+	// 比如 (*attr.Int32Map)(a)
+	convertThis = func() *Statement { return convertAttrType(thisKeyword) }
+	// 比如 (*attr.Int32Map)(name)
+	convertAttrType = func(name string) *Statement { return Parens(Id("*").Add(attrType())).Parens(Id(name)) }
+	return
+}
 
 func EmptyCtor(typName string) string {
 	return fmt.Sprintf("Empty%s", typName)
