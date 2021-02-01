@@ -34,6 +34,19 @@ func writeMapCustomMethod(
 	writeHas(f, keyTypStr, thisFn, convertThisFn)
 }
 
+func writeSliceCustomMethod(
+	f *File,
+	structName string,
+	keyTypStr string,
+	valTypStr string,
+	attrField func() *Statement,
+	thisFn func() *Statement,
+	convertThisFn func() *Statement,
+	convertAttrStrMap func(string) *Statement,
+) {
+	writeParentForEachEqual(f, structName, keyTypStr, valTypStr, attrField, thisFn, convertThisFn, convertAttrStrMap)
+}
+
 func writeChangeKey(
 	f *File,
 	thisFn func() *Statement,

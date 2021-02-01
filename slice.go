@@ -24,7 +24,7 @@ func writeSlice(f *File, v *types.Slice) (string, error) {
 	// *attr.StrMap
 	attrStrMap := func() *Statement { return Id("*").Qual("gitlab.gamesword.com/nut/entitygen/attr", attrTypName) }
 	// attr.Field
-	// attrField := func() *Statement { return Qual("gitlab.gamesword.com/nut/entitygen/attr", "Field") }
+	attrField := func() *Statement { return Qual("gitlab.gamesword.com/nut/entitygen/attr", "Field") }
 	// 将 name 变量转为 *attr.StrMap类型: (*attr.StrMap)(name)
 	convertAttrStrMap := func(name string) *Statement { return Parens(attrStrMap()).Parens(Id(name)) }
 	// a *XXXDef
@@ -63,9 +63,9 @@ func writeSlice(f *File, v *types.Slice) (string, error) {
 	// 5. 写所有字段的 getter/setter
 	writeSliceGetSetDel(f, valTypStr, valTyp, isBasicVal, thisFn, convertThisFn)
 
-	// // 6. 写自定义方法
-	// // 写 setParent ForEach Equal
-	// writeMapCustomMethod(f, structName, keyTypStr, valTypStr, attrField, thisFn, convertThisFn, convertAttrStrMap)
+	// 6. 写自定义方法
+	// 写 setParent ForEach Equal, data
+	writeSliceCustomMethod(f, structName, "int", valTypStr, attrField, thisFn, convertThisFn, convertAttrStrMap)
 
 	// // 7. 写 marshal & unmarshal
 	// writeMapEncodeDecode(f, keyTypStr, valTypStr, isBasicVal, thisFn, convertThisFn)

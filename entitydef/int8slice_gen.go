@@ -31,3 +31,22 @@ func (a *Int8Slice) DelAt(idx int) bool {
 func (a *Int8Slice) Count() int {
 	return (*attr.Slice)(a).Len()
 }
+func (a *Int8Slice) setParent(k string, parent attr.Field) {
+	(*attr.Slice)(a).SetParent(k, parent)
+}
+func (a *Int8Slice) ForEach(fn func(k int, v int8) bool) {
+	(*attr.Slice)(a).ForEach(func(k int, v interface{}) bool {
+		return fn(k, v.(int8))
+	})
+}
+func (a *Int8Slice) Equal(other *Int8Slice) bool {
+	return (*attr.Slice)(a).Equal((*attr.Slice)(other))
+}
+func (a *Int8Slice) data() map[int]int8 {
+	dd := map[int]int8{}
+	a.ForEach(func(k int, v int8) bool {
+		dd[k] = v
+		return true
+	})
+	return dd
+}
