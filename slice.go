@@ -58,7 +58,7 @@ func writeSlice(f *File, v *types.Slice) (string, error) {
 
 	// 6. 写自定义方法
 	// 写 setParent ForEach Equal, data
-	writeSliceCustomMethod(f, structName, "int", valTypStr, thisFn, convertThisFn, convertAttrType)
+	writeSliceCustomMethod(f, structName, attrType, "int", valTypStr, thisFn, convertThisFn, convertAttrType)
 
 	// 7. 写 marshal & unmarshal
 	writeSliceEncodeDecode(f, valTypStr, isBasicVal, thisFn, convertThisFn)
@@ -101,6 +101,7 @@ func writeSliceGetSetDel(
 			// 	Return(getNilValue(valTyp), False()),
 			// )
 			if shouldReturnConvert {
+				g.If(Id("val").Op("==").Nil()).Block(Return(Nil()))
 				g.Return(Id("val").Dot("").Parens(Id(valTypStr))) // 做类型转换
 			} else {
 				g.Return(Id("val"))

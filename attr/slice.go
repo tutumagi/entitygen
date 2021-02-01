@@ -317,46 +317,78 @@ func (a *Slice) Float64(index int) float64 {
 }
 
 func (a *Slice) Equal(other *Slice) bool {
+	if a == nil && other == nil {
+		return true
+	}
+	if (a == nil && other != nil) || (a != nil && other == nil) {
+		return false
+	}
 	if a.Len() != other.Len() {
 		return false
 	}
-
+	equal := true
 	for i, v := range a.data {
-		if im, ok := v.(*Int32Map); ok {
-			if otherVV, ok := other.Value(i).(*Int32Map); ok {
-				if im.Equal(otherVV) {
-					continue
+		if uu, ok := v.(IAttr); ok {
+			if im, ok := uu.Undertype().(*Int32Map); ok {
+				otherV := other.Value(i)
+				if otherV != nil {
+					if otherVV, ok := otherV.(IAttr); ok {
+						if othervvv, ok := otherVV.Undertype().(*Int32Map); ok {
+							if im.Equal(othervvv) {
+								continue
+							}
+						}
+					}
 				}
+				equal = false
+				break
 			}
-			break
-		}
-		if sm, ok := v.(*StrMap); ok {
-			if otherVV, ok := other.Value(i).(*StrMap); ok {
-				if sm.Equal(otherVV) {
-					continue
+			if im, ok := uu.Undertype().(*StrMap); ok {
+				otherV := other.Value(i)
+				if otherV != nil {
+					if otherVV, ok := otherV.(IAttr); ok {
+						if othervvv, ok := otherVV.Undertype().(*StrMap); ok {
+							if im.Equal(othervvv) {
+								continue
+							}
+						}
+					}
 				}
+				equal = false
+				break
 			}
-			break
-		}
-		if arr, ok := v.(*Slice); ok {
-			if otherVV, ok := other.Value(i).(*Slice); ok {
-				if arr.Equal(otherVV) {
-					continue
+			if im, ok := uu.Undertype().(*Slice); ok {
+				otherV := other.Value(i)
+				if otherV != nil {
+					if otherVV, ok := otherV.(IAttr); ok {
+						if othervvv, ok := otherVV.Undertype().(*Slice); ok {
+							if im.Equal(othervvv) {
+								continue
+							}
+						}
+					}
 				}
+				equal = false
+				break
 			}
-			break
 		}
 
 		if v == other.data[i] {
 			continue
+		} else {
+			equal = false
+			break
 		}
-		break
 	}
 
-	return true
+	return equal
 }
 
 // 返回值只读，由外部自己保证不要去改这里面的东西
 func (a *Slice) Data() []interface{} {
 	return a.data
+}
+
+func (a *Slice) Undertype() interface{} {
+	return a
 }

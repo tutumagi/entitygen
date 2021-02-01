@@ -241,3 +241,7 @@ func lowerFirst(s string) string {
 	}
 	return s
 }
+
+type IAttr interface {
+	Undertype() interface{}
+}

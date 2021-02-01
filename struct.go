@@ -35,7 +35,7 @@ func writeStruct(f *File, sourceTypeName string, structType *types.Struct) strin
 	}
 
 	// 6. 写自定义方法
-	writeStructCustomMethod(f, structName, thisFn, convertThisFn, convertAttrType)
+	writeStructCustomMethod(f, structName, attrType, thisFn, convertThisFn, convertAttrType)
 
 	// 7. 写 marshal & unmarshal
 	writeEncodeDecode(f, thisFn, convertThisFn, attrMetaName)

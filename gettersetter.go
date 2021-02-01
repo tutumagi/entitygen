@@ -23,23 +23,27 @@ func writeGetterSetter(f *File, fields []*structField, thisFn func() *Statement,
 			}
 			// func (a *XXXDef) GetField() FieldType
 			f.Func().Params(thisFn()).Add(field.getter).Params().Id(field.typName).
-				Block(
-					ReturnFunc(func(g *Group) {
-						statement := g.Add(convertThisFn()).Dot(field.attrGetter).Params(Lit(field.key))
-						// 如果不是基础类型，则加上类型转换
-						if !isBasic {
-							statement.Dot("").Parens(Id(field.typName))
-						}
-					}),
-				)
+				BlockFunc(func(g *Group) {
+					g.Id("val").Op(":=").Add(convertThisFn()).Dot(field.attrGetter).Call(Lit(field.key))
+					if !isBasic {
+						g.If(Id("val").Op("==").Nil()).Block(Return(Nil()))
+						g.Return(Id("val").Dot("").Parens(Id(field.typName))) // 做类型转换
+					} else {
+						g.Return(Id("val"))
+					}
+				})
 
 			//  写 setter
 			f.Func().Params(thisFn()).Add(field.setter).Params(field.setParam).
 				BlockFunc(func(g *Group) {
 					if !isBasic {
+						// g.If(Id(field.key).Op("==").Nil()).Block(Return())
 						g.Id(field.key).Dot("setParent").Call(Lit(field.key), convertThisFn())
+						g.Add(convertThisFn()).Dot("Set").Params(Lit(field.key), Id(field.key))
+					} else {
+						g.Add(convertThisFn()).Dot("Set").Params(Lit(field.key), Id(field.key))
 					}
-					g.Add(convertThisFn()).Dot("Set").Params(Lit(field.key), Id(field.key))
+
 				})
 
 			// 换行符
@@ -72,18 +76,24 @@ func writeMapGetSetDel(
 	f.Func().Params(thisFn()).Id("Set").Params(Id("k").Add(Id(keyTypStr)), Id("v").Add(Id(valTypStr))).
 		BlockFunc(func(g *Group) {
 			if !isBasicVal {
+				// g.If(Id("v").Op("==").Nil()).Block(Return())
 				g.Add(setParenctCode("k", "v", keyTypStr, convertThisFn))
+				g.Add(convertThisFn().Dot("Set").Call(Id("k"), Id("v")))
+			} else {
+				g.Add(convertThisFn().Dot("Set").Call(Id("k"), Id("v")))
 			}
-			g.Add(convertThisFn().Dot("Set").Call(Id("k"), Id("v")))
 		})
 
 	// 写 Get
 	attrGetter, shouldReturnConvert := getFieldAttrGetterFnName(valTyp)
 	f.Func().Params(thisFn()).Id("Get").Params(Id("k").Add(Id(keyTypStr))).Id(valTypStr).
 		BlockFunc(func(g *Group) {
-			statement := g.Return(Add(convertThisFn()).Dot(attrGetter).Call(Id("k")))
+			g.Id("val").Op(":=").Add(convertThisFn()).Dot(attrGetter).Call(Id("k"))
 			if shouldReturnConvert {
-				statement.Dot("").Parens(Id(valTypStr)) // 做类型转换
+				g.If(Id("val").Op("==").Nil()).Block(Return(Nil()))
+				g.Return(Id("val").Dot("").Parens(Id(valTypStr))) // 做类型转换
+			} else {
+				g.Return(Id("val"))
 			}
 		})
 

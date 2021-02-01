@@ -7,6 +7,7 @@ import (
 func writeStructCustomMethod(
 	f *File,
 	structName string,
+	attrType func() *Statement,
 	thisFn func() *Statement,
 	convertThisFn func() *Statement,
 	convertAttrStrMap func(string) *Statement,
@@ -15,7 +16,7 @@ func writeStructCustomMethod(
 	// 写 changekey 相关的
 	writeChangeKey(f, thisFn, convertThisFn)
 	// 写 setParent ForEach Equal
-	writeParentForEachEqual(f, structName, "string", "interface{}", thisFn, convertThisFn, convertAttrStrMap)
+	writeParentForEachEqual(f, structName, attrType, "string", "interface{}", thisFn, convertThisFn, convertAttrStrMap)
 
 	writeMapData(f, "string", "interface{}", thisFn)
 }
@@ -23,13 +24,14 @@ func writeStructCustomMethod(
 func writeMapCustomMethod(
 	f *File,
 	structName string,
+	attrType func() *Statement,
 	keyTypStr string,
 	valTypStr string,
 	thisFn func() *Statement,
 	convertThisFn func() *Statement,
 	convertAttrStrMap func(string) *Statement,
 ) {
-	writeParentForEachEqual(f, structName, keyTypStr, valTypStr, thisFn, convertThisFn, convertAttrStrMap)
+	writeParentForEachEqual(f, structName, attrType, keyTypStr, valTypStr, thisFn, convertThisFn, convertAttrStrMap)
 
 	writeHas(f, keyTypStr, thisFn, convertThisFn)
 
@@ -39,13 +41,14 @@ func writeMapCustomMethod(
 func writeSliceCustomMethod(
 	f *File,
 	structName string,
+	attrType func() *Statement,
 	keyTypStr string,
 	valTypStr string,
 	thisFn func() *Statement,
 	convertThisFn func() *Statement,
 	convertAttrStrMap func(string) *Statement,
 ) {
-	writeParentForEachEqual(f, structName, keyTypStr, valTypStr, thisFn, convertThisFn, convertAttrStrMap)
+	writeParentForEachEqual(f, structName, attrType, keyTypStr, valTypStr, thisFn, convertThisFn, convertAttrStrMap)
 	writeSliceData(f, valTypStr, thisFn)
 }
 
@@ -73,6 +76,7 @@ func writeChangeKey(
 func writeParentForEachEqual(
 	f *File,
 	structName string,
+	attrType func() *Statement,
 	keyTypStr string,
 	valTypStr string,
 	thisFn func() *Statement,
@@ -108,6 +112,10 @@ func writeParentForEachEqual(
 		Return(convertThisFn().Dot("Equal").Call(convertAttrStrMap("other"))),
 	)
 
+	// 写 undertype
+	f.Func().Params(thisFn()).Id("Undertype").Params().Interface().Block(
+		Return(convertThisFn()),
+	)
 }
 
 func writeHas(

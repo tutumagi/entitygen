@@ -334,40 +334,68 @@ func (a *Int32Map) Float64(key int32) float64 {
 }
 
 func (a *Int32Map) Equal(other *Int32Map) bool {
+	if a == nil && other == nil {
+		return true
+	}
+	if (a == nil && other != nil) || (a != nil && other == nil) {
+		return false
+	}
 	if len(a.data) != len(other.data) {
 		return false
 	}
 	equal := true
 	for k, v := range a.data {
-		if im, ok := v.(*Int32Map); ok {
-			if otherVV, ok := other.Value(k).(*Int32Map); ok {
-				if im.Equal(otherVV) {
-					continue
+		if uu, ok := v.(IAttr); ok {
+			if im, ok := uu.Undertype().(*Int32Map); ok {
+				otherV := other.Value(k)
+				if otherV != nil {
+					if otherVV, ok := otherV.(IAttr); ok {
+						if othervvv, ok := otherVV.Undertype().(*Int32Map); ok {
+							if im.Equal(othervvv) {
+								continue
+							}
+						}
+					}
 				}
+				equal = false
+				break
 			}
-			break
-		}
-		if sm, ok := v.(*StrMap); ok {
-			if otherVV, ok := other.Value(k).(*StrMap); ok {
-				if sm.Equal(otherVV) {
-					continue
+			if im, ok := uu.Undertype().(*StrMap); ok {
+				otherV := other.Value(k)
+				if otherV != nil {
+					if otherVV, ok := otherV.(IAttr); ok {
+						if othervvv, ok := otherVV.Undertype().(*StrMap); ok {
+							if im.Equal(othervvv) {
+								continue
+							}
+						}
+					}
 				}
+				equal = false
+				break
 			}
-			break
-		}
-		if arr, ok := v.(*Slice); ok {
-			if otherVV, ok := other.Value(k).(*Slice); ok {
-				if arr.Equal(otherVV) {
-					continue
+			if im, ok := uu.Undertype().(*Slice); ok {
+				otherV := other.Value(k)
+				if otherV != nil {
+					if otherVV, ok := otherV.(IAttr); ok {
+						if othervvv, ok := otherVV.Undertype().(*Slice); ok {
+							if im.Equal(othervvv) {
+								continue
+							}
+						}
+					}
 				}
+				equal = false
+				break
 			}
-			break
 		}
 
 		if v == other.Value(k) {
 			continue
+		} else {
+			equal = false
+			break
 		}
-		break
 	}
 
 	return equal
@@ -376,4 +404,8 @@ func (a *Int32Map) Equal(other *Int32Map) bool {
 // 返回值只读，由外部自己保证不要去改这里面的东西
 func (a *Int32Map) Data() map[int32]interface{} {
 	return a.data
+}
+
+func (a *Int32Map) Undertype() interface{} {
+	return a
 }

@@ -84,7 +84,7 @@ func writeMap(f *File, v *types.Map) (string, error) {
 
 	// 6. 写自定义方法
 	// 写 setParent ForEach Equal
-	writeMapCustomMethod(f, structName, keyTypStr, valTypStr, thisFn, convertThisFn, convertAttrType)
+	writeMapCustomMethod(f, structName, attrType, keyTypStr, valTypStr, thisFn, convertThisFn, convertAttrType)
 
 	// 7. 写 marshal & unmarshal
 	writeMapEncodeDecode(f, keyTypStr, valTypStr, isBasicVal, thisFn, convertThisFn)
