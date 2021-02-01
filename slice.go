@@ -51,9 +51,9 @@ func writeSlice(f *File, v *types.Slice) (string, error) {
 	}).Op("*").Id(structName).
 		BlockFunc(func(g *Group) {
 			g.Var().Id("convertData").Index().Interface().Op("=").Index().Interface().Block()
-			g.For().Id("k").Op(",").Id("v").Op(":=").Range().Id("items").BlockFunc(
+			g.For().Id("_").Op(",").Id("v").Op(":=").Range().Id("items").BlockFunc(
 				func(ig *Group) {
-					ig.Id("convertData").Index(Id("k")).Op("=").Id("v")
+					ig.Id("convertData").Op("=").Append(Id("convertData"), Id("v"))
 				},
 			)
 

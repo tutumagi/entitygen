@@ -76,6 +76,19 @@ func testEqualSource(t *testing.T, room *RoomDef, roomModel *domain.Room) {
 		Equal(t, d.GetName(), v.Name)
 		Equal(t, d.GetCsvID(), v.CsvID)
 	}
+
+	for k, v := range roomModel.DesksArr {
+		d := room.GetDesksArr().At(k)
+		Equal(t, d.GetHeight(), v.Height)
+		Equal(t, d.GetWidth(), v.Width)
+		Equal(t, d.GetName(), v.Name)
+		Equal(t, d.GetCsvID(), v.CsvID)
+	}
+
+	for k, v := range roomModel.Int8ss {
+		d := room.GetInt8ss().At(k)
+		Equal(t, d, v)
+	}
 }
 
 func testEqualDef(t *testing.T, left *RoomDef, right *RoomDef) {
@@ -88,8 +101,11 @@ func testEqualDef(t *testing.T, left *RoomDef, right *RoomDef) {
 	Equal(t, left.GetDesk111().Equal(right.GetDesk111()), true)
 	Equal(t, left.GetDesks222().Equal(right.GetDesks222()), true)
 	Equal(t, left.GetDesks333().Equal(right.GetDesks333()), true)
+	Equal(t, left.GetDesksArr().Equal(right.GetDesksArr()), true)
+	Equal(t, left.GetInt8ss().Equal(right.GetInt8ss()), true)
 
 	Equal(t, left.Equal(right), true)
+
 }
 
 func testChangeKey(t *testing.T, room *RoomDef) {
@@ -153,6 +169,15 @@ func testChangeKey(t *testing.T, room *RoomDef) {
 	Equal(t, room.ChangeKey(), map[string]struct{}{})
 	room.GetDesks222().Get(101).SetWidth(500)
 	Equal(t, room.ChangeKey(), map[string]struct{}{"desks999": {}})
+
+	room.ClearChangeKey()
+	Equal(t, room.ChangeKey(), map[string]struct{}{})
+	room.GetDesksArr().At(0).SetHeight(3000)
+	Equal(t, room.ChangeKey(), map[string]struct{}{"desks": {}})
+
+	room.GetInt8ss().Set(3, 100)
+	Equal(t, room.ChangeKey(), map[string]struct{}{"int8ss": {}, "desks": {}})
+
 }
 
 func testMarshalUnMarshal(

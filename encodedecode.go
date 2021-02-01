@@ -133,8 +133,11 @@ func writeSliceEncodeDecode(
 						// val 不是基础类型，就需要设置一下 parent
 						if !isBasicVal {
 							ig.Add(setSliceParentCode("k", "v", convertThisFn))
+						} else {
+							// 为了避免 定义了 k，却没有使用 k 导致的编译报错
+							ig.Add(Id("_")).Op("=").Id("k")
 						}
-						ig.Id("convertData").Index(Id("k")).Op("=").Id("v")
+						ig.Id("convertData").Op("=").Append(Id("convertData"), Id("v"))
 					},
 				)
 				g.Add(convertThisFn().Dot("SetData").Params(Id("convertData")))

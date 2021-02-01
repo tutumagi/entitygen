@@ -57,6 +57,23 @@ func mockRoom() (*RoomDef, *domain.Room) {
 				CsvID:  7001,
 			},
 		},
+		Int8ss: []int8{
+			1, 2, 3, 4, 5, 6, 7, 8,
+		},
+		DesksArr: []*domain.Desk{
+			&domain.Desk{
+				Width:  333,
+				Height: 444,
+				Name:   "innerdesk",
+				CsvID:  333444,
+			},
+			&domain.Desk{
+				Width:  555,
+				Height: 666,
+				Name:   "wahaheihei",
+				CsvID:  555666,
+			},
+		},
 	}
 
 	desk := NewDeskDef(
@@ -76,6 +93,11 @@ func mockRoom() (*RoomDef, *domain.Room) {
 		strdesks.Set(k, NewDeskDef(v.Width, v.Height, v.Name, v.CsvID))
 	}
 
+	deskArr := EmptyDeskDefSlice()
+	for _, v := range roomModel.DesksArr {
+		deskArr.Add(NewDeskDef(v.Width, v.Height, v.Name, v.CsvID))
+	}
+
 	room := NewRoomDef(
 		roomModel.CsvPos,
 		roomModel.BuildID,
@@ -86,6 +108,8 @@ func mockRoom() (*RoomDef, *domain.Room) {
 		desk,
 		int32desks,
 		strdesks,
+		deskArr,
+		NewInt8Slice(roomModel.Int8ss),
 	)
 
 	return room, roomModel

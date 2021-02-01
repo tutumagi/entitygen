@@ -14,8 +14,8 @@ func EmptyInt8Slice() *Int8Slice {
 }
 func NewInt8Slice(items []int8) *Int8Slice {
 	var convertData []interface{} = []interface{}{}
-	for k, v := range items {
-		convertData[k] = v
+	for _, v := range items {
+		convertData = append(convertData, v)
 	}
 	return (*Int8Slice)(attr.NewSlice(convertData))
 }
@@ -65,7 +65,8 @@ func (a *Int8Slice) UnmarshalJSON(b []byte) error {
 	}
 	convertData := []interface{}{}
 	for k, v := range dd {
-		convertData[k] = v
+		_ = k
+		convertData = append(convertData, v)
 	}
 	(*attr.Slice)(a).SetData(convertData)
 	return nil
@@ -81,7 +82,8 @@ func (a *Int8Slice) UnmarshalBSON(b []byte) error {
 	}
 	convertData := []interface{}{}
 	for k, v := range dd {
-		convertData[k] = v
+		_ = k
+		convertData = append(convertData, v)
 	}
 	(*attr.Slice)(a).SetData(convertData)
 	return nil

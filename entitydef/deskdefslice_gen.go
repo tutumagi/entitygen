@@ -15,8 +15,8 @@ func EmptyDeskDefSlice() *DeskDefSlice {
 }
 func NewDeskDefSlice(items []*DeskDef) *DeskDefSlice {
 	var convertData []interface{} = []interface{}{}
-	for k, v := range items {
-		convertData[k] = v
+	for _, v := range items {
+		convertData = append(convertData, v)
 	}
 	return (*DeskDefSlice)(attr.NewSlice(convertData))
 }
@@ -70,7 +70,7 @@ func (a *DeskDefSlice) UnmarshalJSON(b []byte) error {
 	convertData := []interface{}{}
 	for k, v := range dd {
 		v.setParent(fmt.Sprintf("ik%d", k), (*attr.Slice)(a))
-		convertData[k] = v
+		convertData = append(convertData, v)
 	}
 	(*attr.Slice)(a).SetData(convertData)
 	return nil
@@ -87,7 +87,7 @@ func (a *DeskDefSlice) UnmarshalBSON(b []byte) error {
 	convertData := []interface{}{}
 	for k, v := range dd {
 		v.setParent(fmt.Sprintf("ik%d", k), (*attr.Slice)(a))
-		convertData[k] = v
+		convertData = append(convertData, v)
 	}
 	(*attr.Slice)(a).SetData(convertData)
 	return nil

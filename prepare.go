@@ -142,7 +142,7 @@ func getEmptyValue(typName string, typ types.Type) Code {
 	case *types.Pointer:
 		return getEmptyValue(trimHeadStar(typName), v.Elem())
 	case *types.Slice:
-		return getEmptyValue(trimHeadStar(typName), v.Elem())
+		return Id(EmptyCtor(trimHeadStar(typName))).Call()
 	default:
 		failErr(fmt.Errorf("空值 Code 获取失败, 不支持的 type:%s", typ))
 	}
