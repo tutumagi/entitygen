@@ -72,16 +72,18 @@ func (a *Int8Slice) UnmarshalJSON(b []byte) error {
 	return nil
 }
 func (a *Int8Slice) MarshalBSON() ([]byte, error) {
-	return bson.Marshal(a.data())
+	return bson.Marshal(map[string][]int8{
+		"d": a.data(),
+	})
 }
 func (a *Int8Slice) UnmarshalBSON(b []byte) error {
-	dd := []int8{}
+	dd := map[string][]int8{}
 	err := bson.Unmarshal(b, &dd)
 	if err != nil {
 		return err
 	}
 	convertData := []interface{}{}
-	for k, v := range dd {
+	for k, v := range dd["d"] {
 		_ = k
 		convertData = append(convertData, v)
 	}

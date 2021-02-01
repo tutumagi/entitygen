@@ -110,17 +110,34 @@ func writeSliceEncodeDecode(
 	thisFn func() *Statement,
 	convertThisFn func() *Statement,
 ) {
+	// bson marshal unmarshal 有点 trick，bson top-level 不支持直接写 array，值，必须都是 k-v 类型的，
+	// 所以 slice 在自定义 bson marshal/unmarshl 时，手动添加一个 key 进去
 
 	writer := func(encodeFnName string, encodePackageFn *Statement, decodeFnName string, decodePackageFn *Statement) {
+
+		isBSON := encodeFnName == "MarshalBSON"
+		marshalVal := Id(thisKeyword).Dot("data").Call() // a.data()
+		if isBSON {
+			// map[string][]*XXX{"d": a.data()}
+			marshalVal = Map(String()).Index().Id(valTypStr).Block(Lit("d").Op(":").Add(marshalVal).Op(","))
+		}
+
 		// marshal
 		f.Func().Params(thisFn()).Id(encodeFnName).Params().Params(Index().Byte(), Error()).
 			Block(
-				Return(encodePackageFn.Call(Id(thisKeyword).Dot("data").Call())),
+				Return(encodePackageFn.Call(marshalVal)),
 			)
 		// unmarshal
 		f.Func().Params(thisFn()).Id(decodeFnName).Params(Id("b").Index().Byte()).Error().
 			BlockFunc(func(g *Group) {
-				g.Id("dd").Op(":=").Index().Id(valTypStr).Block()
+				iterater := Id("dd")
+				if isBSON {
+					g.Id("dd").Op(":=").Map(String()).Index().Id(valTypStr).Block()
+					iterater.Index(Lit("d"))
+				} else {
+					g.Id("dd").Op(":=").Index().Id(valTypStr).Block()
+				}
+
 				g.Id("err").Op(":=").Add(decodePackageFn).Call(Id("b"), Op("&").Id("dd"))
 				g.If(Id("err").Op("!=").Nil()).Block(
 					Return(Id("err")),
@@ -128,7 +145,7 @@ func writeSliceEncodeDecode(
 
 				g.Id("convertData").Op(":=").Index().Interface().Block()
 
-				g.For().Id("k").Op(",").Id("v").Op(":=").Range().Id("dd").BlockFunc(
+				g.For().Id("k").Op(",").Id("v").Op(":=").Range().Add(iterater).BlockFunc(
 					func(ig *Group) {
 						// val 不是基础类型，就需要设置一下 parent
 						if !isBasicVal {
