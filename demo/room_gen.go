@@ -122,12 +122,12 @@ func init() {
 
 	roomAttrDef.DefAttr("csv_pos", attr.Int32, attr.AfBase, true)
 	roomAttrDef.DefAttr("build_id", attr.String, attr.AfBase, true)
-	roomAttrDef.DefAttr("extends", &KVInt32Int32{}, attr.AfBase, true)
-	roomAttrDef.DefAttr("extends1", &KVInt32Str{}, attr.AfBase, true)
-	roomAttrDef.DefAttr("extends2", &KVStrInt32{}, attr.AfBase, true)
-	roomAttrDef.DefAttr("extends3", &KVStrStr{}, attr.AfBase, true)
-	roomAttrDef.DefAttr("desk", &DeskDef{}, attr.AfBase, true)
-	roomAttrDef.DefAttr("desks", &Desks{}, attr.AfBase, true)
+	roomAttrDef.DefAttr("extends", (*KVInt32Int32)(nil), attr.AfBase, true)
+	roomAttrDef.DefAttr("extends1", (*KVInt32Str)(nil), attr.AfBase, true)
+	roomAttrDef.DefAttr("extends2", (*KVStrInt32)(nil), attr.AfBase, true)
+	roomAttrDef.DefAttr("extends3", (*KVStrStr)(nil), attr.AfBase, true)
+	roomAttrDef.DefAttr("desk", (*DeskDef)(nil), attr.AfBase, true)
+	roomAttrDef.DefAttr("desks", (*Desks)(nil), attr.AfBase, true)
 }
 
 type RoomDef attr.StrMap

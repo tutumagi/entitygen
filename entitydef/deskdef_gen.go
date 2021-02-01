@@ -35,35 +35,43 @@ func NewDeskDef(width int32, height int32, name string, csvID int32, below *Desk
 	return m
 }
 func (a *DeskDef) GetWidth() int32 {
-	return (*attr.StrMap)(a).Int32("width")
+	val := (*attr.StrMap)(a).Int32("width")
+	return val
 }
 func (a *DeskDef) SetWidth(width int32) {
 	(*attr.StrMap)(a).Set("width", width)
 }
 
 func (a *DeskDef) GetHeight() int32 {
-	return (*attr.StrMap)(a).Int32("height")
+	val := (*attr.StrMap)(a).Int32("height")
+	return val
 }
 func (a *DeskDef) SetHeight(height int32) {
 	(*attr.StrMap)(a).Set("height", height)
 }
 
 func (a *DeskDef) GetName() string {
-	return (*attr.StrMap)(a).Str("name")
+	val := (*attr.StrMap)(a).Str("name")
+	return val
 }
 func (a *DeskDef) SetName(name string) {
 	(*attr.StrMap)(a).Set("name", name)
 }
 
 func (a *DeskDef) GetCsvID() int32 {
-	return (*attr.StrMap)(a).Int32("csvID")
+	val := (*attr.StrMap)(a).Int32("csvID")
+	return val
 }
 func (a *DeskDef) SetCsvID(csvID int32) {
 	(*attr.StrMap)(a).Set("csvID", csvID)
 }
 
 func (a *DeskDef) GetBelow() *DeskDef {
-	return (*attr.StrMap)(a).Value("below").(*DeskDef)
+	val := (*attr.StrMap)(a).Value("below")
+	if val == nil {
+		return nil
+	}
+	return val.(*DeskDef)
 }
 func (a *DeskDef) SetBelow(below *DeskDef) {
 	below.setParent("below", (*attr.StrMap)(a))
@@ -87,6 +95,9 @@ func (a *DeskDef) ForEach(fn func(k string, v interface{}) bool) {
 }
 func (a *DeskDef) Equal(other *DeskDef) bool {
 	return (*attr.StrMap)(a).Equal((*attr.StrMap)(other))
+}
+func (a *DeskDef) Undertype() interface{} {
+	return (*attr.StrMap)(a)
 }
 func (a *DeskDef) data() map[string]interface{} {
 	dd := map[string]interface{}{}

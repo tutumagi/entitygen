@@ -47,21 +47,27 @@ func NewRoomDef(csvPos int32, buildID string, extends *KVInt32Int32, extends1 *K
 	return m
 }
 func (a *RoomDef) GetCsvPos() int32 {
-	return (*attr.StrMap)(a).Int32("csvPos")
+	val := (*attr.StrMap)(a).Int32("csvPos")
+	return val
 }
 func (a *RoomDef) SetCsvPos(csvPos int32) {
 	(*attr.StrMap)(a).Set("csvPos", csvPos)
 }
 
 func (a *RoomDef) GetBuildID() string {
-	return (*attr.StrMap)(a).Str("buildID")
+	val := (*attr.StrMap)(a).Str("buildID")
+	return val
 }
 func (a *RoomDef) SetBuildID(buildID string) {
 	(*attr.StrMap)(a).Set("buildID", buildID)
 }
 
 func (a *RoomDef) GetExtends() *KVInt32Int32 {
-	return (*attr.StrMap)(a).Value("extends").(*KVInt32Int32)
+	val := (*attr.StrMap)(a).Value("extends")
+	if val == nil {
+		return nil
+	}
+	return val.(*KVInt32Int32)
 }
 func (a *RoomDef) SetExtends(extends *KVInt32Int32) {
 	extends.setParent("extends", (*attr.StrMap)(a))
@@ -69,7 +75,11 @@ func (a *RoomDef) SetExtends(extends *KVInt32Int32) {
 }
 
 func (a *RoomDef) GetExtends1() *KVInt32Str {
-	return (*attr.StrMap)(a).Value("extends1").(*KVInt32Str)
+	val := (*attr.StrMap)(a).Value("extends1")
+	if val == nil {
+		return nil
+	}
+	return val.(*KVInt32Str)
 }
 func (a *RoomDef) SetExtends1(extends1 *KVInt32Str) {
 	extends1.setParent("extends1", (*attr.StrMap)(a))
@@ -77,7 +87,11 @@ func (a *RoomDef) SetExtends1(extends1 *KVInt32Str) {
 }
 
 func (a *RoomDef) GetExtends2() *KVStrInt32 {
-	return (*attr.StrMap)(a).Value("extends2").(*KVStrInt32)
+	val := (*attr.StrMap)(a).Value("extends2")
+	if val == nil {
+		return nil
+	}
+	return val.(*KVStrInt32)
 }
 func (a *RoomDef) SetExtends2(extends2 *KVStrInt32) {
 	extends2.setParent("extends2", (*attr.StrMap)(a))
@@ -85,7 +99,11 @@ func (a *RoomDef) SetExtends2(extends2 *KVStrInt32) {
 }
 
 func (a *RoomDef) GetExtends3() *KVStrStr {
-	return (*attr.StrMap)(a).Value("extends3").(*KVStrStr)
+	val := (*attr.StrMap)(a).Value("extends3")
+	if val == nil {
+		return nil
+	}
+	return val.(*KVStrStr)
 }
 func (a *RoomDef) SetExtends3(extends3 *KVStrStr) {
 	extends3.setParent("extends3", (*attr.StrMap)(a))
@@ -93,7 +111,11 @@ func (a *RoomDef) SetExtends3(extends3 *KVStrStr) {
 }
 
 func (a *RoomDef) GetDesk111() *DeskDef {
-	return (*attr.StrMap)(a).Value("desk111").(*DeskDef)
+	val := (*attr.StrMap)(a).Value("desk111")
+	if val == nil {
+		return nil
+	}
+	return val.(*DeskDef)
 }
 func (a *RoomDef) SetDesk111(desk111 *DeskDef) {
 	desk111.setParent("desk111", (*attr.StrMap)(a))
@@ -101,7 +123,11 @@ func (a *RoomDef) SetDesk111(desk111 *DeskDef) {
 }
 
 func (a *RoomDef) GetDesks222() *KVInt32DeskDef {
-	return (*attr.StrMap)(a).Value("desks222").(*KVInt32DeskDef)
+	val := (*attr.StrMap)(a).Value("desks222")
+	if val == nil {
+		return nil
+	}
+	return val.(*KVInt32DeskDef)
 }
 func (a *RoomDef) SetDesks222(desks222 *KVInt32DeskDef) {
 	desks222.setParent("desks222", (*attr.StrMap)(a))
@@ -109,7 +135,11 @@ func (a *RoomDef) SetDesks222(desks222 *KVInt32DeskDef) {
 }
 
 func (a *RoomDef) GetDesks333() *KVStrDeskDef {
-	return (*attr.StrMap)(a).Value("desks333").(*KVStrDeskDef)
+	val := (*attr.StrMap)(a).Value("desks333")
+	if val == nil {
+		return nil
+	}
+	return val.(*KVStrDeskDef)
 }
 func (a *RoomDef) SetDesks333(desks333 *KVStrDeskDef) {
 	desks333.setParent("desks333", (*attr.StrMap)(a))
@@ -117,7 +147,11 @@ func (a *RoomDef) SetDesks333(desks333 *KVStrDeskDef) {
 }
 
 func (a *RoomDef) GetDesksArr() *DeskDefSlice {
-	return (*attr.StrMap)(a).Value("desksArr").(*DeskDefSlice)
+	val := (*attr.StrMap)(a).Value("desksArr")
+	if val == nil {
+		return nil
+	}
+	return val.(*DeskDefSlice)
 }
 func (a *RoomDef) SetDesksArr(desksArr *DeskDefSlice) {
 	desksArr.setParent("desksArr", (*attr.StrMap)(a))
@@ -125,7 +159,11 @@ func (a *RoomDef) SetDesksArr(desksArr *DeskDefSlice) {
 }
 
 func (a *RoomDef) GetInt8ss() *Int8Slice {
-	return (*attr.StrMap)(a).Value("int8ss").(*Int8Slice)
+	val := (*attr.StrMap)(a).Value("int8ss")
+	if val == nil {
+		return nil
+	}
+	return val.(*Int8Slice)
 }
 func (a *RoomDef) SetInt8ss(int8ss *Int8Slice) {
 	int8ss.setParent("int8ss", (*attr.StrMap)(a))
@@ -149,6 +187,9 @@ func (a *RoomDef) ForEach(fn func(k string, v interface{}) bool) {
 }
 func (a *RoomDef) Equal(other *RoomDef) bool {
 	return (*attr.StrMap)(a).Equal((*attr.StrMap)(other))
+}
+func (a *RoomDef) Undertype() interface{} {
+	return (*attr.StrMap)(a)
 }
 func (a *RoomDef) data() map[string]interface{} {
 	dd := map[string]interface{}{}

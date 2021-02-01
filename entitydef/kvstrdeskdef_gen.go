@@ -24,7 +24,11 @@ func (a *KVStrDeskDef) Set(k string, v *DeskDef) {
 	(*attr.StrMap)(a).Set(k, v)
 }
 func (a *KVStrDeskDef) Get(k string) *DeskDef {
-	return (*attr.StrMap)(a).Value(k).(*DeskDef)
+	val := (*attr.StrMap)(a).Value(k)
+	if val == nil {
+		return nil
+	}
+	return val.(*DeskDef)
 }
 func (a *KVStrDeskDef) Delete(k string) bool {
 	return (*attr.StrMap)(a).Delete(k)
@@ -39,6 +43,9 @@ func (a *KVStrDeskDef) ForEach(fn func(k string, v *DeskDef) bool) {
 }
 func (a *KVStrDeskDef) Equal(other *KVStrDeskDef) bool {
 	return (*attr.StrMap)(a).Equal((*attr.StrMap)(other))
+}
+func (a *KVStrDeskDef) Undertype() interface{} {
+	return (*attr.StrMap)(a)
 }
 func (a *KVStrDeskDef) Has(k string) bool {
 	return (*attr.StrMap)(a).Has(k)

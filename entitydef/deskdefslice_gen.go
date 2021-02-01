@@ -31,6 +31,9 @@ func (a *DeskDefSlice) Add(item *DeskDef) {
 }
 func (a *DeskDefSlice) At(idx int) *DeskDef {
 	val := (*attr.Slice)(a).Value(idx)
+	if val == nil {
+		return nil
+	}
 	return val.(*DeskDef)
 }
 func (a *DeskDefSlice) DelAt(idx int) bool {
@@ -49,6 +52,9 @@ func (a *DeskDefSlice) ForEach(fn func(k int, v *DeskDef) bool) {
 }
 func (a *DeskDefSlice) Equal(other *DeskDefSlice) bool {
 	return (*attr.Slice)(a).Equal((*attr.Slice)(other))
+}
+func (a *DeskDefSlice) Undertype() interface{} {
+	return (*attr.Slice)(a)
 }
 func (a *DeskDefSlice) data() []*DeskDef {
 	dd := []*DeskDef{}

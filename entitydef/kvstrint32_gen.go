@@ -23,7 +23,8 @@ func (a *KVStrInt32) Set(k string, v int32) {
 	(*attr.StrMap)(a).Set(k, v)
 }
 func (a *KVStrInt32) Get(k string) int32 {
-	return (*attr.StrMap)(a).Int32(k)
+	val := (*attr.StrMap)(a).Int32(k)
+	return val
 }
 func (a *KVStrInt32) Delete(k string) bool {
 	return (*attr.StrMap)(a).Delete(k)
@@ -38,6 +39,9 @@ func (a *KVStrInt32) ForEach(fn func(k string, v int32) bool) {
 }
 func (a *KVStrInt32) Equal(other *KVStrInt32) bool {
 	return (*attr.StrMap)(a).Equal((*attr.StrMap)(other))
+}
+func (a *KVStrInt32) Undertype() interface{} {
+	return (*attr.StrMap)(a)
 }
 func (a *KVStrInt32) Has(k string) bool {
 	return (*attr.StrMap)(a).Has(k)

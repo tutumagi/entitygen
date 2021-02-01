@@ -23,7 +23,8 @@ func (a *KVInt32Int32) Set(k int32, v int32) {
 	(*attr.Int32Map)(a).Set(k, v)
 }
 func (a *KVInt32Int32) Get(k int32) int32 {
-	return (*attr.Int32Map)(a).Int32(k)
+	val := (*attr.Int32Map)(a).Int32(k)
+	return val
 }
 func (a *KVInt32Int32) Delete(k int32) bool {
 	return (*attr.Int32Map)(a).Delete(k)
@@ -38,6 +39,9 @@ func (a *KVInt32Int32) ForEach(fn func(k int32, v int32) bool) {
 }
 func (a *KVInt32Int32) Equal(other *KVInt32Int32) bool {
 	return (*attr.Int32Map)(a).Equal((*attr.Int32Map)(other))
+}
+func (a *KVInt32Int32) Undertype() interface{} {
+	return (*attr.Int32Map)(a)
 }
 func (a *KVInt32Int32) Has(k int32) bool {
 	return (*attr.Int32Map)(a).Has(k)

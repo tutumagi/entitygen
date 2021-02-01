@@ -25,7 +25,11 @@ func (a *KVInt32DeskDef) Set(k int32, v *DeskDef) {
 	(*attr.Int32Map)(a).Set(k, v)
 }
 func (a *KVInt32DeskDef) Get(k int32) *DeskDef {
-	return (*attr.Int32Map)(a).Value(k).(*DeskDef)
+	val := (*attr.Int32Map)(a).Value(k)
+	if val == nil {
+		return nil
+	}
+	return val.(*DeskDef)
 }
 func (a *KVInt32DeskDef) Delete(k int32) bool {
 	return (*attr.Int32Map)(a).Delete(k)
@@ -40,6 +44,9 @@ func (a *KVInt32DeskDef) ForEach(fn func(k int32, v *DeskDef) bool) {
 }
 func (a *KVInt32DeskDef) Equal(other *KVInt32DeskDef) bool {
 	return (*attr.Int32Map)(a).Equal((*attr.Int32Map)(other))
+}
+func (a *KVInt32DeskDef) Undertype() interface{} {
+	return (*attr.Int32Map)(a)
 }
 func (a *KVInt32DeskDef) Has(k int32) bool {
 	return (*attr.Int32Map)(a).Has(k)
