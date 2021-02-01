@@ -21,8 +21,8 @@ func main() {
 
 	// 2. 拿到参数
 	sourceArg := os.Args[1] // 包名.类型名
-	// 如果要生成的是 包名/路径.类型格式的，则加载指定类型
-	if len(strings.Split(sourceArg, ".")) >= 2 {
+
+	if isGenerateSingleType(sourceArg) {
 		sourceTypePackage, sourceTypeName := splitSourceType(sourceArg)
 
 		// 3. 加载包
@@ -64,22 +64,22 @@ func main() {
 			if tt != nil {
 				switch v := tt.Type().(type) {
 				case *types.Basic:
-					fmt.Printf("collect types name:%s type:%s. skip it\n", tt.Name(), tt.Type())
+					fmt.Printf("collect basic types name:%s type:%s. skip it\n", tt.Name(), tt.Type())
 				case *types.Map:
-					fmt.Printf("collect types name:%s type:%s. \n", tt.Name(), tt.Type())
+					fmt.Printf("collect map types name:%s type:%s. \n", tt.Name(), tt.Type())
 					allStructs = append(allStructs, ssInfo{
 						name: MapTypeName(v),
 						typ:  v,
 					})
 				case *types.Struct:
-					fmt.Printf("collect types name:%s type:%s. \n", tt.Name(), tt.Type())
+					fmt.Printf("collect struct types name:%s type:%s. \n", tt.Name(), tt.Type())
 					allStructs = append(allStructs, ssInfo{
 						name: tt.Name(),
 						typ:  v,
 					})
 				case *types.Named: // 某个字段是自定义类型 会跑到这里
 					// fmt.Printf("collect types is named: %s. \n", tt.Type.String())
-					fmt.Printf("collect types(named) name:%s type:%s. \n", tt.Name(), tt.Type())
+					fmt.Printf("collect named types name:%s type:%s. \n", tt.Name(), tt.Type())
 					allStructs = append(allStructs, ssInfo{
 						name: tt.Name(),
 						typ:  tt.Type().Underlying().(*types.Struct),
@@ -139,6 +139,8 @@ func generate(sourceTypeName string, structType types.Type) error {
 	baseFilename := goFile[0 : len(goFile)-len(ext)]
 	targetFilename := baseFilename + "_" + strings.ToLower(sourceTypeName) + "_gen.go"
 
+	fmt.Printf("save generate type:%s to file %s\n", sourceTypeName, targetFilename)
+
 	return f.Save(targetFilename)
 }
 
@@ -165,6 +167,15 @@ func splitSourceType(sourceType string) (string, string) {
 	sourceTypePackage := sourceType[0:idx]
 	sourceTypeName := sourceType[idx+1:]
 	return sourceTypePackage, sourceTypeName
+}
+
+// 判断是否生成单个类型，还是生成整个包
+func isGenerateSingleType(sourePath string) bool {
+	// 如果要生成的是 包名/路径.类型格式的，则加载指定类型
+	paths := strings.Split(sourePath, "/")
+	lastPath := paths[len(paths)-1]
+
+	return len(strings.Split(lastPath, ".")) >= 2
 }
 
 func failErr(err error) {
