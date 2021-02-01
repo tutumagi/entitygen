@@ -48,6 +48,9 @@ func (a *KVStrDeskDef) data() map[string]*DeskDef {
 	})
 	return dd
 }
+func (a *KVStrDeskDef) Has(k string) bool {
+	return (*attr.StrMap)(a).Has(k)
+}
 func (a *KVStrDeskDef) MarshalJSON() ([]byte, error) {
 	return json.Marshal((*attr.StrMap)(a).ToMap())
 }

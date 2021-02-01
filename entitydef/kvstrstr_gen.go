@@ -47,6 +47,9 @@ func (a *KVStrStr) data() map[string]string {
 	})
 	return dd
 }
+func (a *KVStrStr) Has(k string) bool {
+	return (*attr.StrMap)(a).Has(k)
+}
 func (a *KVStrStr) MarshalJSON() ([]byte, error) {
 	return json.Marshal((*attr.StrMap)(a).ToMap())
 }

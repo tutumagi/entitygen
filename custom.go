@@ -4,7 +4,7 @@ import (
 	. "github.com/dave/jennifer/jen"
 )
 
-func writeCustomMethod(
+func writeStructCustomMethod(
 	f *File,
 	structName string,
 	attrField func() *Statement,
@@ -17,6 +17,21 @@ func writeCustomMethod(
 	writeChangeKey(f, thisFn, convertThisFn)
 	// 写 setParent ForEach Equal
 	writeParentForEachEqual(f, structName, "string", "interface{}", attrField, thisFn, convertThisFn, convertAttrStrMap)
+}
+
+func writeMapCustomMethod(
+	f *File,
+	structName string,
+	keyTypStr string,
+	valTypStr string,
+	attrField func() *Statement,
+	thisFn func() *Statement,
+	convertThisFn func() *Statement,
+	convertAttrStrMap func(string) *Statement,
+) {
+	writeParentForEachEqual(f, structName, keyTypStr, valTypStr, attrField, thisFn, convertThisFn, convertAttrStrMap)
+
+	writeHas(f, keyTypStr, thisFn, convertThisFn)
 }
 
 func writeChangeKey(
@@ -88,4 +103,17 @@ func writeParentForEachEqual(
 			))
 			g.Return(Id("dd"))
 		})
+}
+
+func writeHas(
+	f *File,
+	keyTypStr string,
+	thisFn func() *Statement,
+	convertThisFn func() *Statement,
+) {
+	// 4. 写 setParent
+	f.Func().Params(thisFn()).Id("Has").Params(Id("k").Id(keyTypStr)).Bool().
+		Block(
+			Return(convertThisFn().Dot("Has").Call(Id("k"))),
+		)
 }

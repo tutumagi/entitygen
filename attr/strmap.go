@@ -99,6 +99,11 @@ func (a *StrMap) ForEach(fn func(k string, v interface{}) bool) {
 	}
 }
 
+func (a *StrMap) Has(k string) bool {
+	_, ok := a.data[k]
+	return ok
+}
+
 func (a *StrMap) Delete(key string) bool {
 	if _, ok := a.data[key]; ok {
 		delete(a.data, key)
@@ -379,6 +384,14 @@ func (a *StrMap) Equal(other *StrMap) bool {
 		if sm, ok := v.(*StrMap); ok {
 			if otherVV, ok := other.Value(k).(*StrMap); ok {
 				if sm.Equal(otherVV) {
+					continue
+				}
+			}
+			break
+		}
+		if arr, ok := v.(*Slice); ok {
+			if otherVV, ok := other.Value(k).(*Slice); ok {
+				if arr.Equal(otherVV) {
 					continue
 				}
 			}

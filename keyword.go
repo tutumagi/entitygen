@@ -51,6 +51,17 @@ func MapTypeName(v *types.Map) string {
 	return fmt.Sprintf("KV%s%s", key, val)
 }
 
+func SliceTypeName(v *types.Slice) string {
+	val := trimHeadStar(getTypString(v.Elem()))
+
+	val = strings.Title(val)
+	if val == "String" {
+		val = "Str"
+	}
+
+	return fmt.Sprintf("%sSlice", val)
+}
+
 // 如果是 *Desk, 则返回 Desk
 func trimHeadStar(str string) string {
 	if strings.HasPrefix(str, "*") {

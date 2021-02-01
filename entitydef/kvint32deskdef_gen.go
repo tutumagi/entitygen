@@ -49,6 +49,9 @@ func (a *KVInt32DeskDef) data() map[int32]*DeskDef {
 	})
 	return dd
 }
+func (a *KVInt32DeskDef) Has(k int32) bool {
+	return (*attr.Int32Map)(a).Has(k)
+}
 func (a *KVInt32DeskDef) MarshalJSON() ([]byte, error) {
 	return json.Marshal((*attr.Int32Map)(a).ToMap())
 }

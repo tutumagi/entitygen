@@ -140,6 +140,8 @@ func getEmptyValue(typName string, typ types.Type) Code {
 		return Id(EmptyCtor(trimHeadStar(typName))).Call()
 	case *types.Pointer:
 		return getEmptyValue(trimHeadStar(typName), v.Elem())
+	case *types.Slice:
+		return getEmptyValue(trimHeadStar(typName), v.Elem())
 	default:
 		failErr(fmt.Errorf("空值 Code 获取失败, 不支持的 type:%s", typ))
 	}
@@ -178,6 +180,8 @@ func getTypString(typ types.Type) string {
 		return fmt.Sprintf("*%s", getTypString(v.Elem()))
 	case *types.Map:
 		return fmt.Sprintf("*%s", MapTypeName(v))
+	case *types.Slice:
+		return fmt.Sprintf("*%s", SliceTypeName(v))
 	default:
 		failErr(fmt.Errorf("不支持的类型 %s", v.String()))
 	}

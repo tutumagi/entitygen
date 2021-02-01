@@ -26,6 +26,8 @@ type Room struct {
 	Desk *Desk `key:"desk" flag:"cell" client:"true" storedb:"true"`
 
 	Desks map[int32]*Desk `key:"desks" flag:"cell" client:"true" storedb:"true"`
+
+	Int8ss []int8 `key:"int8ss" flag:"cell" client:"true" storedb:"true"`
 }
 
 // 桌子

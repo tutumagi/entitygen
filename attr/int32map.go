@@ -75,6 +75,11 @@ func (a *Int32Map) ToMap() map[int32]interface{} {
 	return a.data
 }
 
+func (a *Int32Map) Has(k int32) bool {
+	_, ok := a.data[k]
+	return ok
+}
+
 func (a *Int32Map) ForEach(fn func(k int32, v interface{}) bool) {
 	for k, v := range a.data {
 		if !fn(k, v) {
@@ -342,6 +347,14 @@ func (a *Int32Map) Equal(other *Int32Map) bool {
 		if sm, ok := v.(*StrMap); ok {
 			if otherVV, ok := other.Value(k).(*StrMap); ok {
 				if sm.Equal(otherVV) {
+					continue
+				}
+			}
+			break
+		}
+		if arr, ok := v.(*Slice); ok {
+			if otherVV, ok := other.Value(k).(*Slice); ok {
+				if arr.Equal(otherVV) {
 					continue
 				}
 			}

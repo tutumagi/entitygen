@@ -83,6 +83,12 @@ func main() {
 						name: tt.Name(),
 						typ:  tt.Type().Underlying().(*types.Struct),
 					})
+				case *types.Slice:
+					fmt.Printf("collect slice types name:%s type:%s. \n", tt.Name(), tt.Type())
+					allStructs = append(allStructs, ssInfo{
+						name: SliceTypeName(v),
+						typ:  v,
+					})
 				}
 			}
 		}
@@ -135,6 +141,13 @@ func generate(sourceTypeName string, structType types.Type) error {
 		if err != nil {
 			failErr(err)
 		}
+	case *types.Slice:
+		desTypeName, err = writeSlice(f, vv)
+		if err != nil {
+			failErr(err)
+		}
+	default:
+		fmt.Printf("cannot generate the type %s\n", vv)
 	}
 
 	// 3. dump 到 文件

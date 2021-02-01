@@ -90,7 +90,7 @@ func writeMap(f *File, v *types.Map) (string, error) {
 
 	// 6. 写自定义方法
 	// 写 setParent ForEach Equal
-	writeParentForEachEqual(f, structName, keyTypStr, valTypStr, attrField, thisFn, convertThisFn, convertAttrStrMap)
+	writeMapCustomMethod(f, structName, keyTypStr, valTypStr, attrField, thisFn, convertThisFn, convertAttrStrMap)
 
 	// 7. 写 marshal & unmarshal
 	writeMapEncodeDecode(f, keyTypStr, valTypStr, isBasicVal, thisFn, convertThisFn)
@@ -109,5 +109,15 @@ func setParenctCode(
 		// mk 表示 map key :)
 		parentKey = Qual("fmt", "Sprintf").Call(Lit("mk%d").Op(",").Id(keyParamName))
 	}
+	return Id(valParamName).Dot("setParent").Call(parentKey, convertThisFn())
+}
+
+func setSliceParentCode(
+	idxParamName string,
+	valParamName string,
+	convertThisFn func() *Statement,
+) *Statement {
+	parentKey := Qual("fmt", "Sprintf").Call(Lit("ik%d").Op(",").Id(idxParamName))
+
 	return Id(valParamName).Dot("setParent").Call(parentKey, convertThisFn())
 }

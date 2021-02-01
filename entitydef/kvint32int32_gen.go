@@ -47,6 +47,9 @@ func (a *KVInt32Int32) data() map[int32]int32 {
 	})
 	return dd
 }
+func (a *KVInt32Int32) Has(k int32) bool {
+	return (*attr.Int32Map)(a).Has(k)
+}
 func (a *KVInt32Int32) MarshalJSON() ([]byte, error) {
 	return json.Marshal((*attr.Int32Map)(a).ToMap())
 }

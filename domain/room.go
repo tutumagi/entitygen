@@ -33,7 +33,7 @@ type Room struct {
 
 	// Strss []string `key:"strss" flag:"cell" client:"true" storedb:"true"`
 
-	// Int8ss []int8 `key:"int8ss" flag:"cell" client:"true" storedb:"true"`
+	Int8ss []int8 `key:"int8ss" flag:"cell" client:"true" storedb:"true"`
 }
 
 // 桌子

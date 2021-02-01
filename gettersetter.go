@@ -13,7 +13,7 @@ func writeGetterSetter(f *File, fields []*structField, thisFn func() *Statement,
 		field := fields[i]
 
 		switch v := field.typ.(type) {
-		case *types.Basic, *types.Pointer, *types.Map:
+		case *types.Basic, *types.Pointer, *types.Map, *types.Slice:
 			// 写 getter
 			_, isBasic := v.(*types.Basic)
 			if vvm, ok := v.(*types.Map); ok {

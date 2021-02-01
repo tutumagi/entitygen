@@ -26,7 +26,7 @@ var strSlicePool *sync.Pool = &sync.Pool{
 	},
 }
 
-func NewStrSlice(data []interface{}) *Slice {
+func NewSlice(data []interface{}) *Slice {
 	strSlice := strSlicePool.Get().(*Slice)
 	strSlice.parentKey = ""
 	strSlice.parent = nil
@@ -34,7 +34,7 @@ func NewStrSlice(data []interface{}) *Slice {
 	return strSlice
 }
 
-func ReleaseStrSlice(mm *Int32Map) {
+func ReleaseSlice(mm *Int32Map) {
 	mm.data = map[int32]interface{}{}
 	mm.parentKey = ""
 	mm.parent = nil
@@ -100,6 +100,7 @@ func (a *Slice) SetData(data []interface{}) {
 
 func (a *Slice) Set(index int, val interface{}) {
 	if index > len(a.data) {
+		// TODO 这里是否需要打印出日志?
 		return
 	}
 	a.data[index] = val
@@ -161,7 +162,7 @@ func (a *Slice) Str(index int) string {
 // Value returns value with interface{} type
 func (a *Slice) Value(index int) interface{} {
 	if index >= len(a.data) {
-		return ""
+		return nil
 	}
 	return a.data[index]
 }
@@ -310,4 +311,44 @@ func (a *Slice) Float64(index int) float64 {
 	}
 
 	return r
+}
+
+func (a *Slice) Equal(other *Slice) bool {
+	if a.Len() != other.Len() {
+		return false
+	}
+
+	for i, v := range a.data {
+		if im, ok := v.(*Int32Map); ok {
+			if otherVV, ok := other.Value(i).(*Int32Map); ok {
+				if im.Equal(otherVV) {
+					continue
+				}
+			}
+			break
+		}
+		if sm, ok := v.(*StrMap); ok {
+			if otherVV, ok := other.Value(i).(*StrMap); ok {
+				if sm.Equal(otherVV) {
+					continue
+				}
+			}
+			break
+		}
+		if arr, ok := v.(*Slice); ok {
+			if otherVV, ok := other.Value(i).(*Slice); ok {
+				if arr.Equal(otherVV) {
+					continue
+				}
+			}
+			break
+		}
+
+		if v == other.data[i] {
+			continue
+		}
+		break
+	}
+
+	return true
 }
