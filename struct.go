@@ -2,6 +2,7 @@ package main
 
 import (
 	"go/types"
+	"strings"
 
 	. "github.com/dave/jennifer/jen"
 )
@@ -9,7 +10,8 @@ import (
 func writeStruct(f *File, sourceTypeName string, structType *types.Struct) string {
 	// 1. 对 struct 做一些准备工作
 	// 读取 types.Struct 所有字段信息，计算出我们要的信息，并做合法性判断
-	fields := getStructFields(structType)
+	// 结构体类型名字如果是以 Def 结尾则表示是实体类型
+	fields := getStructFields(structType, strings.HasSuffix(sourceTypeName, "Def"))
 
 	// 生成的结构体名字 XXXDef
 	structName := StructTypeName(sourceTypeName)

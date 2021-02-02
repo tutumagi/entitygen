@@ -8,67 +8,67 @@ import (
 	bson "go.mongodb.org/mongo-driver/bson"
 )
 
-type DeskDefSlice attr.Slice
+type DeskSlice attr.Slice
 
-func EmptyDeskDefSlice() *DeskDefSlice {
-	return NewDeskDefSlice(nil)
+func EmptyDeskSlice() *DeskSlice {
+	return NewDeskSlice(nil)
 }
-func NewDeskDefSlice(items []*DeskDef) *DeskDefSlice {
+func NewDeskSlice(items []*Desk) *DeskSlice {
 	var convertData []interface{} = []interface{}{}
 	for _, v := range items {
 		convertData = append(convertData, v)
 	}
-	return (*DeskDefSlice)(attr.NewSlice(convertData))
+	return (*DeskSlice)(attr.NewSlice(convertData))
 }
-func (a *DeskDefSlice) Set(idx int, item *DeskDef) {
+func (a *DeskSlice) Set(idx int, item *Desk) {
 	item.setParent(fmt.Sprintf("ik%d", idx), (*attr.Slice)(a))
 	(*attr.Slice)(a).Set(idx, item)
 }
-func (a *DeskDefSlice) Add(item *DeskDef) {
+func (a *DeskSlice) Add(item *Desk) {
 	idx := a.Count()
 	item.setParent(fmt.Sprintf("ik%d", idx), (*attr.Slice)(a))
 	(*attr.Slice)(a).Add(item)
 }
-func (a *DeskDefSlice) At(idx int) *DeskDef {
+func (a *DeskSlice) At(idx int) *Desk {
 	val := (*attr.Slice)(a).Value(idx)
 	if val == nil {
 		return nil
 	}
-	return val.(*DeskDef)
+	return val.(*Desk)
 }
-func (a *DeskDefSlice) DelAt(idx int) bool {
+func (a *DeskSlice) DelAt(idx int) bool {
 	return (*attr.Slice)(a).DeleteAt(idx)
 }
-func (a *DeskDefSlice) Count() int {
+func (a *DeskSlice) Count() int {
 	return (*attr.Slice)(a).Len()
 }
-func (a *DeskDefSlice) setParent(k string, parent attr.Field) {
+func (a *DeskSlice) setParent(k string, parent attr.Field) {
 	(*attr.Slice)(a).SetParent(k, parent)
 }
-func (a *DeskDefSlice) ForEach(fn func(k int, v *DeskDef) bool) {
+func (a *DeskSlice) ForEach(fn func(k int, v *Desk) bool) {
 	(*attr.Slice)(a).ForEach(func(k int, v interface{}) bool {
-		return fn(k, v.(*DeskDef))
+		return fn(k, v.(*Desk))
 	})
 }
-func (a *DeskDefSlice) Equal(other *DeskDefSlice) bool {
+func (a *DeskSlice) Equal(other *DeskSlice) bool {
 	return (*attr.Slice)(a).Equal((*attr.Slice)(other))
 }
-func (a *DeskDefSlice) Undertype() interface{} {
+func (a *DeskSlice) Undertype() interface{} {
 	return (*attr.Slice)(a)
 }
-func (a *DeskDefSlice) data() []*DeskDef {
-	dd := []*DeskDef{}
-	a.ForEach(func(idx int, v *DeskDef) bool {
+func (a *DeskSlice) data() []*Desk {
+	dd := []*Desk{}
+	a.ForEach(func(idx int, v *Desk) bool {
 		dd = append(dd, v)
 		return true
 	})
 	return dd
 }
-func (a *DeskDefSlice) MarshalJSON() ([]byte, error) {
+func (a *DeskSlice) MarshalJSON() ([]byte, error) {
 	return json.Marshal(a.data())
 }
-func (a *DeskDefSlice) UnmarshalJSON(b []byte) error {
-	dd := []*DeskDef{}
+func (a *DeskSlice) UnmarshalJSON(b []byte) error {
+	dd := []*Desk{}
 	err := json.Unmarshal(b, &dd)
 	if err != nil {
 		return err
@@ -81,13 +81,13 @@ func (a *DeskDefSlice) UnmarshalJSON(b []byte) error {
 	(*attr.Slice)(a).SetData(convertData)
 	return nil
 }
-func (a *DeskDefSlice) MarshalBSON() ([]byte, error) {
-	return bson.Marshal(map[string][]*DeskDef{
+func (a *DeskSlice) MarshalBSON() ([]byte, error) {
+	return bson.Marshal(map[string][]*Desk{
 		"d": a.data(),
 	})
 }
-func (a *DeskDefSlice) UnmarshalBSON(b []byte) error {
-	dd := map[string][]*DeskDef{}
+func (a *DeskSlice) UnmarshalBSON(b []byte) error {
+	dd := map[string][]*Desk{}
 	err := bson.Unmarshal(b, &dd)
 	if err != nil {
 		return err

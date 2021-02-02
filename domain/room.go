@@ -1,7 +1,10 @@
 package domain
 
-// Room model
-type Room struct {
+import "github.com/g3n/engine/math32"
+
+// RoomDef model
+// 以 Def 结尾的表示是实体定义
+type RoomDef struct {
 	// ID string `flag:"cell" client:"true" storedb:"true"`
 	// CsvPos 是指配置表里面的pos，表示房间在整个建筑结构里面的方位
 	CsvPos int32 `flag:"cell" client:"true" storedb:"true"`
@@ -33,13 +36,15 @@ type Room struct {
 	// Strss []string `flag:"cell" client:"true" storedb:"true"`
 
 	Int8ss []int8 `flag:"cell" client:"true" storedb:"true"`
+
+	Vec3 *math32.Vector3 `flag:"cell" client:"true" storedb:"true"`
 }
 
 // 桌子
 type Desk struct {
-	Width  int32  `flag:"cell" client:"true" storedb:"true"`
-	Height int32  `flag:"cell" client:"true" storedb:"true"`
-	Name   string `flag:"cell" client:"true" storedb:"true"`
-	CsvID  int32  `flag:"cell" client:"true" storedb:"true"`
-	Below  *Desk  `flag:"base" client:"true" storedb:"true"`
+	Width  int32
+	Height int32
+	Name   string
+	CsvID  int32
+	Below  *Desk
 }

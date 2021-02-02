@@ -12,20 +12,20 @@ var deskMeta *attr.Meta
 func init() {
 	deskMeta = &attr.Meta{}
 
-	deskMeta.DefAttr("width", attr.Int32, attr.AfOtherClients, true)
-	deskMeta.DefAttr("height", attr.Int32, attr.AfOtherClients, true)
-	deskMeta.DefAttr("name", attr.String, attr.AfOtherClients, true)
-	deskMeta.DefAttr("csvID", attr.Int32, attr.AfOtherClients, true)
-	deskMeta.DefAttr("below", &DeskDef{}, attr.AfBase, true)
+	deskMeta.DefAttr("width", attr.Int32, attr.AfBase, true)
+	deskMeta.DefAttr("height", attr.Int32, attr.AfBase, true)
+	deskMeta.DefAttr("name", attr.String, attr.AfBase, true)
+	deskMeta.DefAttr("csvID", attr.Int32, attr.AfBase, true)
+	deskMeta.DefAttr("below", &Desk{}, attr.AfBase, true)
 }
 
-type DeskDef attr.StrMap
+type Desk attr.StrMap
 
-func EmptyDeskDef() *DeskDef {
-	return NewDeskDef(0, 0, "", 0, nil)
+func EmptyDesk() *Desk {
+	return NewDesk(0, 0, "", 0, nil)
 }
-func NewDeskDef(width int32, height int32, name string, csvID int32, below *DeskDef) *DeskDef {
-	m := (*DeskDef)(attr.NewStrMap(nil))
+func NewDesk(width int32, height int32, name string, csvID int32, below *Desk) *Desk {
+	m := (*Desk)(attr.NewStrMap(nil))
 	m.SetWidth(width)
 	m.SetHeight(height)
 	m.SetName(name)
@@ -34,72 +34,72 @@ func NewDeskDef(width int32, height int32, name string, csvID int32, below *Desk
 	m.ClearChangeKey()
 	return m
 }
-func (a *DeskDef) GetWidth() int32 {
+func (a *Desk) GetWidth() int32 {
 	val := (*attr.StrMap)(a).Int32("width")
 	return val
 }
-func (a *DeskDef) SetWidth(width int32) {
+func (a *Desk) SetWidth(width int32) {
 	(*attr.StrMap)(a).Set("width", width)
 }
 
-func (a *DeskDef) GetHeight() int32 {
+func (a *Desk) GetHeight() int32 {
 	val := (*attr.StrMap)(a).Int32("height")
 	return val
 }
-func (a *DeskDef) SetHeight(height int32) {
+func (a *Desk) SetHeight(height int32) {
 	(*attr.StrMap)(a).Set("height", height)
 }
 
-func (a *DeskDef) GetName() string {
+func (a *Desk) GetName() string {
 	val := (*attr.StrMap)(a).Str("name")
 	return val
 }
-func (a *DeskDef) SetName(name string) {
+func (a *Desk) SetName(name string) {
 	(*attr.StrMap)(a).Set("name", name)
 }
 
-func (a *DeskDef) GetCsvID() int32 {
+func (a *Desk) GetCsvID() int32 {
 	val := (*attr.StrMap)(a).Int32("csvID")
 	return val
 }
-func (a *DeskDef) SetCsvID(csvID int32) {
+func (a *Desk) SetCsvID(csvID int32) {
 	(*attr.StrMap)(a).Set("csvID", csvID)
 }
 
-func (a *DeskDef) GetBelow() *DeskDef {
+func (a *Desk) GetBelow() *Desk {
 	val := (*attr.StrMap)(a).Value("below")
 	if val == nil {
 		return nil
 	}
-	return val.(*DeskDef)
+	return val.(*Desk)
 }
-func (a *DeskDef) SetBelow(below *DeskDef) {
+func (a *Desk) SetBelow(below *Desk) {
 	below.setParent("below", (*attr.StrMap)(a))
 	(*attr.StrMap)(a).Set("below", below)
 }
 
-func (a *DeskDef) HasChange() bool {
+func (a *Desk) HasChange() bool {
 	return (*attr.StrMap)(a).HasChange()
 }
-func (a *DeskDef) ChangeKey() map[string]struct{} {
+func (a *Desk) ChangeKey() map[string]struct{} {
 	return (*attr.StrMap)(a).ChangeKey()
 }
-func (a *DeskDef) ClearChangeKey() {
+func (a *Desk) ClearChangeKey() {
 	(*attr.StrMap)(a).ClearChangeKey()
 }
-func (a *DeskDef) setParent(k string, parent attr.Field) {
+func (a *Desk) setParent(k string, parent attr.Field) {
 	(*attr.StrMap)(a).SetParent(k, parent)
 }
-func (a *DeskDef) ForEach(fn func(k string, v interface{}) bool) {
+func (a *Desk) ForEach(fn func(k string, v interface{}) bool) {
 	(*attr.StrMap)(a).ForEach(fn)
 }
-func (a *DeskDef) Equal(other *DeskDef) bool {
+func (a *Desk) Equal(other *Desk) bool {
 	return (*attr.StrMap)(a).Equal((*attr.StrMap)(other))
 }
-func (a *DeskDef) Undertype() interface{} {
+func (a *Desk) Undertype() interface{} {
 	return (*attr.StrMap)(a)
 }
-func (a *DeskDef) data() map[string]interface{} {
+func (a *Desk) data() map[string]interface{} {
 	dd := map[string]interface{}{}
 	a.ForEach(func(k string, v interface{}) bool {
 		dd[k] = v
@@ -107,10 +107,10 @@ func (a *DeskDef) data() map[string]interface{} {
 	})
 	return dd
 }
-func (a *DeskDef) MarshalJSON() ([]byte, error) {
+func (a *Desk) MarshalJSON() ([]byte, error) {
 	return json.Marshal((*attr.StrMap)(a).ToMap())
 }
-func (a *DeskDef) UnmarshalJSON(b []byte) error {
+func (a *Desk) UnmarshalJSON(b []byte) error {
 	mm, err := deskMeta.UnmarshalJson(b)
 	if err != nil {
 		return err
@@ -124,10 +124,10 @@ func (a *DeskDef) UnmarshalJSON(b []byte) error {
 	})
 	return nil
 }
-func (a *DeskDef) MarshalBSON() ([]byte, error) {
+func (a *Desk) MarshalBSON() ([]byte, error) {
 	return bson.Marshal((*attr.StrMap)(a).ToMap())
 }
-func (a *DeskDef) UnmarshalBSON(b []byte) error {
+func (a *Desk) UnmarshalBSON(b []byte) error {
 	mm, err := deskMeta.UnmarshalBson(b)
 	if err != nil {
 		return err

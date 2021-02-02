@@ -30,7 +30,7 @@ type structField struct {
 	emptyValue Code
 }
 
-func getStructFields(structType *types.Struct) []*structField {
+func getStructFields(structType *types.Struct, isEntityDef bool) []*structField {
 	result := make([]*structField, 0, structType.NumFields())
 	for i := 0; i < structType.NumFields(); i++ {
 		field := structType.Field(i)
@@ -42,10 +42,10 @@ func getStructFields(structType *types.Struct) []*structField {
 		}
 
 		typ := field.Type()
-		storeDB := false
+		storeDB := true
 		flagBase := true // 目前的实现里面属性肯定会存储在 base 里面
 		flagCell := false
-		client := false
+		client := true
 
 		tagValue := reflect.StructTag(structType.Tag(i))
 		key, ok := tagValue.Lookup("key")
@@ -62,42 +62,46 @@ func getStructFields(structType *types.Struct) []*structField {
 			fmt.Printf("field:%s 没有 key，使用 name 作为 key(%s) \n", name, key)
 		}
 		getterSetterName := strings.Title(key)
-		{
-			storeDBStr, ok := tagValue.Lookup("storedb")
-			if !ok {
-				failErr(fmt.Errorf("field:%s 必须有tag:storedb", name))
-			}
-			if storeDBStr != "true" && storeDBStr != "false" {
-				failErr(fmt.Errorf("field:%s storedb(%s) 必须是 true 或者 false", name, storeDBStr))
-			}
-			if storeDBStr == "true" {
-				storeDB = true
-			}
-		}
 
-		{
-			clientStr, ok := tagValue.Lookup("client")
-			if !ok {
-				failErr(fmt.Errorf("field:%s 必须有tag:client", name))
+		// 如果是实体定义 才需要检查 flag, storedb 和 client 的标签
+		if isEntityDef {
+			{
+				storeDBStr, ok := tagValue.Lookup("storedb")
+				if !ok {
+					failErr(fmt.Errorf("field:%s 必须有tag:storedb", name))
+				}
+				if storeDBStr != "true" && storeDBStr != "false" {
+					failErr(fmt.Errorf("field:%s storedb(%s) 必须是 true 或者 false", name, storeDBStr))
+				}
+				if storeDBStr == "true" {
+					storeDB = true
+				}
 			}
-			if clientStr != "true" && clientStr != "false" {
-				failErr(fmt.Errorf("field:%s client(%s) 必须是 true 或者 false", name, clientStr))
-			}
-			if clientStr == "true" {
-				client = true
-			}
-		}
 
-		{
-			flagStr, ok := tagValue.Lookup("flag")
-			if !ok {
-				failErr(fmt.Errorf("field:%s 必须有tag:flag", name))
+			{
+				clientStr, ok := tagValue.Lookup("client")
+				if !ok {
+					failErr(fmt.Errorf("field:%s 必须有tag:client", name))
+				}
+				if clientStr != "true" && clientStr != "false" {
+					failErr(fmt.Errorf("field:%s client(%s) 必须是 true 或者 false", name, clientStr))
+				}
+				if clientStr == "true" {
+					client = true
+				}
 			}
-			if flagStr != "base" && flagStr != "cell" {
-				failErr(fmt.Errorf("field:%s flag(%s) 必须是 base 或者 cell", name, flagStr))
-			}
-			if flagStr == "cell" {
-				flagCell = true
+
+			{
+				flagStr, ok := tagValue.Lookup("flag")
+				if !ok {
+					failErr(fmt.Errorf("field:%s 必须有tag:flag", name))
+				}
+				if flagStr != "base" && flagStr != "cell" {
+					failErr(fmt.Errorf("field:%s flag(%s) 必须是 base 或者 cell", name, flagStr))
+				}
+				if flagStr == "cell" {
+					flagCell = true
+				}
 			}
 		}
 

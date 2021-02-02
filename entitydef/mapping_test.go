@@ -49,7 +49,7 @@ func TestMarshalUnmarshal(t *testing.T) {
 	})
 }
 
-func testEqualSource(t *testing.T, room *RoomDef, roomModel *domain.Room) {
+func testEqualSource(t *testing.T, room *RoomDef, roomModel *domain.RoomDef) {
 	Equal(t, room.GetCsvPos(), roomModel.CsvPos)
 	Equal(t, room.GetBuildID(), roomModel.BuildID)
 	Equal(t, room.GetExtends().data(), roomModel.Extends)
@@ -60,6 +60,10 @@ func testEqualSource(t *testing.T, room *RoomDef, roomModel *domain.Room) {
 	Equal(t, room.GetDesk111().GetHeight(), roomModel.Desk111.Height)
 	Equal(t, room.GetDesk111().GetName(), roomModel.Desk111.Name)
 	Equal(t, room.GetDesk111().GetCsvID(), roomModel.Desk111.CsvID)
+
+	Equal(t, room.GetVec3().GetX(), roomModel.Vec3.X)
+	Equal(t, room.GetVec3().GetY(), roomModel.Vec3.Y)
+	Equal(t, room.GetVec3().GetZ(), roomModel.Vec3.Z)
 
 	for k, v := range roomModel.Desks222 {
 		d := room.GetDesks222().Get(k)
@@ -103,6 +107,7 @@ func testEqualDef(t *testing.T, left *RoomDef, right *RoomDef) {
 	Equal(t, left.GetDesks333().Equal(right.GetDesks333()), true)
 	Equal(t, left.GetDesksArr().Equal(right.GetDesksArr()), true)
 	Equal(t, left.GetInt8ss().Equal(right.GetInt8ss()), true)
+	Equal(t, left.GetVec3().Equal(right.GetVec3()), true)
 
 	Equal(t, left.Equal(right), true)
 
@@ -178,6 +183,8 @@ func testChangeKey(t *testing.T, room *RoomDef) {
 	room.GetInt8ss().Set(3, 100)
 	Equal(t, room.ChangeKey(), map[string]struct{}{"int8ss": {}, "desksArr": {}})
 
+	room.GetVec3().SetX(100)
+	Equal(t, room.ChangeKey(), map[string]struct{}{"int8ss": {}, "desksArr": {}, "vec3": {}})
 }
 
 func testMarshalUnMarshal(
@@ -185,7 +192,7 @@ func testMarshalUnMarshal(
 	marshal func(v interface{}) ([]byte, error),
 	unmarshal func([]byte, interface{}) error,
 	room *RoomDef,
-	model *domain.Room,
+	model *domain.RoomDef,
 ) {
 	bbs, err := marshal(room)
 	Equal(t, err, nil)

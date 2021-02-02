@@ -7,30 +7,32 @@ import (
 	bson "go.mongodb.org/mongo-driver/bson"
 )
 
-var roomMeta *attr.Meta
+var roomdefMeta *attr.Meta
 
 func init() {
-	roomMeta = &attr.Meta{}
+	roomdefMeta = &attr.Meta{}
 
-	roomMeta.DefAttr("csvPos", attr.Int32, attr.AfOtherClients, true)
-	roomMeta.DefAttr("buildID", attr.String, attr.AfOtherClients, true)
-	roomMeta.DefAttr("extends", &KVInt32Int32{}, attr.AfOtherClients, true)
-	roomMeta.DefAttr("extends1", &KVInt32Str{}, attr.AfOtherClients, true)
-	roomMeta.DefAttr("extends2", &KVStrInt32{}, attr.AfOtherClients, true)
-	roomMeta.DefAttr("extends3", &KVStrStr{}, attr.AfOtherClients, true)
-	roomMeta.DefAttr("desk111", &DeskDef{}, attr.AfOtherClients, true)
-	roomMeta.DefAttr("desks222", &KVInt32DeskDef{}, attr.AfOtherClients, true)
-	roomMeta.DefAttr("desks333", &KVStrDeskDef{}, attr.AfOtherClients, true)
-	roomMeta.DefAttr("desksArr", &DeskDefSlice{}, attr.AfOtherClients, true)
-	roomMeta.DefAttr("int8ss", &Int8Slice{}, attr.AfOtherClients, true)
+	roomdefMeta.DefAttr("csvPos", attr.Int32, attr.AfOtherClients, true)
+	roomdefMeta.DefAttr("buildID", attr.String, attr.AfOtherClients, true)
+	roomdefMeta.DefAttr("extends", &KVInt32Int32{}, attr.AfOtherClients, true)
+	roomdefMeta.DefAttr("extends1", &KVInt32Str{}, attr.AfOtherClients, true)
+	roomdefMeta.DefAttr("extends2", &KVStrInt32{}, attr.AfOtherClients, true)
+	roomdefMeta.DefAttr("extends3", &KVStrStr{}, attr.AfOtherClients, true)
+	roomdefMeta.DefAttr("desk111", &Desk{}, attr.AfOtherClients, true)
+	roomdefMeta.DefAttr("desks222", &KVInt32Desk{}, attr.AfOtherClients, true)
+	roomdefMeta.DefAttr("desks333", &KVStrDesk{}, attr.AfOtherClients, true)
+	roomdefMeta.DefAttr("desksArr", &DeskSlice{}, attr.AfOtherClients, true)
+	roomdefMeta.DefAttr("int8ss", &Int8Slice{}, attr.AfOtherClients, true)
+	roomdefMeta.DefAttr("vec3", &Vector3{}, attr.AfOtherClients, true)
+	roomdefMeta.DefAttr("rot", &Vector3{}, attr.AfOtherClients, true)
 }
 
 type RoomDef attr.StrMap
 
 func EmptyRoomDef() *RoomDef {
-	return NewRoomDef(0, "", nil, nil, nil, nil, nil, nil, nil, nil, nil)
+	return NewRoomDef(0, "", nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil)
 }
-func NewRoomDef(csvPos int32, buildID string, extends *KVInt32Int32, extends1 *KVInt32Str, extends2 *KVStrInt32, extends3 *KVStrStr, desk111 *DeskDef, desks222 *KVInt32DeskDef, desks333 *KVStrDeskDef, desksArr *DeskDefSlice, int8ss *Int8Slice) *RoomDef {
+func NewRoomDef(csvPos int32, buildID string, extends *KVInt32Int32, extends1 *KVInt32Str, extends2 *KVStrInt32, extends3 *KVStrStr, desk111 *Desk, desks222 *KVInt32Desk, desks333 *KVStrDesk, desksArr *DeskSlice, int8ss *Int8Slice, vec3 *Vector3, rot *Vector3) *RoomDef {
 	m := (*RoomDef)(attr.NewStrMap(nil))
 	m.SetCsvPos(csvPos)
 	m.SetBuildID(buildID)
@@ -43,6 +45,8 @@ func NewRoomDef(csvPos int32, buildID string, extends *KVInt32Int32, extends1 *K
 	m.SetDesks333(desks333)
 	m.SetDesksArr(desksArr)
 	m.SetInt8ss(int8ss)
+	m.SetVec3(vec3)
+	m.SetRot(rot)
 	m.ClearChangeKey()
 	return m
 }
@@ -110,50 +114,50 @@ func (a *RoomDef) SetExtends3(extends3 *KVStrStr) {
 	(*attr.StrMap)(a).Set("extends3", extends3)
 }
 
-func (a *RoomDef) GetDesk111() *DeskDef {
+func (a *RoomDef) GetDesk111() *Desk {
 	val := (*attr.StrMap)(a).Value("desk111")
 	if val == nil {
 		return nil
 	}
-	return val.(*DeskDef)
+	return val.(*Desk)
 }
-func (a *RoomDef) SetDesk111(desk111 *DeskDef) {
+func (a *RoomDef) SetDesk111(desk111 *Desk) {
 	desk111.setParent("desk111", (*attr.StrMap)(a))
 	(*attr.StrMap)(a).Set("desk111", desk111)
 }
 
-func (a *RoomDef) GetDesks222() *KVInt32DeskDef {
+func (a *RoomDef) GetDesks222() *KVInt32Desk {
 	val := (*attr.StrMap)(a).Value("desks222")
 	if val == nil {
 		return nil
 	}
-	return val.(*KVInt32DeskDef)
+	return val.(*KVInt32Desk)
 }
-func (a *RoomDef) SetDesks222(desks222 *KVInt32DeskDef) {
+func (a *RoomDef) SetDesks222(desks222 *KVInt32Desk) {
 	desks222.setParent("desks222", (*attr.StrMap)(a))
 	(*attr.StrMap)(a).Set("desks222", desks222)
 }
 
-func (a *RoomDef) GetDesks333() *KVStrDeskDef {
+func (a *RoomDef) GetDesks333() *KVStrDesk {
 	val := (*attr.StrMap)(a).Value("desks333")
 	if val == nil {
 		return nil
 	}
-	return val.(*KVStrDeskDef)
+	return val.(*KVStrDesk)
 }
-func (a *RoomDef) SetDesks333(desks333 *KVStrDeskDef) {
+func (a *RoomDef) SetDesks333(desks333 *KVStrDesk) {
 	desks333.setParent("desks333", (*attr.StrMap)(a))
 	(*attr.StrMap)(a).Set("desks333", desks333)
 }
 
-func (a *RoomDef) GetDesksArr() *DeskDefSlice {
+func (a *RoomDef) GetDesksArr() *DeskSlice {
 	val := (*attr.StrMap)(a).Value("desksArr")
 	if val == nil {
 		return nil
 	}
-	return val.(*DeskDefSlice)
+	return val.(*DeskSlice)
 }
-func (a *RoomDef) SetDesksArr(desksArr *DeskDefSlice) {
+func (a *RoomDef) SetDesksArr(desksArr *DeskSlice) {
 	desksArr.setParent("desksArr", (*attr.StrMap)(a))
 	(*attr.StrMap)(a).Set("desksArr", desksArr)
 }
@@ -168,6 +172,30 @@ func (a *RoomDef) GetInt8ss() *Int8Slice {
 func (a *RoomDef) SetInt8ss(int8ss *Int8Slice) {
 	int8ss.setParent("int8ss", (*attr.StrMap)(a))
 	(*attr.StrMap)(a).Set("int8ss", int8ss)
+}
+
+func (a *RoomDef) GetVec3() *Vector3 {
+	val := (*attr.StrMap)(a).Value("vec3")
+	if val == nil {
+		return nil
+	}
+	return val.(*Vector3)
+}
+func (a *RoomDef) SetVec3(vec3 *Vector3) {
+	vec3.setParent("vec3", (*attr.StrMap)(a))
+	(*attr.StrMap)(a).Set("vec3", vec3)
+}
+
+func (a *RoomDef) GetRot() *Vector3 {
+	val := (*attr.StrMap)(a).Value("rot")
+	if val == nil {
+		return nil
+	}
+	return val.(*Vector3)
+}
+func (a *RoomDef) SetRot(rot *Vector3) {
+	rot.setParent("rot", (*attr.StrMap)(a))
+	(*attr.StrMap)(a).Set("rot", rot)
 }
 
 func (a *RoomDef) HasChange() bool {
@@ -203,13 +231,13 @@ func (a *RoomDef) MarshalJSON() ([]byte, error) {
 	return json.Marshal((*attr.StrMap)(a).ToMap())
 }
 func (a *RoomDef) UnmarshalJSON(b []byte) error {
-	mm, err := roomMeta.UnmarshalJson(b)
+	mm, err := roomdefMeta.UnmarshalJson(b)
 	if err != nil {
 		return err
 	}
 	(*attr.StrMap)(a).SetData(mm)
 	(*attr.StrMap)(a).ForEach(func(k string, v interface{}) bool {
-		if k != "id" && !roomMeta.GetDef(k).IsPrimary() {
+		if k != "id" && !roomdefMeta.GetDef(k).IsPrimary() {
 			v.(IField).setParent(k, (*attr.StrMap)(a))
 		}
 		return true
@@ -220,13 +248,13 @@ func (a *RoomDef) MarshalBSON() ([]byte, error) {
 	return bson.Marshal((*attr.StrMap)(a).ToMap())
 }
 func (a *RoomDef) UnmarshalBSON(b []byte) error {
-	mm, err := roomMeta.UnmarshalBson(b)
+	mm, err := roomdefMeta.UnmarshalBson(b)
 	if err != nil {
 		return err
 	}
 	(*attr.StrMap)(a).SetData(mm)
 	(*attr.StrMap)(a).ForEach(func(k string, v interface{}) bool {
-		if k != "id" && !roomMeta.GetDef(k).IsPrimary() {
+		if k != "id" && !roomdefMeta.GetDef(k).IsPrimary() {
 			v.(IField).setParent(k, (*attr.StrMap)(a))
 		}
 		return true

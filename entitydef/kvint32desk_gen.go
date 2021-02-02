@@ -8,62 +8,62 @@ import (
 	bson "go.mongodb.org/mongo-driver/bson"
 )
 
-type KVInt32DeskDef attr.Int32Map
+type KVInt32Desk attr.Int32Map
 
-func EmptyKVInt32DeskDef() *KVInt32DeskDef {
-	return NewKVInt32DeskDef(nil)
+func EmptyKVInt32Desk() *KVInt32Desk {
+	return NewKVInt32Desk(nil)
 }
-func NewKVInt32DeskDef(data map[int32]*DeskDef) *KVInt32DeskDef {
+func NewKVInt32Desk(data map[int32]*Desk) *KVInt32Desk {
 	var convertData map[int32]interface{} = map[int32]interface{}{}
 	for k, v := range data {
 		convertData[k] = v
 	}
-	return (*KVInt32DeskDef)(attr.NewInt32Map(convertData))
+	return (*KVInt32Desk)(attr.NewInt32Map(convertData))
 }
-func (a *KVInt32DeskDef) Set(k int32, v *DeskDef) {
+func (a *KVInt32Desk) Set(k int32, v *Desk) {
 	v.setParent(fmt.Sprintf("mk%d", k), (*attr.Int32Map)(a))
 	(*attr.Int32Map)(a).Set(k, v)
 }
-func (a *KVInt32DeskDef) Get(k int32) *DeskDef {
+func (a *KVInt32Desk) Get(k int32) *Desk {
 	val := (*attr.Int32Map)(a).Value(k)
 	if val == nil {
 		return nil
 	}
-	return val.(*DeskDef)
+	return val.(*Desk)
 }
-func (a *KVInt32DeskDef) Delete(k int32) bool {
+func (a *KVInt32Desk) Delete(k int32) bool {
 	return (*attr.Int32Map)(a).Delete(k)
 }
-func (a *KVInt32DeskDef) setParent(k string, parent attr.Field) {
+func (a *KVInt32Desk) setParent(k string, parent attr.Field) {
 	(*attr.Int32Map)(a).SetParent(k, parent)
 }
-func (a *KVInt32DeskDef) ForEach(fn func(k int32, v *DeskDef) bool) {
+func (a *KVInt32Desk) ForEach(fn func(k int32, v *Desk) bool) {
 	(*attr.Int32Map)(a).ForEach(func(k int32, v interface{}) bool {
-		return fn(k, v.(*DeskDef))
+		return fn(k, v.(*Desk))
 	})
 }
-func (a *KVInt32DeskDef) Equal(other *KVInt32DeskDef) bool {
+func (a *KVInt32Desk) Equal(other *KVInt32Desk) bool {
 	return (*attr.Int32Map)(a).Equal((*attr.Int32Map)(other))
 }
-func (a *KVInt32DeskDef) Undertype() interface{} {
+func (a *KVInt32Desk) Undertype() interface{} {
 	return (*attr.Int32Map)(a)
 }
-func (a *KVInt32DeskDef) Has(k int32) bool {
+func (a *KVInt32Desk) Has(k int32) bool {
 	return (*attr.Int32Map)(a).Has(k)
 }
-func (a *KVInt32DeskDef) data() map[int32]*DeskDef {
-	dd := map[int32]*DeskDef{}
-	a.ForEach(func(k int32, v *DeskDef) bool {
+func (a *KVInt32Desk) data() map[int32]*Desk {
+	dd := map[int32]*Desk{}
+	a.ForEach(func(k int32, v *Desk) bool {
 		dd[k] = v
 		return true
 	})
 	return dd
 }
-func (a *KVInt32DeskDef) MarshalJSON() ([]byte, error) {
+func (a *KVInt32Desk) MarshalJSON() ([]byte, error) {
 	return json.Marshal((*attr.Int32Map)(a).ToMap())
 }
-func (a *KVInt32DeskDef) UnmarshalJSON(b []byte) error {
-	dd := map[int32]*DeskDef{}
+func (a *KVInt32Desk) UnmarshalJSON(b []byte) error {
+	dd := map[int32]*Desk{}
 	err := json.Unmarshal(b, &dd)
 	if err != nil {
 		return err
@@ -76,11 +76,11 @@ func (a *KVInt32DeskDef) UnmarshalJSON(b []byte) error {
 	(*attr.Int32Map)(a).SetData(convertData)
 	return nil
 }
-func (a *KVInt32DeskDef) MarshalBSON() ([]byte, error) {
+func (a *KVInt32Desk) MarshalBSON() ([]byte, error) {
 	return bson.Marshal((*attr.Int32Map)(a).ToMap())
 }
-func (a *KVInt32DeskDef) UnmarshalBSON(b []byte) error {
-	dd := map[int32]*DeskDef{}
+func (a *KVInt32Desk) UnmarshalBSON(b []byte) error {
+	dd := map[int32]*Desk{}
 	err := bson.Unmarshal(b, &dd)
 	if err != nil {
 		return err

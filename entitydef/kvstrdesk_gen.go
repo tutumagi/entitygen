@@ -7,62 +7,62 @@ import (
 	bson "go.mongodb.org/mongo-driver/bson"
 )
 
-type KVStrDeskDef attr.StrMap
+type KVStrDesk attr.StrMap
 
-func EmptyKVStrDeskDef() *KVStrDeskDef {
-	return NewKVStrDeskDef(nil)
+func EmptyKVStrDesk() *KVStrDesk {
+	return NewKVStrDesk(nil)
 }
-func NewKVStrDeskDef(data map[string]*DeskDef) *KVStrDeskDef {
+func NewKVStrDesk(data map[string]*Desk) *KVStrDesk {
 	var convertData map[string]interface{} = map[string]interface{}{}
 	for k, v := range data {
 		convertData[k] = v
 	}
-	return (*KVStrDeskDef)(attr.NewStrMap(convertData))
+	return (*KVStrDesk)(attr.NewStrMap(convertData))
 }
-func (a *KVStrDeskDef) Set(k string, v *DeskDef) {
+func (a *KVStrDesk) Set(k string, v *Desk) {
 	v.setParent(k, (*attr.StrMap)(a))
 	(*attr.StrMap)(a).Set(k, v)
 }
-func (a *KVStrDeskDef) Get(k string) *DeskDef {
+func (a *KVStrDesk) Get(k string) *Desk {
 	val := (*attr.StrMap)(a).Value(k)
 	if val == nil {
 		return nil
 	}
-	return val.(*DeskDef)
+	return val.(*Desk)
 }
-func (a *KVStrDeskDef) Delete(k string) bool {
+func (a *KVStrDesk) Delete(k string) bool {
 	return (*attr.StrMap)(a).Delete(k)
 }
-func (a *KVStrDeskDef) setParent(k string, parent attr.Field) {
+func (a *KVStrDesk) setParent(k string, parent attr.Field) {
 	(*attr.StrMap)(a).SetParent(k, parent)
 }
-func (a *KVStrDeskDef) ForEach(fn func(k string, v *DeskDef) bool) {
+func (a *KVStrDesk) ForEach(fn func(k string, v *Desk) bool) {
 	(*attr.StrMap)(a).ForEach(func(k string, v interface{}) bool {
-		return fn(k, v.(*DeskDef))
+		return fn(k, v.(*Desk))
 	})
 }
-func (a *KVStrDeskDef) Equal(other *KVStrDeskDef) bool {
+func (a *KVStrDesk) Equal(other *KVStrDesk) bool {
 	return (*attr.StrMap)(a).Equal((*attr.StrMap)(other))
 }
-func (a *KVStrDeskDef) Undertype() interface{} {
+func (a *KVStrDesk) Undertype() interface{} {
 	return (*attr.StrMap)(a)
 }
-func (a *KVStrDeskDef) Has(k string) bool {
+func (a *KVStrDesk) Has(k string) bool {
 	return (*attr.StrMap)(a).Has(k)
 }
-func (a *KVStrDeskDef) data() map[string]*DeskDef {
-	dd := map[string]*DeskDef{}
-	a.ForEach(func(k string, v *DeskDef) bool {
+func (a *KVStrDesk) data() map[string]*Desk {
+	dd := map[string]*Desk{}
+	a.ForEach(func(k string, v *Desk) bool {
 		dd[k] = v
 		return true
 	})
 	return dd
 }
-func (a *KVStrDeskDef) MarshalJSON() ([]byte, error) {
+func (a *KVStrDesk) MarshalJSON() ([]byte, error) {
 	return json.Marshal((*attr.StrMap)(a).ToMap())
 }
-func (a *KVStrDeskDef) UnmarshalJSON(b []byte) error {
-	dd := map[string]*DeskDef{}
+func (a *KVStrDesk) UnmarshalJSON(b []byte) error {
+	dd := map[string]*Desk{}
 	err := json.Unmarshal(b, &dd)
 	if err != nil {
 		return err
@@ -75,11 +75,11 @@ func (a *KVStrDeskDef) UnmarshalJSON(b []byte) error {
 	(*attr.StrMap)(a).SetData(convertData)
 	return nil
 }
-func (a *KVStrDeskDef) MarshalBSON() ([]byte, error) {
+func (a *KVStrDesk) MarshalBSON() ([]byte, error) {
 	return bson.Marshal((*attr.StrMap)(a).ToMap())
 }
-func (a *KVStrDeskDef) UnmarshalBSON(b []byte) error {
-	dd := map[string]*DeskDef{}
+func (a *KVStrDesk) UnmarshalBSON(b []byte) error {
+	dd := map[string]*Desk{}
 	err := bson.Unmarshal(b, &dd)
 	if err != nil {
 		return err

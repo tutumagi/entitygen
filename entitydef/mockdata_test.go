@@ -1,9 +1,12 @@
 package entitydef
 
-import "gitlab.gamesword.com/nut/entitygen/domain"
+import (
+	"github.com/g3n/engine/math32"
+	"gitlab.gamesword.com/nut/entitygen/domain"
+)
 
-func mockRoom() (*RoomDef, *domain.Room) {
-	roomModel := &domain.Room{
+func mockRoom() (*RoomDef, *domain.RoomDef) {
+	roomModel := &domain.RoomDef{
 		// ID:      "1",
 		CsvPos:  3,
 		BuildID: "i am a build id",
@@ -74,29 +77,30 @@ func mockRoom() (*RoomDef, *domain.Room) {
 				CsvID:  555666,
 			},
 		},
+		Vec3: math32.NewVector3(1, 2, 3),
 	}
 
-	desk := NewDeskDef(
+	desk := NewDesk(
 		roomModel.Desk111.Width,
 		roomModel.Desk111.Height,
 		roomModel.Desk111.Name,
 		roomModel.Desk111.CsvID,
-		EmptyDeskDef(),
+		EmptyDesk(),
 	)
 
-	int32desks := EmptyKVInt32DeskDef()
+	int32desks := EmptyKVInt32Desk()
 	for k, v := range roomModel.Desks222 {
-		int32desks.Set(k, NewDeskDef(v.Width, v.Height, v.Name, v.CsvID, EmptyDeskDef()))
+		int32desks.Set(k, NewDesk(v.Width, v.Height, v.Name, v.CsvID, EmptyDesk()))
 	}
 
-	strdesks := EmptyKVStrDeskDef()
+	strdesks := EmptyKVStrDesk()
 	for k, v := range roomModel.Desks333 {
-		strdesks.Set(k, NewDeskDef(v.Width, v.Height, v.Name, v.CsvID, EmptyDeskDef()))
+		strdesks.Set(k, NewDesk(v.Width, v.Height, v.Name, v.CsvID, EmptyDesk()))
 	}
 
-	deskArr := EmptyDeskDefSlice()
+	deskArr := EmptyDeskSlice()
 	for _, v := range roomModel.DesksArr {
-		deskArr.Add(NewDeskDef(v.Width, v.Height, v.Name, v.CsvID, EmptyDeskDef()))
+		deskArr.Add(NewDesk(v.Width, v.Height, v.Name, v.CsvID, EmptyDesk()))
 	}
 
 	room := NewRoomDef(
@@ -111,6 +115,7 @@ func mockRoom() (*RoomDef, *domain.Room) {
 		strdesks,
 		deskArr,
 		NewInt8Slice(roomModel.Int8ss),
+		NewVector3(roomModel.Vec3.X, roomModel.Vec3.Y, roomModel.Vec3.Z),
 	)
 
 	return room, roomModel
