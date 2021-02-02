@@ -76,22 +76,14 @@ func (a *StrMap) ToMap() map[string]interface{} {
 	if a == nil {
 		return nil
 	}
-	// result := map[string]interface{}{}
-	// var f func(k string) bool = nil
-	// if len(filter) > 0 {
-	// 	f = filter[0]
-	// }
-	// for k, v := range a.data {
-	// 	if f != nil {
-	// 		if f(k) {
-	// 			result[k] = v
-	// 		}
-	// 	} else {
-	// 		result[k] = v
-	// 	}
-	// }
-	// return result
-	return a.data
+	result := map[string]interface{}{}
+	for k, v := range a.data {
+		if !isNil(v) {
+			result[k] = v
+		}
+	}
+	return result
+	// return a.data
 }
 
 func (a *StrMap) ForEach(fn func(k string, v interface{}) bool) {

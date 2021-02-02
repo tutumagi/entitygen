@@ -72,7 +72,17 @@ func (a *Int32Map) String() string {
 }
 
 func (a *Int32Map) ToMap() map[int32]interface{} {
-	return a.data
+	if a == nil {
+		return nil
+	}
+	result := map[int32]interface{}{}
+	for k, v := range a.data {
+		if !isNil(v) {
+			result[k] = v
+		}
+	}
+	return result
+	// return a.data
 }
 
 func (a *Int32Map) Has(k int32) bool {
