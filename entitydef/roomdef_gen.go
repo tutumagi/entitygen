@@ -24,15 +24,14 @@ func init() {
 	roomdefMeta.DefAttr("desksArr", &DeskSlice{}, attr.AfOtherClients, true)
 	roomdefMeta.DefAttr("int8ss", &Int8Slice{}, attr.AfOtherClients, true)
 	roomdefMeta.DefAttr("vec3", &Vector3{}, attr.AfOtherClients, true)
-	roomdefMeta.DefAttr("rot", &Vector3{}, attr.AfOtherClients, true)
 }
 
 type RoomDef attr.StrMap
 
 func EmptyRoomDef() *RoomDef {
-	return NewRoomDef(0, "", nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil)
+	return NewRoomDef(0, "", nil, nil, nil, nil, nil, nil, nil, nil, nil, nil)
 }
-func NewRoomDef(csvPos int32, buildID string, extends *KVInt32Int32, extends1 *KVInt32Str, extends2 *KVStrInt32, extends3 *KVStrStr, desk111 *Desk, desks222 *KVInt32Desk, desks333 *KVStrDesk, desksArr *DeskSlice, int8ss *Int8Slice, vec3 *Vector3, rot *Vector3) *RoomDef {
+func NewRoomDef(csvPos int32, buildID string, extends *KVInt32Int32, extends1 *KVInt32Str, extends2 *KVStrInt32, extends3 *KVStrStr, desk111 *Desk, desks222 *KVInt32Desk, desks333 *KVStrDesk, desksArr *DeskSlice, int8ss *Int8Slice, vec3 *Vector3) *RoomDef {
 	m := (*RoomDef)(attr.NewStrMap(nil))
 	m.SetCsvPos(csvPos)
 	m.SetBuildID(buildID)
@@ -46,7 +45,6 @@ func NewRoomDef(csvPos int32, buildID string, extends *KVInt32Int32, extends1 *K
 	m.SetDesksArr(desksArr)
 	m.SetInt8ss(int8ss)
 	m.SetVec3(vec3)
-	m.SetRot(rot)
 	m.ClearChangeKey()
 	return m
 }
@@ -184,18 +182,6 @@ func (a *RoomDef) GetVec3() *Vector3 {
 func (a *RoomDef) SetVec3(vec3 *Vector3) {
 	vec3.setParent("vec3", (*attr.StrMap)(a))
 	(*attr.StrMap)(a).Set("vec3", vec3)
-}
-
-func (a *RoomDef) GetRot() *Vector3 {
-	val := (*attr.StrMap)(a).Value("rot")
-	if val == nil {
-		return nil
-	}
-	return val.(*Vector3)
-}
-func (a *RoomDef) SetRot(rot *Vector3) {
-	rot.setParent("rot", (*attr.StrMap)(a))
-	(*attr.StrMap)(a).Set("rot", rot)
 }
 
 func (a *RoomDef) HasChange() bool {

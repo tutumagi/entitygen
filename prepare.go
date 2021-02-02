@@ -73,9 +73,8 @@ func getStructFields(structType *types.Struct, isEntityDef bool) []*structField 
 				if storeDBStr != "true" && storeDBStr != "false" {
 					failErr(fmt.Errorf("field:%s storedb(%s) 必须是 true 或者 false", name, storeDBStr))
 				}
-				if storeDBStr == "true" {
-					storeDB = true
-				}
+
+				storeDB = storeDBStr == "true"
 			}
 
 			{
@@ -86,9 +85,8 @@ func getStructFields(structType *types.Struct, isEntityDef bool) []*structField 
 				if clientStr != "true" && clientStr != "false" {
 					failErr(fmt.Errorf("field:%s client(%s) 必须是 true 或者 false", name, clientStr))
 				}
-				if clientStr == "true" {
-					client = true
-				}
+
+				client = clientStr == "true"
 			}
 
 			{
@@ -99,9 +97,8 @@ func getStructFields(structType *types.Struct, isEntityDef bool) []*structField 
 				if flagStr != "base" && flagStr != "cell" {
 					failErr(fmt.Errorf("field:%s flag(%s) 必须是 base 或者 cell", name, flagStr))
 				}
-				if flagStr == "cell" {
-					flagCell = true
-				}
+
+				flagCell = flagStr == "cell"
 			}
 		}
 
