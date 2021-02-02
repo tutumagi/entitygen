@@ -195,8 +195,8 @@ func (meta *Meta) unmarshal(srcStruct interface{}) map[string]interface{} {
 	return meta.readerToMap(dynamicstruct.NewReader(srcStruct))
 }
 
-// 通过 dynamicStruct 解析到的struct，转为 map[string]interface{}
-func (meta *Meta) unmarshalSlice(srcStruct interface{}) []map[string]interface{} {
+// 通过 dynamicStruct 解析到的struct，转为 []map[string]interface{}
+func (meta *Meta) UnmarshalSlice(srcStruct interface{}) []map[string]interface{} {
 	var attrs = []map[string]interface{}{}
 	readers := dynamicstruct.NewReader(srcStruct).ToSliceOfReaders()
 	for _, r := range readers {
