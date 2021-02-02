@@ -15,10 +15,10 @@ type Field interface {
 	setChangeKey(k string)
 }
 
-// 每个实体都有自己的实体ID，角色的实体ID就是角色ID
-type _Empty struct {
-	ID string `bson:"id" json:"id"`
-}
+// // 每个实体都有自己的实体ID，角色的实体ID就是角色ID
+// type _Empty struct {
+// 	ID string `key:"id"`
+// }
 
 type AttrFlag uint16
 
@@ -134,6 +134,14 @@ func (f *FieldDef) IsPrimary() bool {
 	return f.primary
 }
 
+func (f *FieldDef) V() interface{} {
+	return f.typv
+}
+
+func (f *FieldDef) P() reflect.Type {
+	return f.typp
+}
+
 type Meta struct {
 	fields map[string]*FieldDef
 
@@ -168,8 +176,9 @@ func (meta *Meta) DynamicSliceOfStruct() interface{} {
 
 func (meta *Meta) builder() dynamicstruct.DynamicStruct {
 	if meta.dynStruct == nil {
-		// builder := dynamicstruct.ExtendStruct(_Empty{})	// 这个是默认数据结构中都有一个 ID("id")
+		// builder := dynamicstruct.ExtendStruct(_Empty{}) // 这个是默认数据结构中都有一个 ID("id")
 		builder := dynamicstruct.NewStruct()
+		// builder.AddField("ID", "", `json:"id" bson:"id"`)
 		for k, v := range meta.fields {
 			tagStr := "-"
 			if v.storeDB {
@@ -191,7 +200,7 @@ func (meta *Meta) builder() dynamicstruct.DynamicStruct {
 }
 
 // 通过 dynamicStruct 解析到的struct，转为 map[string]interface{}
-func (meta *Meta) unmarshal(srcStruct interface{}) map[string]interface{} {
+func (meta *Meta) Unmarshal(srcStruct interface{}) map[string]interface{} {
 	return meta.readerToMap(dynamicstruct.NewReader(srcStruct))
 }
 
@@ -223,7 +232,7 @@ func (meta *Meta) UnmarshalBson(bytes []byte) (map[string]interface{}, error) {
 	if err != nil {
 		return nil, err
 	}
-	return meta.unmarshal(dynStruct), nil
+	return meta.Unmarshal(dynStruct), nil
 }
 
 func (meta *Meta) UnmarshalJson(bytes []byte) (map[string]interface{}, error) {
@@ -232,7 +241,7 @@ func (meta *Meta) UnmarshalJson(bytes []byte) (map[string]interface{}, error) {
 	if err != nil {
 		return nil, err
 	}
-	return meta.unmarshal(dynStruct), nil
+	return meta.Unmarshal(dynStruct), nil
 }
 
 func lowerFirst(s string) string {
@@ -245,3 +254,5 @@ func lowerFirst(s string) string {
 type IAttr interface {
 	Undertype() interface{}
 }
+
+type A map[string]interface{}

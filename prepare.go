@@ -24,7 +24,7 @@ type structField struct {
 	attrGetter string
 	// 该字段类型 转换后的字符串
 	// 比如 string 就是 string， int8 就是  int8
-	// 自定义类型就要转一下 加一个 Def 后面，比如 Desk 就是 DeskDef
+	// 自定义类型目前也是自定义类型
 	typName string
 	// zero value 对应的 Code
 	emptyValue Code

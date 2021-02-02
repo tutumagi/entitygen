@@ -86,6 +86,19 @@ func (a *StrMap) ToMap() map[string]interface{} {
 	// return a.data
 }
 
+func (a *StrMap) FilterMap(filter func(k string) bool) map[string]interface{} {
+	if a == nil {
+		return nil
+	}
+	result := map[string]interface{}{}
+	for k, v := range a.data {
+		if filter(k) {
+			result[k] = v
+		}
+	}
+	return result
+}
+
 func (a *StrMap) ForEach(fn func(k string, v interface{}) bool) {
 	for k, v := range a.data {
 		// if k == "id" {

@@ -51,45 +51,48 @@ func main() {
 	} else {
 		pkg := loadPackage(sourceArg)
 
-		type ssInfo struct {
-			name string
-			typ  types.Type
-		}
-
-		allStructs := make([]ssInfo, 0, len(pkg.TypesInfo.Types))
+		allStructs := make(map[string]ssInfo, len(pkg.TypesInfo.Types))
 
 		for _, tt := range pkg.TypesInfo.Defs {
 			// 这里为 nil 情况就是类似 go 源文件第一行写着 `package domain`，则 ast 是有的，不过类型定义为 nil
 			if tt != nil {
-				switch v := tt.Type().(type) {
-				case *types.Basic:
-					fmt.Printf("collect basic types name:%s type:%s. skip it\n", tt.Name(), tt.Type())
-				case *types.Map:
-					fmt.Printf("collect map types name:%s type:%s. \n", tt.Name(), tt.Type())
-					allStructs = append(allStructs, ssInfo{
-						name: MapTypeName(v),
-						typ:  v,
-					})
-				case *types.Struct:
-					fmt.Printf("collect struct types name:%s type:%s. \n", tt.Name(), tt.Type())
-					allStructs = append(allStructs, ssInfo{
-						name: tt.Name(),
-						typ:  v,
-					})
-				case *types.Named: // 某个字段是自定义类型 会跑到这里
-					// fmt.Printf("collect types is named: %s. \n", tt.Type.String())
-					fmt.Printf("collect named types name:%s type:%s. \n", tt.Name(), tt.Type())
-					allStructs = append(allStructs, ssInfo{
-						name: tt.Name(),
-						typ:  tt.Type().Underlying().(*types.Struct),
-					})
-				case *types.Slice:
-					fmt.Printf("collect slice types name:%s type:%s. \n", tt.Name(), tt.Type())
-					allStructs = append(allStructs, ssInfo{
-						name: SliceTypeName(v),
-						typ:  v,
-					})
+				ss := collectTypes(tt.Name(), tt.Type())
+				if ss != nil {
+					allStructs[ss.name] = *ss
 				}
+				// switch v := tt.Type().(type) {
+				// case *types.Basic:
+				// 	fmt.Printf("collect basic types name:%s type:%s. skip it\n", tt.Name(), tt.Type())
+				// case *types.Map:
+				// 	fmt.Printf("collect map types name:%s type:%s. \n", tt.Name(), tt.Type())
+				// 	allStructs = append(allStructs, ssInfo{
+				// 		name: MapTypeName(v),
+				// 		typ:  v,
+				// 	})
+				// case *types.Struct:
+				// 	fmt.Printf("collect struct types name:%s type:%s. \n", tt.Name(), tt.Type())
+				// 	allStructs = append(allStructs, ssInfo{
+				// 		name: tt.Name(),
+				// 		typ:  v,
+				// 	})
+				// case *types.Named: // 某个字段是自定义类型 会跑到这里
+				// 	// fmt.Printf("collect types is named: %s. \n", tt.Type.String())
+				// 	fmt.Printf("collect named types name:%s type:%s. \n", tt.Name(), tt.Type())
+				// 	allStructs = append(allStructs, ssInfo{
+				// 		name: tt.Name(),
+				// 		typ:  tt.Type().Underlying().(*types.Struct),
+				// 	})
+				// case *types.Slice:
+				// 	fmt.Printf("collect slice types name:%s type:%s. \n", tt.Name(), tt.Type())
+				// 	allStructs = append(allStructs, ssInfo{
+				// 		name: SliceTypeName(v),
+				// 		typ:  v,
+				// 	})
+				// case *types.Pointer:
+				// 	v.Elem()
+				// default:
+				// 	fmt.Printf("collect other types name:%s type:%s. \n", tt.Name(), tt.Type())
+				// }
 			}
 		}
 		// for _, tt := range pkg.TypesInfo.Types {
@@ -118,6 +121,50 @@ func main() {
 		return
 	}
 
+}
+
+type ssInfo struct {
+	name string
+	typ  types.Type
+}
+
+func collectTypes(objName string, tt types.Type) *ssInfo {
+	switch v := tt.(type) {
+	case *types.Basic:
+		fmt.Printf("collect basic types name:%s type:%s. skip it\n", objName, v)
+	case *types.Map:
+		fmt.Printf("collect map types name:%s type:%s. \n", objName, v)
+		return &ssInfo{
+			name: MapTypeName(v),
+			typ:  v,
+		}
+	case *types.Struct:
+		fmt.Printf("collect struct types name:%s type:%s. \n", objName, v)
+		return &ssInfo{
+			name: objName,
+			typ:  v,
+		}
+	case *types.Named: // 某个字段是自定义类型 会跑到这里
+		// fmt.Printf("collect types is named: %s. \n", tt.Type.String())
+		fmt.Printf("collect named types name:%s type:%s. \n", objName, v)
+		return &ssInfo{
+			name: v.Obj().Name(),
+			typ:  v.Underlying().(*types.Struct),
+		}
+	case *types.Slice:
+		fmt.Printf("collect slice types name:%s type:%s. \n", objName, v)
+		return &ssInfo{
+			name: SliceTypeName(v),
+			typ:  v,
+		}
+	case *types.Pointer:
+		fmt.Printf("collect pointer types name:%s type:%s. \n", objName, v)
+		return collectTypes(objName, v.Elem())
+	default:
+		fmt.Printf("collect other types name:%s type:%s. \n", objName, tt)
+		return nil
+	}
+	return nil
 }
 
 func generate(sourceTypeName string, structType types.Type) error {

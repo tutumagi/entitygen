@@ -50,7 +50,7 @@ func NormalCtor(typName string) string {
 
 // 通过原始 struct 名字，获取生成的 struct 名字
 func StructTypeName(sourceTypeName string) string {
-	return sourceTypeName + "Def"
+	return sourceTypeName
 }
 
 // 通过原始 struct 名字，获取生成的 struct 的 meta 变量名字
