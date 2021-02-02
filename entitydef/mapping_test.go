@@ -11,7 +11,6 @@ import (
 )
 
 func TestData(t *testing.T) {
-
 	// 检查 数据
 	t.Run("equal", func(t *testing.T) {
 		room, roomModel := mockRoom()
