@@ -17,6 +17,8 @@ const (
 var (
 	// attr.Field
 	attrField = func() *Statement { return Qual(attrPackageName, "Field") }
+	// attr.Meta
+	attrMeta = func() *Statement { return Qual(attrPackageName, "Meta") }
 )
 
 // 根据 要生成的类型名字，和依赖的 attr 里面的名字生成一些预设的 statement
@@ -55,7 +57,8 @@ func StructTypeName(sourceTypeName string) string {
 
 // 通过原始 struct 名字，获取生成的 struct 的 meta 变量名字
 func StructMetaName(srcName string) string {
-	return strings.ToLower(srcName) + "Meta"
+	// return strings.ToLower(srcName) + "Meta"
+	return srcName + "Meta"
 }
 
 // 生成的 Map 名字 KV{Key}{Val}

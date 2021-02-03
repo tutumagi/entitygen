@@ -136,7 +136,7 @@ func writeSliceData(
 	valTypStr string,
 	thisFn func() *Statement,
 ) {
-	f.Func().Params(thisFn()).Id("data").Params().Index().Id(valTypStr).
+	f.Func().Params(thisFn()).Id("Data").Params().Index().Id(valTypStr).
 		BlockFunc(func(g *Group) {
 			g.Id("dd").Op(":=").Index().Id(valTypStr).Block()
 			g.Id(thisKeyword).Dot("ForEach").Call(Func().Params(Id("idx").Int(), Id("v").Id(valTypStr)).Bool().Block(
@@ -154,7 +154,7 @@ func writeMapData(
 	valTypStr string,
 	thisFn func() *Statement,
 ) {
-	f.Func().Params(thisFn()).Id("data").Params().Map(Id(keyTypStr)).Id(valTypStr).
+	f.Func().Params(thisFn()).Id("Data").Params().Map(Id(keyTypStr)).Id(valTypStr).
 		BlockFunc(func(g *Group) {
 			g.Id("dd").Op(":=").Map(Id(keyTypStr)).Id(valTypStr).Block()
 			g.Id(thisKeyword).Dot("ForEach").Call(Func().Params(Id("k").Id(keyTypStr), Id("v").Id(valTypStr)).Bool().Block(

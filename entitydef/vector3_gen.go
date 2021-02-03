@@ -7,14 +7,14 @@ import (
 	bson "go.mongodb.org/mongo-driver/bson"
 )
 
-var vector3Meta *attr.Meta
+var Vector3Meta *attr.Meta
 
 func init() {
-	vector3Meta = &attr.Meta{}
+	Vector3Meta = &attr.Meta{}
 
-	vector3Meta.DefAttr("x", attr.Float32, attr.AfBase, true)
-	vector3Meta.DefAttr("y", attr.Float32, attr.AfBase, true)
-	vector3Meta.DefAttr("z", attr.Float32, attr.AfBase, true)
+	Vector3Meta.DefAttr("x", attr.Float32, attr.AfBase, true)
+	Vector3Meta.DefAttr("y", attr.Float32, attr.AfBase, true)
+	Vector3Meta.DefAttr("z", attr.Float32, attr.AfBase, true)
 }
 
 type Vector3 attr.StrMap
@@ -75,7 +75,7 @@ func (a *Vector3) Equal(other *Vector3) bool {
 func (a *Vector3) Undertype() interface{} {
 	return (*attr.StrMap)(a)
 }
-func (a *Vector3) data() map[string]interface{} {
+func (a *Vector3) Data() map[string]interface{} {
 	dd := map[string]interface{}{}
 	a.ForEach(func(k string, v interface{}) bool {
 		dd[k] = v
@@ -87,13 +87,13 @@ func (a *Vector3) MarshalJSON() ([]byte, error) {
 	return json.Marshal((*attr.StrMap)(a).ToMap())
 }
 func (a *Vector3) UnmarshalJSON(b []byte) error {
-	mm, err := vector3Meta.UnmarshalJson(b)
+	mm, err := Vector3Meta.UnmarshalJson(b)
 	if err != nil {
 		return err
 	}
 	(*attr.StrMap)(a).SetData(mm)
 	(*attr.StrMap)(a).ForEach(func(k string, v interface{}) bool {
-		if k != "id" && !vector3Meta.GetDef(k).IsPrimary() {
+		if k != "id" && !Vector3Meta.GetDef(k).IsPrimary() {
 			v.(IField).setParent(k, (*attr.StrMap)(a))
 		}
 		return true
@@ -104,13 +104,13 @@ func (a *Vector3) MarshalBSON() ([]byte, error) {
 	return bson.Marshal((*attr.StrMap)(a).ToMap())
 }
 func (a *Vector3) UnmarshalBSON(b []byte) error {
-	mm, err := vector3Meta.UnmarshalBson(b)
+	mm, err := Vector3Meta.UnmarshalBson(b)
 	if err != nil {
 		return err
 	}
 	(*attr.StrMap)(a).SetData(mm)
 	(*attr.StrMap)(a).ForEach(func(k string, v interface{}) bool {
-		if k != "id" && !vector3Meta.GetDef(k).IsPrimary() {
+		if k != "id" && !Vector3Meta.GetDef(k).IsPrimary() {
 			v.(IField).setParent(k, (*attr.StrMap)(a))
 		}
 		return true

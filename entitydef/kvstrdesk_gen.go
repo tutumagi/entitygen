@@ -50,7 +50,7 @@ func (a *KVStrDesk) Undertype() interface{} {
 func (a *KVStrDesk) Has(k string) bool {
 	return (*attr.StrMap)(a).Has(k)
 }
-func (a *KVStrDesk) data() map[string]*Desk {
+func (a *KVStrDesk) Data() map[string]*Desk {
 	dd := map[string]*Desk{}
 	a.ForEach(func(k string, v *Desk) bool {
 		dd[k] = v

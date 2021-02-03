@@ -7,16 +7,16 @@ import (
 	bson "go.mongodb.org/mongo-driver/bson"
 )
 
-var deskMeta *attr.Meta
+var DeskMeta *attr.Meta
 
 func init() {
-	deskMeta = &attr.Meta{}
+	DeskMeta = &attr.Meta{}
 
-	deskMeta.DefAttr("width", attr.Int32, attr.AfBase, true)
-	deskMeta.DefAttr("height", attr.Int32, attr.AfBase, true)
-	deskMeta.DefAttr("name", attr.String, attr.AfBase, true)
-	deskMeta.DefAttr("csvID", attr.Int32, attr.AfBase, true)
-	deskMeta.DefAttr("below", &Desk{}, attr.AfBase, true)
+	DeskMeta.DefAttr("width", attr.Int32, attr.AfBase, true)
+	DeskMeta.DefAttr("height", attr.Int32, attr.AfBase, true)
+	DeskMeta.DefAttr("name", attr.String, attr.AfBase, true)
+	DeskMeta.DefAttr("csvID", attr.Int32, attr.AfBase, true)
+	DeskMeta.DefAttr("below", &Desk{}, attr.AfBase, true)
 }
 
 type Desk attr.StrMap
@@ -99,7 +99,7 @@ func (a *Desk) Equal(other *Desk) bool {
 func (a *Desk) Undertype() interface{} {
 	return (*attr.StrMap)(a)
 }
-func (a *Desk) data() map[string]interface{} {
+func (a *Desk) Data() map[string]interface{} {
 	dd := map[string]interface{}{}
 	a.ForEach(func(k string, v interface{}) bool {
 		dd[k] = v
@@ -111,13 +111,13 @@ func (a *Desk) MarshalJSON() ([]byte, error) {
 	return json.Marshal((*attr.StrMap)(a).ToMap())
 }
 func (a *Desk) UnmarshalJSON(b []byte) error {
-	mm, err := deskMeta.UnmarshalJson(b)
+	mm, err := DeskMeta.UnmarshalJson(b)
 	if err != nil {
 		return err
 	}
 	(*attr.StrMap)(a).SetData(mm)
 	(*attr.StrMap)(a).ForEach(func(k string, v interface{}) bool {
-		if k != "id" && !deskMeta.GetDef(k).IsPrimary() {
+		if k != "id" && !DeskMeta.GetDef(k).IsPrimary() {
 			v.(IField).setParent(k, (*attr.StrMap)(a))
 		}
 		return true
@@ -128,13 +128,13 @@ func (a *Desk) MarshalBSON() ([]byte, error) {
 	return bson.Marshal((*attr.StrMap)(a).ToMap())
 }
 func (a *Desk) UnmarshalBSON(b []byte) error {
-	mm, err := deskMeta.UnmarshalBson(b)
+	mm, err := DeskMeta.UnmarshalBson(b)
 	if err != nil {
 		return err
 	}
 	(*attr.StrMap)(a).SetData(mm)
 	(*attr.StrMap)(a).ForEach(func(k string, v interface{}) bool {
-		if k != "id" && !deskMeta.GetDef(k).IsPrimary() {
+		if k != "id" && !DeskMeta.GetDef(k).IsPrimary() {
 			v.(IField).setParent(k, (*attr.StrMap)(a))
 		}
 		return true

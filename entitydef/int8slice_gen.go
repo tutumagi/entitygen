@@ -49,7 +49,7 @@ func (a *Int8Slice) Equal(other *Int8Slice) bool {
 func (a *Int8Slice) Undertype() interface{} {
 	return (*attr.Slice)(a)
 }
-func (a *Int8Slice) data() []int8 {
+func (a *Int8Slice) Data() []int8 {
 	dd := []int8{}
 	a.ForEach(func(idx int, v int8) bool {
 		dd = append(dd, v)
@@ -58,7 +58,7 @@ func (a *Int8Slice) data() []int8 {
 	return dd
 }
 func (a *Int8Slice) MarshalJSON() ([]byte, error) {
-	return json.Marshal(a.data())
+	return json.Marshal(a.Data())
 }
 func (a *Int8Slice) UnmarshalJSON(b []byte) error {
 	dd := []int8{}
@@ -76,7 +76,7 @@ func (a *Int8Slice) UnmarshalJSON(b []byte) error {
 }
 func (a *Int8Slice) MarshalBSON() ([]byte, error) {
 	return bson.Marshal(map[string][]int8{
-		"d": a.data(),
+		"d": a.Data(),
 	})
 }
 func (a *Int8Slice) UnmarshalBSON(b []byte) error {

@@ -56,7 +56,7 @@ func (a *DeskSlice) Equal(other *DeskSlice) bool {
 func (a *DeskSlice) Undertype() interface{} {
 	return (*attr.Slice)(a)
 }
-func (a *DeskSlice) data() []*Desk {
+func (a *DeskSlice) Data() []*Desk {
 	dd := []*Desk{}
 	a.ForEach(func(idx int, v *Desk) bool {
 		dd = append(dd, v)
@@ -65,7 +65,7 @@ func (a *DeskSlice) data() []*Desk {
 	return dd
 }
 func (a *DeskSlice) MarshalJSON() ([]byte, error) {
-	return json.Marshal(a.data())
+	return json.Marshal(a.Data())
 }
 func (a *DeskSlice) UnmarshalJSON(b []byte) error {
 	dd := []*Desk{}
@@ -83,7 +83,7 @@ func (a *DeskSlice) UnmarshalJSON(b []byte) error {
 }
 func (a *DeskSlice) MarshalBSON() ([]byte, error) {
 	return bson.Marshal(map[string][]*Desk{
-		"d": a.data(),
+		"d": a.Data(),
 	})
 }
 func (a *DeskSlice) UnmarshalBSON(b []byte) error {

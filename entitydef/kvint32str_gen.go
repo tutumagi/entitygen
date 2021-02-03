@@ -46,7 +46,7 @@ func (a *KVInt32Str) Undertype() interface{} {
 func (a *KVInt32Str) Has(k int32) bool {
 	return (*attr.Int32Map)(a).Has(k)
 }
-func (a *KVInt32Str) data() map[int32]string {
+func (a *KVInt32Str) Data() map[int32]string {
 	dd := map[int32]string{}
 	a.ForEach(func(k int32, v string) bool {
 		dd[k] = v

@@ -26,7 +26,7 @@ func TestConvert(t *testing.T) {
 
 func TestDesk(t *testing.T) {
 	empty := EmptyDesk()
-	Equal(t, empty.data(), map[string]interface{}{
+	Equal(t, empty.Data(), map[string]interface{}{
 		"csvID":  int32(0),
 		"height": int32(0),
 		"name":   "",
@@ -51,7 +51,7 @@ func TestDesk(t *testing.T) {
 
 	empty.SetBelow(NewDesk(300, 200, "washington", 100, nil))
 	Equal(t, empty.ChangeKey(), map[string]struct{}{"below": {}})
-	Equal(t, empty.GetBelow().data(), map[string]interface{}{
+	Equal(t, empty.GetBelow().Data(), map[string]interface{}{
 		"width":  int32(300),
 		"height": int32(200),
 		"csvID":  int32(100),

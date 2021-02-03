@@ -7,23 +7,23 @@ import (
 	bson "go.mongodb.org/mongo-driver/bson"
 )
 
-var roomdefMeta *attr.Meta
+var RoomDefMeta *attr.Meta
 
 func init() {
-	roomdefMeta = &attr.Meta{}
+	RoomDefMeta = &attr.Meta{}
 
-	roomdefMeta.DefAttr("csvPos", attr.Int32, attr.AfOtherClients, true)
-	roomdefMeta.DefAttr("buildID", attr.String, attr.AfOtherClients, true)
-	roomdefMeta.DefAttr("extends", &KVInt32Int32{}, attr.AfOtherClients, true)
-	roomdefMeta.DefAttr("extends1", &KVInt32Str{}, attr.AfOtherClients, true)
-	roomdefMeta.DefAttr("extends2", &KVStrInt32{}, attr.AfOtherClients, true)
-	roomdefMeta.DefAttr("extends3", &KVStrStr{}, attr.AfOtherClients, true)
-	roomdefMeta.DefAttr("desk111", &Desk{}, attr.AfOtherClients, true)
-	roomdefMeta.DefAttr("desks222", &KVInt32Desk{}, attr.AfOtherClients, true)
-	roomdefMeta.DefAttr("desks333", &KVStrDesk{}, attr.AfOtherClients, true)
-	roomdefMeta.DefAttr("desksArr", &DeskSlice{}, attr.AfOtherClients, true)
-	roomdefMeta.DefAttr("int8ss", &Int8Slice{}, attr.AfOtherClients, true)
-	roomdefMeta.DefAttr("vec3", &Vector3{}, attr.AfOtherClients, true)
+	RoomDefMeta.DefAttr("csvPos", attr.Int32, attr.AfOtherClients, true)
+	RoomDefMeta.DefAttr("buildID", attr.String, attr.AfOtherClients, true)
+	RoomDefMeta.DefAttr("extends", &KVInt32Int32{}, attr.AfOtherClients, true)
+	RoomDefMeta.DefAttr("extends1", &KVInt32Str{}, attr.AfOtherClients, true)
+	RoomDefMeta.DefAttr("extends2", &KVStrInt32{}, attr.AfOtherClients, true)
+	RoomDefMeta.DefAttr("extends3", &KVStrStr{}, attr.AfOtherClients, true)
+	RoomDefMeta.DefAttr("desk111", &Desk{}, attr.AfOtherClients, true)
+	RoomDefMeta.DefAttr("desks222", &KVInt32Desk{}, attr.AfOtherClients, true)
+	RoomDefMeta.DefAttr("desks333", &KVStrDesk{}, attr.AfOtherClients, true)
+	RoomDefMeta.DefAttr("desksArr", &DeskSlice{}, attr.AfOtherClients, true)
+	RoomDefMeta.DefAttr("int8ss", &Int8Slice{}, attr.AfOtherClients, true)
+	RoomDefMeta.DefAttr("vec3", &Vector3{}, attr.AfOtherClients, true)
 }
 
 type RoomDef attr.StrMap
@@ -205,7 +205,7 @@ func (a *RoomDef) Equal(other *RoomDef) bool {
 func (a *RoomDef) Undertype() interface{} {
 	return (*attr.StrMap)(a)
 }
-func (a *RoomDef) data() map[string]interface{} {
+func (a *RoomDef) Data() map[string]interface{} {
 	dd := map[string]interface{}{}
 	a.ForEach(func(k string, v interface{}) bool {
 		dd[k] = v
@@ -217,13 +217,13 @@ func (a *RoomDef) MarshalJSON() ([]byte, error) {
 	return json.Marshal((*attr.StrMap)(a).ToMap())
 }
 func (a *RoomDef) UnmarshalJSON(b []byte) error {
-	mm, err := roomdefMeta.UnmarshalJson(b)
+	mm, err := RoomDefMeta.UnmarshalJson(b)
 	if err != nil {
 		return err
 	}
 	(*attr.StrMap)(a).SetData(mm)
 	(*attr.StrMap)(a).ForEach(func(k string, v interface{}) bool {
-		if k != "id" && !roomdefMeta.GetDef(k).IsPrimary() {
+		if k != "id" && !RoomDefMeta.GetDef(k).IsPrimary() {
 			v.(IField).setParent(k, (*attr.StrMap)(a))
 		}
 		return true
@@ -234,13 +234,13 @@ func (a *RoomDef) MarshalBSON() ([]byte, error) {
 	return bson.Marshal((*attr.StrMap)(a).ToMap())
 }
 func (a *RoomDef) UnmarshalBSON(b []byte) error {
-	mm, err := roomdefMeta.UnmarshalBson(b)
+	mm, err := RoomDefMeta.UnmarshalBson(b)
 	if err != nil {
 		return err
 	}
 	(*attr.StrMap)(a).SetData(mm)
 	(*attr.StrMap)(a).ForEach(func(k string, v interface{}) bool {
-		if k != "id" && !roomdefMeta.GetDef(k).IsPrimary() {
+		if k != "id" && !RoomDefMeta.GetDef(k).IsPrimary() {
 			v.(IField).setParent(k, (*attr.StrMap)(a))
 		}
 		return true

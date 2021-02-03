@@ -51,7 +51,7 @@ func (a *KVInt32Desk) Undertype() interface{} {
 func (a *KVInt32Desk) Has(k int32) bool {
 	return (*attr.Int32Map)(a).Has(k)
 }
-func (a *KVInt32Desk) data() map[int32]*Desk {
+func (a *KVInt32Desk) Data() map[int32]*Desk {
 	dd := map[int32]*Desk{}
 	a.ForEach(func(k int32, v *Desk) bool {
 		dd[k] = v

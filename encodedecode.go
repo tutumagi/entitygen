@@ -116,7 +116,7 @@ func writeSliceEncodeDecode(
 	writer := func(encodeFnName string, encodePackageFn *Statement, decodeFnName string, decodePackageFn *Statement) {
 
 		isBSON := encodeFnName == "MarshalBSON"
-		marshalVal := Id(thisKeyword).Dot("data").Call() // a.data()
+		marshalVal := Id(thisKeyword).Dot("Data").Call() // a.data()
 		if isBSON {
 			// map[string][]*XXX{"d": a.data()}
 			marshalVal = Map(String()).Index().Id(valTypStr).Block(Lit("d").Op(":").Add(marshalVal).Op(","))

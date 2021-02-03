@@ -51,10 +51,10 @@ func TestMarshalUnmarshal(t *testing.T) {
 func testEqualSource(t *testing.T, room *RoomDef, roomModel *domain.RoomDef) {
 	Equal(t, room.GetCsvPos(), roomModel.CsvPos)
 	Equal(t, room.GetBuildID(), roomModel.BuildID)
-	Equal(t, room.GetExtends().data(), roomModel.Extends)
-	Equal(t, room.GetExtends1().data(), roomModel.Extends1)
-	Equal(t, room.GetExtends2().data(), roomModel.Extends2)
-	Equal(t, room.GetExtends3().data(), roomModel.Extends3)
+	Equal(t, room.GetExtends().Data(), roomModel.Extends)
+	Equal(t, room.GetExtends1().Data(), roomModel.Extends1)
+	Equal(t, room.GetExtends2().Data(), roomModel.Extends2)
+	Equal(t, room.GetExtends3().Data(), roomModel.Extends3)
 	Equal(t, room.GetDesk111().GetWidth(), roomModel.Desk111.Width)
 	Equal(t, room.GetDesk111().GetHeight(), roomModel.Desk111.Height)
 	Equal(t, room.GetDesk111().GetName(), roomModel.Desk111.Name)
@@ -127,7 +127,7 @@ func testChangeKey(t *testing.T, room *RoomDef) {
 		"buildID": {},
 	})
 	room.SetExtends(NewKVInt32Int32(map[int32]int32{888: 999}))
-	Equal(t, room.GetExtends().data(), map[int32]int32{888: 999})
+	Equal(t, room.GetExtends().Data(), map[int32]int32{888: 999})
 	Equal(t, room.ChangeKey(), map[string]struct{}{
 		"csvPos":  {},
 		"buildID": {},

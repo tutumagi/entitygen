@@ -8,15 +8,12 @@ import (
 )
 
 func writeAttrMeta(f *File, attrMetaName string, fields []*structField) {
-	// *attr.Def
-	attrMeta := func() *Statement { return Id("*").Qual(attrPackageName, "Meta") }
-
 	// var xxxAttrDef *attr.Def
-	f.Var().Id(attrMetaName).Add(attrMeta())
+	f.Var().Id(attrMetaName).Id("*").Add(attrMeta())
 	f.Func().Id("init").Params().
 		BlockFunc(
 			func(g *Group) {
-				g.Id(attrMetaName).Op("=").Op("&").Qual(attrPackageName, "Meta").Block()
+				g.Id(attrMetaName).Op("=").Op("&").Add(attrMeta()).Block()
 				g.Line()
 
 				for i := 0; i < len(fields); i++ {
