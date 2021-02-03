@@ -251,8 +251,8 @@ func (a *StrMap) UInt(key string) uint {
 	return r
 }
 
-// UInt8 returns value with UInt8 type
-func (a *StrMap) UInt8(key string) uint8 {
+// Uint8 returns value with Uint8 type
+func (a *StrMap) Uint8(key string) uint8 {
 	v, ok := a.data[key]
 	if !ok {
 		return 0
@@ -264,8 +264,8 @@ func (a *StrMap) UInt8(key string) uint8 {
 	return r
 }
 
-// UInt16 returns value with UInt16 type
-func (a *StrMap) UInt16(key string) uint16 {
+// Uint16 returns value with Uint16 type
+func (a *StrMap) Uint16(key string) uint16 {
 	v, ok := a.data[key]
 	if !ok {
 		return 0
@@ -277,8 +277,8 @@ func (a *StrMap) UInt16(key string) uint16 {
 	return r
 }
 
-// UInt32 returns value with UInt32 type
-func (a *StrMap) UInt32(key string) uint32 {
+// Uint32 returns value with Uint32 type
+func (a *StrMap) Uint32(key string) uint32 {
 	v, ok := a.data[key]
 	if !ok {
 		return 0
@@ -290,8 +290,8 @@ func (a *StrMap) UInt32(key string) uint32 {
 	return r
 }
 
-// UInt64 returns value with UInt64 type
-func (a *StrMap) UInt64(key string) uint64 {
+// Uint64 returns value with Uint64 type
+func (a *StrMap) Uint64(key string) uint64 {
 	v, ok := a.data[key]
 	if !ok {
 		return 0

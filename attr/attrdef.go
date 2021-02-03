@@ -43,8 +43,8 @@ const (
 	// AfOtherClients     = afOtherCell | afCell | afOtherClient
 	// AfOwnClient        = afCell | afClient
 
-	AfBase = afBase
-	// AfCell         = afCell
+	AfBase         = afBase
+	AfCell         = afCell
 	AfBaseAndCell  = afBase | afCell
 	AfOtherClients = AfBaseAndCell | afOtherClient
 )
@@ -59,10 +59,10 @@ func isPrimary(a AttrTyp) bool {
 		Int16,
 		Int32,
 		Int64,
-		UInt8,
-		UInt16,
-		UInt32,
-		UInt64,
+		Uint8,
+		Uint16,
+		Uint32,
+		Uint64,
 		Float32,
 		Float64,
 		Bool,
@@ -80,10 +80,10 @@ var (
 	Int16  AttrTyp = int16(0)
 	Int32  AttrTyp = int32(0)
 	Int64  AttrTyp = int64(0)
-	UInt8  AttrTyp = uint8(0)
-	UInt16 AttrTyp = uint16(0)
-	UInt32 AttrTyp = uint32(0)
-	UInt64 AttrTyp = uint64(0)
+	Uint8  AttrTyp = uint8(0)
+	Uint16 AttrTyp = uint16(0)
+	Uint32 AttrTyp = uint32(0)
+	Uint64 AttrTyp = uint64(0)
 
 	Float32 AttrTyp = float32(0)
 	Float64 AttrTyp = float64(0)

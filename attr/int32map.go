@@ -263,8 +263,8 @@ func (a *Int32Map) UInt(key int32) uint {
 	return r
 }
 
-// UInt8 returns value with UInt8 type
-func (a *Int32Map) UInt8(key int32) uint8 {
+// Uint8 returns value with Uint8 type
+func (a *Int32Map) Uint8(key int32) uint8 {
 	v, ok := a.data[key]
 	if !ok {
 		return 0
@@ -276,8 +276,8 @@ func (a *Int32Map) UInt8(key int32) uint8 {
 	return r
 }
 
-// UInt16 returns value with UInt16 type
-func (a *Int32Map) UInt16(key int32) uint16 {
+// Uint16 returns value with Uint16 type
+func (a *Int32Map) Uint16(key int32) uint16 {
 	v, ok := a.data[key]
 	if !ok {
 		return 0
@@ -289,8 +289,8 @@ func (a *Int32Map) UInt16(key int32) uint16 {
 	return r
 }
 
-// UInt32 returns value with UInt32 type
-func (a *Int32Map) UInt32(key int32) uint32 {
+// Uint32 returns value with Uint32 type
+func (a *Int32Map) Uint32(key int32) uint32 {
 	v, ok := a.data[key]
 	if !ok {
 		return 0
@@ -302,8 +302,8 @@ func (a *Int32Map) UInt32(key int32) uint32 {
 	return r
 }
 
-// UInt64 returns value with UInt64 type
-func (a *Int32Map) UInt64(key int32) uint64 {
+// Uint64 returns value with Uint64 type
+func (a *Int32Map) Uint64(key int32) uint64 {
 	v, ok := a.data[key]
 	if !ok {
 		return 0

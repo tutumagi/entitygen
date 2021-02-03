@@ -242,8 +242,8 @@ func (a *Slice) UInt(index int) uint {
 	return r
 }
 
-// UInt8 returns value with UInt8 type
-func (a *Slice) UInt8(index int) uint8 {
+// Uint8 returns value with Uint8 type
+func (a *Slice) Uint8(index int) uint8 {
 	if index >= len(a.data) {
 		return 0
 	}
@@ -254,8 +254,8 @@ func (a *Slice) UInt8(index int) uint8 {
 	return r
 }
 
-// UInt16 returns value with UInt16 type
-func (a *Slice) UInt16(index int) uint16 {
+// Uint16 returns value with Uint16 type
+func (a *Slice) Uint16(index int) uint16 {
 	if index >= len(a.data) {
 		return 0
 	}
@@ -266,8 +266,8 @@ func (a *Slice) UInt16(index int) uint16 {
 	return r
 }
 
-// UInt32 returns value with UInt32 type
-func (a *Slice) UInt32(index int) uint32 {
+// Uint32 returns value with Uint32 type
+func (a *Slice) Uint32(index int) uint32 {
 	if index >= len(a.data) {
 		return 0
 	}
@@ -278,8 +278,8 @@ func (a *Slice) UInt32(index int) uint32 {
 	return r
 }
 
-// UInt64 returns value with UInt64 type
-func (a *Slice) UInt64(index int) uint64 {
+// Uint64 returns value with Uint64 type
+func (a *Slice) Uint64(index int) uint64 {
 	if index >= len(a.data) {
 		return 0
 	}
