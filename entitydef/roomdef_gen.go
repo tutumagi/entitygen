@@ -24,14 +24,15 @@ func init() {
 	RoomDefMeta.DefAttr("desksArr", &DeskSlice{}, attr.AfOtherClients, true)
 	RoomDefMeta.DefAttr("int8ss", &Int8Slice{}, attr.AfOtherClients, true)
 	RoomDefMeta.DefAttr("vec3", &Vector3{}, attr.AfOtherClients, true)
+	RoomDefMeta.DefAttr("vec2Arr", &Vector2Slice{}, attr.AfOtherClients, true)
 }
 
 type RoomDef attr.StrMap
 
 func EmptyRoomDef() *RoomDef {
-	return NewRoomDef(0, "", nil, nil, nil, nil, nil, nil, nil, nil, nil, nil)
+	return NewRoomDef(0, "", nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil)
 }
-func NewRoomDef(csvPos int32, buildID string, extends *KVInt32Int32, extends1 *KVInt32Str, extends2 *KVStrInt32, extends3 *KVStrStr, desk111 *Desk, desks222 *KVInt32Desk, desks333 *KVStrDesk, desksArr *DeskSlice, int8ss *Int8Slice, vec3 *Vector3) *RoomDef {
+func NewRoomDef(csvPos int32, buildID string, extends *KVInt32Int32, extends1 *KVInt32Str, extends2 *KVStrInt32, extends3 *KVStrStr, desk111 *Desk, desks222 *KVInt32Desk, desks333 *KVStrDesk, desksArr *DeskSlice, int8ss *Int8Slice, vec3 *Vector3, vec2Arr *Vector2Slice) *RoomDef {
 	m := (*RoomDef)(attr.NewStrMap(nil))
 	m.SetCsvPos(csvPos)
 	m.SetBuildID(buildID)
@@ -45,6 +46,7 @@ func NewRoomDef(csvPos int32, buildID string, extends *KVInt32Int32, extends1 *K
 	m.SetDesksArr(desksArr)
 	m.SetInt8ss(int8ss)
 	m.SetVec3(vec3)
+	m.SetVec2Arr(vec2Arr)
 	m.ClearChangeKey()
 	return m
 }
@@ -182,6 +184,18 @@ func (a *RoomDef) GetVec3() *Vector3 {
 func (a *RoomDef) SetVec3(vec3 *Vector3) {
 	vec3.setParent("vec3", (*attr.StrMap)(a))
 	(*attr.StrMap)(a).Set("vec3", vec3)
+}
+
+func (a *RoomDef) GetVec2Arr() *Vector2Slice {
+	val := (*attr.StrMap)(a).Value("vec2Arr")
+	if val == nil {
+		return nil
+	}
+	return val.(*Vector2Slice)
+}
+func (a *RoomDef) SetVec2Arr(vec2Arr *Vector2Slice) {
+	vec2Arr.setParent("vec2Arr", (*attr.StrMap)(a))
+	(*attr.StrMap)(a).Set("vec2Arr", vec2Arr)
 }
 
 func (a *RoomDef) HasChange() bool {

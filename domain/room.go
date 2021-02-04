@@ -38,6 +38,8 @@ type RoomDef struct {
 	Int8ss []int8 `flag:"cell" client:"true" storedb:"true"`
 
 	Vec3 *math32.Vector3 `flag:"cell" client:"true" storedb:"true"`
+
+	Vec2Arr []*math32.Vector2 `flag:"cell" client:"true" storedb:"true"`
 }
 
 // 桌子

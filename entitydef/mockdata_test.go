@@ -116,6 +116,7 @@ func mockRoom() (*RoomDef, *domain.RoomDef) {
 		deskArr,
 		NewInt8Slice(roomModel.Int8ss),
 		NewVector3(roomModel.Vec3.X, roomModel.Vec3.Y, roomModel.Vec3.Z),
+		NewVector2Slice([]*Vector2{NewVector2(1, 2), NewVector2(3, 4)}),
 	)
 
 	return room, roomModel
