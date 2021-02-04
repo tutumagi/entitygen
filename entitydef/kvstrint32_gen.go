@@ -29,6 +29,9 @@ func (a *KVStrInt32) Get(k string) int32 {
 func (a *KVStrInt32) Delete(k string) bool {
 	return (*attr.StrMap)(a).Delete(k)
 }
+func (a *KVStrInt32) Count() int {
+	return (*attr.StrMap)(a).Len()
+}
 func (a *KVStrInt32) setParent(k string, parent attr.Field) {
 	(*attr.StrMap)(a).SetParent(k, parent)
 }

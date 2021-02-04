@@ -419,3 +419,7 @@ func (a *Int32Map) Data() map[int32]interface{} {
 func (a *Int32Map) Undertype() interface{} {
 	return a
 }
+
+func (a *Int32Map) Len() int {
+	return len(a.data)
+}

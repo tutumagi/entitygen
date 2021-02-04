@@ -33,6 +33,9 @@ func (a *KVStrDesk) Get(k string) *Desk {
 func (a *KVStrDesk) Delete(k string) bool {
 	return (*attr.StrMap)(a).Delete(k)
 }
+func (a *KVStrDesk) Count() int {
+	return (*attr.StrMap)(a).Len()
+}
 func (a *KVStrDesk) setParent(k string, parent attr.Field) {
 	(*attr.StrMap)(a).SetParent(k, parent)
 }

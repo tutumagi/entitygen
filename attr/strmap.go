@@ -459,3 +459,7 @@ func (a *StrMap) Data() map[string]interface{} {
 func (a *StrMap) Undertype() interface{} {
 	return a
 }
+
+func (a *StrMap) Len() int {
+	return len(a.data)
+}

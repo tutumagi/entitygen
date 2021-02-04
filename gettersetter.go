@@ -102,4 +102,10 @@ func writeMapGetSetDel(
 		Block(
 			Return(convertThisFn().Dot("Delete").Call(Id("k"))),
 		)
+
+		// 写 Count
+	f.Func().Params(thisFn()).Id("Count").Params().Int().
+		Block(
+			Return(convertThisFn().Dot("Len").Call()),
+		)
 }

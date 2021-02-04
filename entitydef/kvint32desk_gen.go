@@ -34,6 +34,9 @@ func (a *KVInt32Desk) Get(k int32) *Desk {
 func (a *KVInt32Desk) Delete(k int32) bool {
 	return (*attr.Int32Map)(a).Delete(k)
 }
+func (a *KVInt32Desk) Count() int {
+	return (*attr.Int32Map)(a).Len()
+}
 func (a *KVInt32Desk) setParent(k string, parent attr.Field) {
 	(*attr.Int32Map)(a).SetParent(k, parent)
 }
