@@ -36,11 +36,6 @@ func getStructFields(structType *types.Struct, isEntityDef bool) []*structField 
 		field := structType.Field(i)
 		name := field.Name()
 
-		if name == "id" {
-			// NOTE: 目前生成的代码里面跳过 id 的处理
-			continue
-		}
-
 		typ := field.Type()
 		storeDB := true
 		flagBase := true // 目前的实现里面属性肯定会存储在 base 里面
