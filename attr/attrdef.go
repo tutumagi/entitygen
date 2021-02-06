@@ -13,6 +13,7 @@ import (
 
 type Field interface {
 	setChangeKey(k string)
+	SetParent(k string, parent Field)
 }
 
 // // 每个实体都有自己的实体ID，角色的实体ID就是角色ID
@@ -147,12 +148,14 @@ type Meta struct {
 
 	dynStruct dynamicstruct.DynamicStruct
 
-	creater func() interface{}
+	creater     func() interface{}
+	createSlice func() interface{}
 }
 
-func NewMeta(creater func() interface{}) *Meta {
+func NewMeta(creater func() interface{}, createSlice func() interface{}) *Meta {
 	m := &Meta{}
 	m.creater = creater
+	m.createSlice = createSlice
 	return m
 }
 
@@ -175,6 +178,10 @@ func (meta *Meta) GetDef(key string) *FieldDef {
 
 func (meta *Meta) Create() interface{} {
 	return meta.creater()
+}
+
+func (meta *Meta) CreateSlice() interface{} {
+	return meta.createSlice()
 }
 
 func (meta *Meta) DynamicStruct() interface{} {
@@ -218,6 +225,14 @@ func (meta *Meta) Unmarshal(srcStruct interface{}) map[string]interface{} {
 
 // 通过 dynamicStruct 解析到的struct，转为 []map[string]interface{}
 func (meta *Meta) UnmarshalSlice(srcStruct interface{}) []map[string]interface{} {
+	// srcStruct 类型为 *[]*StrMap
+	// v := reflect.ValueOf(srcStruct)
+	// if v.Kind() == reflect.Ptr {
+	// 	v = v.Elem()
+	// }
+	// if v.Kind() == reflect.Slice {
+
+	// }
 	var attrs = []map[string]interface{}{}
 	readers := dynamicstruct.NewReader(srcStruct).ToSliceOfReaders()
 	for _, r := range readers {

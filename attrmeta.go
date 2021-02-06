@@ -16,9 +16,14 @@ func writeAttrMeta(f *File, attrMetaName string, structName string, fields []*st
 
 				// attr.NewMeta(func() interface{} {
 				// 	return EmptyDesk()
+				// }, func() interface{} {
+				// 	return []*Desk{}
 				// })
+
 				g.Id(attrMetaName).Op("=").Add(attrNewMeta()).Call(Func().Params().Interface().Block(
 					Return(Id(EmptyCtor(structName)).Call()),
+				), Func().Params().Interface().Block(
+					Return(Op("&").Index().Op("*").Id(structName).Block()),
 				))
 				g.Line()
 

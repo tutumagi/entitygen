@@ -12,6 +12,8 @@ var RoomDefMeta *attr.Meta
 func init() {
 	RoomDefMeta = attr.NewMeta(func() interface{} {
 		return EmptyRoomDef()
+	}, func() interface{} {
+		return &[]*RoomDef{}
 	})
 
 	RoomDefMeta.DefAttr("csvPos", attr.Int32, attr.AfOtherClients, true)

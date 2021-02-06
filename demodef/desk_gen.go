@@ -12,6 +12,8 @@ var DeskMeta *attr.Meta
 func init() {
 	DeskMeta = attr.NewMeta(func() interface{} {
 		return EmptyDesk()
+	}, func() interface{} {
+		return &[]*Desk{}
 	})
 
 	DeskMeta.DefAttr("width", attr.Int32, attr.AfBase, true)

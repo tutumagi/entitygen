@@ -333,6 +333,11 @@ func (a *StrMap) Float64(key string) float64 {
 
 func (a *StrMap) setChangeKey(key string) {
 	if a.parent == nil {
+		// NOTE: 注意，理论上来说这里不应该做判断，当没有 parent 的时候，必须要有 changedkey，如果没有代表有 bug
+		// 但是这里 当我们使用 []*StrMap{} 去 mongo 里面做批量查询时，通过反射创建的StrMap里面 changedkey 为 nil
+		if a.changedkey == nil {
+			a.changedkey = map[string]struct{}{}
+		}
 		a.changedkey[key] = struct{}{}
 	} else {
 		a.parent.setChangeKey(a.parentKey)

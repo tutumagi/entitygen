@@ -12,6 +12,8 @@ var Vector2Meta *attr.Meta
 func init() {
 	Vector2Meta = attr.NewMeta(func() interface{} {
 		return EmptyVector2()
+	}, func() interface{} {
+		return &[]*Vector2{}
 	})
 
 	Vector2Meta.DefAttr("x", attr.Float32, attr.AfBase, true)

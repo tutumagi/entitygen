@@ -54,6 +54,8 @@ var ttMeta *Meta
 func init() {
 	ttMeta = NewMeta(func() interface{} {
 		return &TTMap{}
+	}, func() interface{} {
+		return []*TTMap{}
 	})
 	ttMeta.DefAttr("name", "", AfBase, true)
 	ttMeta.DefAttr("age", int32(0), AfBase, true)
@@ -61,7 +63,6 @@ func init() {
 }
 
 func TestDynamicStruct(t *testing.T) {
-
 	emptyTT := (*TTMap)(&StrMap{
 		data: map[string]interface{}{
 			"name": "tt",
@@ -73,45 +74,33 @@ func TestDynamicStruct(t *testing.T) {
 		bb, err := json.Marshal(emptyTT)
 		Equal(t, err, nil)
 
-		mm, err := ttMeta.UnmarshalJson(bb)
+		mm := &TTMap{}
+		err = json.Unmarshal(bb, mm)
 		Equal(t, err, nil)
 		NotEqual(t, mm, nil)
 
 		m := (*StrMap)(emptyTT).data
 		Equal(t, err, nil)
-		Equal(t, m["name"].(string), mm["name"].(string))
-		Equal(t, m["age"].(int32), mm["age"].(int32))
-		Equal(t, m["t"].(*TTMap), mm["t"].(*TTMap))
+		Equal(t, m["name"].(string), mm.data["name"].(string))
+		Equal(t, m["age"].(int32), mm.data["age"].(int32))
+		Equal(t, m["t"].(*TTMap), mm.data["t"].(*TTMap))
 	}
 
 	{
 		bb, err := bson.Marshal(emptyTT)
 		Equal(t, err, nil)
 
-		mm, err := ttMeta.UnmarshalBson(bb)
+		mm := &TTMap{}
+		err = bson.Unmarshal(bb, mm)
 		Equal(t, err, nil)
 		NotEqual(t, mm, nil)
 
 		m := (*StrMap)(emptyTT).data
 		Equal(t, err, nil)
-		Equal(t, m["name"].(string), mm["name"].(string))
-		Equal(t, m["age"].(int32), mm["age"].(int32))
-		Equal(t, m["t"].(*TTMap), mm["t"].(*TTMap))
+		Equal(t, m["name"].(string), mm.data["name"].(string))
+		Equal(t, m["age"].(int32), mm.data["age"].(int32))
+		Equal(t, m["t"].(*TTMap), mm.data["t"].(*TTMap))
 	}
-
-	// {
-	// 	ttmap := &TTMap{}
-	// 	err := bson.Unmarshal(bb, ttmap)
-	// 	Equal(t, err, nil)
-	// 	NotEqual(t, ttmap, nil)
-
-	// 	mm := (*StrMap)(ttmap)
-	// 	Equal(t, err, nil)
-	// 	Equal(t, emptyTT.Name, mm.data["name"].(string))
-	// 	Equal(t, emptyTT.Age, mm.data["age"].(int32))
-	// 	Equal(t, nil, mm.data["t"].(*TTMap))
-	// }
-
 }
 
 func TestSelf(t *testing.T) {
@@ -165,3 +154,22 @@ func TestSelf(t *testing.T) {
 		Equal(t, emptyTT.T, r.GetField("T").Interface().(*TT))
 	}
 }
+
+// func TestMMMM(t *testing.T) {
+// 	smsmsm := func() interface{} {
+// 		tttt := []*StrMap{
+// 			NewStrMap(map[string]interface{}{"1": 1, "2": 2}),
+// 		}
+// 		return &tttt
+// 	}()
+
+// 	v := reflect.ValueOf(smsmsm)
+// 	if v.Kind() == reflect.Ptr {
+// 		v = v.Elem()
+// 	}
+
+// 	t.Logf(" %d", v.Kind())
+// 	sss := *(*[]*StrMap)(unsafe.Pointer(v.UnsafeAddr()))
+// 	t.Logf("%s", sss[0])
+
+// }

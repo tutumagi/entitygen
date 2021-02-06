@@ -12,6 +12,8 @@ var Vector3Meta *attr.Meta
 func init() {
 	Vector3Meta = attr.NewMeta(func() interface{} {
 		return EmptyVector3()
+	}, func() interface{} {
+		return &[]*Vector3{}
 	})
 
 	Vector3Meta.DefAttr("x", attr.Float32, attr.AfBase, true)
