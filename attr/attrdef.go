@@ -146,6 +146,14 @@ type Meta struct {
 	fields map[string]*FieldDef
 
 	dynStruct dynamicstruct.DynamicStruct
+
+	creater func() interface{}
+}
+
+func NewMeta(creater func() interface{}) *Meta {
+	m := &Meta{}
+	m.creater = creater
+	return m
 }
 
 func (meta *Meta) DefAttr(key string, typ AttrTyp, flag AttrFlag, storeDB bool) {
@@ -163,6 +171,10 @@ func (meta *Meta) DefAttr(key string, typ AttrTyp, flag AttrFlag, storeDB bool) 
 
 func (meta *Meta) GetDef(key string) *FieldDef {
 	return meta.fields[key]
+}
+
+func (meta *Meta) Create() interface{} {
+	return meta.creater()
 }
 
 func (meta *Meta) DynamicStruct() interface{} {

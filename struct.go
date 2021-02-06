@@ -15,14 +15,14 @@ func writeStruct(f *File, sourceTypeName string, structType *types.Struct) strin
 
 	// 生成的结构体名字 XXXDef
 	structName := StructTypeName(sourceTypeName)
-	// 生成的对应的数据结构描述的名字 XXXAttrDef
+	// 生成的对应的数据结构描述的名字 XXXMeta
 	attrMetaName := StructMetaName(sourceTypeName)
 
 	// a *XXXDef
 	attrType, thisFn, convertThisFn, convertAttrType := aboutThisCode(structName, "StrMap")
 
 	// 2. 写 attrDef
-	writeAttrMeta(f, attrMetaName, fields)
+	writeAttrMeta(f, attrMetaName, structName, fields)
 
 	// 3. 写定义  type XXXDef attr.StrMap
 	f.Type().Id(structName).Add(attrType())

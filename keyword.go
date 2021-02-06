@@ -19,6 +19,9 @@ var (
 	attrField = func() *Statement { return Qual(attrPackageName, "Field") }
 	// attr.Meta
 	attrMeta = func() *Statement { return Qual(attrPackageName, "Meta") }
+
+	// attr.NewMeta
+	attrNewMeta = func() *Statement { return Qual(attrPackageName, "NewMeta") }
 )
 
 // 根据 要生成的类型名字，和依赖的 attr 里面的名字生成一些预设的 statement

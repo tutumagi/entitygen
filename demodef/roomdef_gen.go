@@ -10,7 +10,9 @@ import (
 var RoomDefMeta *attr.Meta
 
 func init() {
-	RoomDefMeta = &attr.Meta{}
+	RoomDefMeta = attr.NewMeta(func() interface{} {
+		return EmptyRoomDef()
+	})
 
 	RoomDefMeta.DefAttr("csvPos", attr.Int32, attr.AfOtherClients, true)
 	RoomDefMeta.DefAttr("buildID", attr.String, attr.AfOtherClients, true)

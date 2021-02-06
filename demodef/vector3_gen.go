@@ -10,7 +10,9 @@ import (
 var Vector3Meta *attr.Meta
 
 func init() {
-	Vector3Meta = &attr.Meta{}
+	Vector3Meta = attr.NewMeta(func() interface{} {
+		return EmptyVector3()
+	})
 
 	Vector3Meta.DefAttr("x", attr.Float32, attr.AfBase, true)
 	Vector3Meta.DefAttr("y", attr.Float32, attr.AfBase, true)

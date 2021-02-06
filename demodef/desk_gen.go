@@ -10,7 +10,9 @@ import (
 var DeskMeta *attr.Meta
 
 func init() {
-	DeskMeta = &attr.Meta{}
+	DeskMeta = attr.NewMeta(func() interface{} {
+		return EmptyDesk()
+	})
 
 	DeskMeta.DefAttr("width", attr.Int32, attr.AfBase, true)
 	DeskMeta.DefAttr("height", attr.Int32, attr.AfBase, true)

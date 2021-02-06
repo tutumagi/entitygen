@@ -7,13 +7,19 @@ import (
 	. "github.com/dave/jennifer/jen"
 )
 
-func writeAttrMeta(f *File, attrMetaName string, fields []*structField) {
+func writeAttrMeta(f *File, attrMetaName string, structName string, fields []*structField) {
 	// var xxxAttrDef *attr.Def
 	f.Var().Id(attrMetaName).Id("*").Add(attrMeta())
 	f.Func().Id("init").Params().
 		BlockFunc(
 			func(g *Group) {
-				g.Id(attrMetaName).Op("=").Op("&").Add(attrMeta()).Block()
+
+				// attr.NewMeta(func() interface{} {
+				// 	return EmptyDesk()
+				// })
+				g.Id(attrMetaName).Op("=").Add(attrNewMeta()).Call(Func().Params().Interface().Block(
+					Return(Id(EmptyCtor(structName)).Call()),
+				))
 				g.Line()
 
 				for i := 0; i < len(fields); i++ {

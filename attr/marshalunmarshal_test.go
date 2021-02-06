@@ -52,7 +52,9 @@ func (a *TTMap) IsZero() bool {
 var ttMeta *Meta
 
 func init() {
-	ttMeta = &Meta{}
+	ttMeta = NewMeta(func() interface{} {
+		return &TTMap{}
+	})
 	ttMeta.DefAttr("name", "", AfBase, true)
 	ttMeta.DefAttr("age", int32(0), AfBase, true)
 	ttMeta.DefAttr("t", &TTMap{}, AfBase, true)
