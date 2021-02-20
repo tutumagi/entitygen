@@ -74,6 +74,97 @@ func isPrimary(a AttrTyp) bool {
 	}
 }
 
+func primaryUnmarshal(att AttrTyp) func(b []byte) (interface{}, error) {
+	switch att {
+	case Int:
+		return func(b []byte) (interface{}, error) {
+			var a int
+			err := json.Unmarshal(b, &a)
+			return a, err
+		}
+	case UInt:
+		return func(b []byte) (interface{}, error) {
+			var a uint
+			err := json.Unmarshal(b, &a)
+			return a, err
+		}
+	case Int8:
+		return func(b []byte) (interface{}, error) {
+			var a int8
+			err := json.Unmarshal(b, &a)
+			return a, err
+		}
+	case Int16:
+		return func(b []byte) (interface{}, error) {
+			var a int16
+			err := json.Unmarshal(b, &a)
+			return a, err
+		}
+	case Int32:
+		return func(b []byte) (interface{}, error) {
+			var a int32
+			err := json.Unmarshal(b, &a)
+			return a, err
+		}
+	case Int64:
+		return func(b []byte) (interface{}, error) {
+			var a int64
+			err := json.Unmarshal(b, &a)
+			return a, err
+		}
+	case Uint8:
+		return func(b []byte) (interface{}, error) {
+			var a uint8
+			err := json.Unmarshal(b, &a)
+			return a, err
+		}
+	case Uint16:
+		return func(b []byte) (interface{}, error) {
+			var a uint16
+			err := json.Unmarshal(b, &a)
+			return a, err
+		}
+	case Uint32:
+		return func(b []byte) (interface{}, error) {
+			var a uint32
+			err := json.Unmarshal(b, &a)
+			return a, err
+		}
+	case Uint64:
+		return func(b []byte) (interface{}, error) {
+			var a uint64
+			err := json.Unmarshal(b, &a)
+			return a, err
+		}
+	case Float32:
+		return func(b []byte) (interface{}, error) {
+			var a float32
+			err := json.Unmarshal(b, &a)
+			return a, err
+		}
+	case Float64:
+		return func(b []byte) (interface{}, error) {
+			var a float64
+			err := json.Unmarshal(b, &a)
+			return a, err
+		}
+	case Bool:
+		return func(b []byte) (interface{}, error) {
+			var a bool
+			err := json.Unmarshal(b, &a)
+			return a, err
+		}
+	case String:
+		return func(b []byte) (interface{}, error) {
+			var a string
+			err := json.Unmarshal(b, &a)
+			return a, err
+		}
+	default:
+		panic(fmt.Sprintf("unsupport return no primary unmarshal func. kind:%d", reflect.TypeOf(att).Kind()))
+	}
+}
+
 var (
 	Int    AttrTyp = int(0)
 	UInt   AttrTyp = uint(0)
@@ -105,6 +196,8 @@ type FieldDef struct {
 	typp reflect.Type
 	// 值，动态构建 struct 需要用的
 	typv interface{}
+
+	primaryUnmarshal func(b []byte) (interface{}, error)
 }
 
 func (f *FieldDef) Flag() AttrFlag {
@@ -143,6 +236,13 @@ func (f *FieldDef) P() reflect.Type {
 	return f.typp
 }
 
+func (f *FieldDef) UnmarshalPrimary(b []byte) (interface{}, error) {
+	if f.primary {
+		return f.primaryUnmarshal(b)
+	}
+	panic(fmt.Sprintf("unmarshal a not primary field. kind:%d", f.typp.Kind()))
+}
+
 type Meta struct {
 	fields map[string]*FieldDef
 
@@ -163,12 +263,16 @@ func (meta *Meta) DefAttr(key string, typ AttrTyp, flag AttrFlag, storeDB bool) 
 	if meta.fields == nil {
 		meta.fields = make(map[string]*FieldDef, 10)
 	}
-	meta.fields[key] = &FieldDef{
+	f := &FieldDef{
 		flag:    flag,
 		typv:    typ,
 		typp:    reflect.TypeOf(typ),
 		storeDB: storeDB,
 		primary: isPrimary(typ),
+	}
+	meta.fields[key] = f
+	if f.primary {
+		f.primaryUnmarshal = primaryUnmarshal(typ)
 	}
 }
 
