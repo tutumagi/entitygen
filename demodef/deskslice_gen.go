@@ -21,12 +21,12 @@ func NewDeskSlice(items []*Desk) *DeskSlice {
 	return (*DeskSlice)(attr.NewSlice(convertData))
 }
 func (a *DeskSlice) Set(idx int, item *Desk) {
-	item.setParent(fmt.Sprintf("ik%d", idx), (*attr.Slice)(a))
+	item.SetParent(fmt.Sprintf("ik%d", idx), (*attr.Slice)(a))
 	(*attr.Slice)(a).Set(idx, item)
 }
 func (a *DeskSlice) Add(item *Desk) {
 	idx := a.Count()
-	item.setParent(fmt.Sprintf("ik%d", idx), (*attr.Slice)(a))
+	item.SetParent(fmt.Sprintf("ik%d", idx), (*attr.Slice)(a))
 	(*attr.Slice)(a).Add(item)
 }
 func (a *DeskSlice) At(idx int) *Desk {
@@ -42,7 +42,7 @@ func (a *DeskSlice) DelAt(idx int) bool {
 func (a *DeskSlice) Count() int {
 	return (*attr.Slice)(a).Len()
 }
-func (a *DeskSlice) setParent(k string, parent attr.Field) {
+func (a *DeskSlice) SetParent(k string, parent attr.Field) {
 	(*attr.Slice)(a).SetParent(k, parent)
 }
 func (a *DeskSlice) ForEach(fn func(k int, v *Desk) bool) {
@@ -75,7 +75,7 @@ func (a *DeskSlice) UnmarshalJSON(b []byte) error {
 	}
 	convertData := []interface{}{}
 	for k, v := range dd {
-		v.setParent(fmt.Sprintf("ik%d", k), (*attr.Slice)(a))
+		v.SetParent(fmt.Sprintf("ik%d", k), (*attr.Slice)(a))
 		convertData = append(convertData, v)
 	}
 	(*attr.Slice)(a).SetData(convertData)
@@ -94,7 +94,7 @@ func (a *DeskSlice) UnmarshalBSON(b []byte) error {
 	}
 	convertData := []interface{}{}
 	for k, v := range dd["d"] {
-		v.setParent(fmt.Sprintf("ik%d", k), (*attr.Slice)(a))
+		v.SetParent(fmt.Sprintf("ik%d", k), (*attr.Slice)(a))
 		convertData = append(convertData, v)
 	}
 	(*attr.Slice)(a).SetData(convertData)

@@ -32,7 +32,7 @@ func (a *KVStrStr) Delete(k string) bool {
 func (a *KVStrStr) Count() int {
 	return (*attr.StrMap)(a).Len()
 }
-func (a *KVStrStr) setParent(k string, parent attr.Field) {
+func (a *KVStrStr) SetParent(k string, parent attr.Field) {
 	(*attr.StrMap)(a).SetParent(k, parent)
 }
 func (a *KVStrStr) ForEach(fn func(k string, v string) bool) {

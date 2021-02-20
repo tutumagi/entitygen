@@ -78,7 +78,7 @@ func (a *RoomDef) GetExtends() *KVInt32Int32 {
 	return val.(*KVInt32Int32)
 }
 func (a *RoomDef) SetExtends(extends *KVInt32Int32) {
-	extends.setParent("extends", (*attr.StrMap)(a))
+	extends.SetParent("extends", (*attr.StrMap)(a))
 	(*attr.StrMap)(a).Set("extends", extends)
 }
 
@@ -90,7 +90,7 @@ func (a *RoomDef) GetExtends1() *KVInt32Str {
 	return val.(*KVInt32Str)
 }
 func (a *RoomDef) SetExtends1(extends1 *KVInt32Str) {
-	extends1.setParent("extends1", (*attr.StrMap)(a))
+	extends1.SetParent("extends1", (*attr.StrMap)(a))
 	(*attr.StrMap)(a).Set("extends1", extends1)
 }
 
@@ -102,7 +102,7 @@ func (a *RoomDef) GetExtends2() *KVStrInt32 {
 	return val.(*KVStrInt32)
 }
 func (a *RoomDef) SetExtends2(extends2 *KVStrInt32) {
-	extends2.setParent("extends2", (*attr.StrMap)(a))
+	extends2.SetParent("extends2", (*attr.StrMap)(a))
 	(*attr.StrMap)(a).Set("extends2", extends2)
 }
 
@@ -114,7 +114,7 @@ func (a *RoomDef) GetExtends3() *KVStrStr {
 	return val.(*KVStrStr)
 }
 func (a *RoomDef) SetExtends3(extends3 *KVStrStr) {
-	extends3.setParent("extends3", (*attr.StrMap)(a))
+	extends3.SetParent("extends3", (*attr.StrMap)(a))
 	(*attr.StrMap)(a).Set("extends3", extends3)
 }
 
@@ -126,7 +126,7 @@ func (a *RoomDef) GetDesk111() *Desk {
 	return val.(*Desk)
 }
 func (a *RoomDef) SetDesk111(desk111 *Desk) {
-	desk111.setParent("desk111", (*attr.StrMap)(a))
+	desk111.SetParent("desk111", (*attr.StrMap)(a))
 	(*attr.StrMap)(a).Set("desk111", desk111)
 }
 
@@ -138,7 +138,7 @@ func (a *RoomDef) GetDesks222() *KVInt32Desk {
 	return val.(*KVInt32Desk)
 }
 func (a *RoomDef) SetDesks222(desks222 *KVInt32Desk) {
-	desks222.setParent("desks222", (*attr.StrMap)(a))
+	desks222.SetParent("desks222", (*attr.StrMap)(a))
 	(*attr.StrMap)(a).Set("desks222", desks222)
 }
 
@@ -150,7 +150,7 @@ func (a *RoomDef) GetDesks333() *KVStrDesk {
 	return val.(*KVStrDesk)
 }
 func (a *RoomDef) SetDesks333(desks333 *KVStrDesk) {
-	desks333.setParent("desks333", (*attr.StrMap)(a))
+	desks333.SetParent("desks333", (*attr.StrMap)(a))
 	(*attr.StrMap)(a).Set("desks333", desks333)
 }
 
@@ -162,7 +162,7 @@ func (a *RoomDef) GetDesksArr() *DeskSlice {
 	return val.(*DeskSlice)
 }
 func (a *RoomDef) SetDesksArr(desksArr *DeskSlice) {
-	desksArr.setParent("desksArr", (*attr.StrMap)(a))
+	desksArr.SetParent("desksArr", (*attr.StrMap)(a))
 	(*attr.StrMap)(a).Set("desksArr", desksArr)
 }
 
@@ -174,7 +174,7 @@ func (a *RoomDef) GetInt8ss() *Int8Slice {
 	return val.(*Int8Slice)
 }
 func (a *RoomDef) SetInt8ss(int8ss *Int8Slice) {
-	int8ss.setParent("int8ss", (*attr.StrMap)(a))
+	int8ss.SetParent("int8ss", (*attr.StrMap)(a))
 	(*attr.StrMap)(a).Set("int8ss", int8ss)
 }
 
@@ -186,7 +186,7 @@ func (a *RoomDef) GetVec3() *Vector3 {
 	return val.(*Vector3)
 }
 func (a *RoomDef) SetVec3(vec3 *Vector3) {
-	vec3.setParent("vec3", (*attr.StrMap)(a))
+	vec3.SetParent("vec3", (*attr.StrMap)(a))
 	(*attr.StrMap)(a).Set("vec3", vec3)
 }
 
@@ -198,7 +198,7 @@ func (a *RoomDef) GetVec2Arr() *Vector2Slice {
 	return val.(*Vector2Slice)
 }
 func (a *RoomDef) SetVec2Arr(vec2Arr *Vector2Slice) {
-	vec2Arr.setParent("vec2Arr", (*attr.StrMap)(a))
+	vec2Arr.SetParent("vec2Arr", (*attr.StrMap)(a))
 	(*attr.StrMap)(a).Set("vec2Arr", vec2Arr)
 }
 
@@ -211,7 +211,7 @@ func (a *RoomDef) ChangeKey() map[string]struct{} {
 func (a *RoomDef) ClearChangeKey() {
 	(*attr.StrMap)(a).ClearChangeKey()
 }
-func (a *RoomDef) setParent(k string, parent attr.Field) {
+func (a *RoomDef) SetParent(k string, parent attr.Field) {
 	(*attr.StrMap)(a).SetParent(k, parent)
 }
 func (a *RoomDef) ForEach(fn func(k string, v interface{}) bool) {
@@ -235,33 +235,19 @@ func (a *RoomDef) MarshalJSON() ([]byte, error) {
 	return json.Marshal((*attr.StrMap)(a).ToMap())
 }
 func (a *RoomDef) UnmarshalJSON(b []byte) error {
-	mm, err := RoomDefMeta.UnmarshalJson(b)
+	_, err := RoomDefMeta.UnmarshalJson(b, (*attr.StrMap)(a))
 	if err != nil {
 		return err
 	}
-	(*attr.StrMap)(a).SetData(mm)
-	(*attr.StrMap)(a).ForEach(func(k string, v interface{}) bool {
-		if k != "id" && !RoomDefMeta.GetDef(k).IsPrimary() {
-			v.(IField).setParent(k, (*attr.StrMap)(a))
-		}
-		return true
-	})
 	return nil
 }
 func (a *RoomDef) MarshalBSON() ([]byte, error) {
 	return bson.Marshal((*attr.StrMap)(a).ToMap())
 }
 func (a *RoomDef) UnmarshalBSON(b []byte) error {
-	mm, err := RoomDefMeta.UnmarshalBson(b)
+	_, err := RoomDefMeta.UnmarshalBson(b, (*attr.StrMap)(a))
 	if err != nil {
 		return err
 	}
-	(*attr.StrMap)(a).SetData(mm)
-	(*attr.StrMap)(a).ForEach(func(k string, v interface{}) bool {
-		if k != "id" && !RoomDefMeta.GetDef(k).IsPrimary() {
-			v.(IField).setParent(k, (*attr.StrMap)(a))
-		}
-		return true
-	})
 	return nil
 }

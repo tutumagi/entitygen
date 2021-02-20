@@ -23,11 +23,10 @@ func (a *TTMap) MarshalBSON() ([]byte, error) {
 	return bson.Marshal((*StrMap)(a).ToMap())
 }
 func (a *TTMap) UnmarshalBSON(b []byte) error {
-	mm, err := ttMeta.UnmarshalBson(b)
+	_, err := ttMeta.UnmarshalBson(b, (*StrMap)(a))
 	if err != nil {
 		return err
 	}
-	(*StrMap)(a).SetData(mm)
 
 	return nil
 }
@@ -36,17 +35,16 @@ func (a *TTMap) MarshalJSON() ([]byte, error) {
 	return json.Marshal((*StrMap)(a).ToMap())
 }
 func (a *TTMap) UnmarshalJSON(b []byte) error {
-	mm, err := ttMeta.UnmarshalJson(b)
+	_, err := ttMeta.UnmarshalJson(b, (*StrMap)(a))
 	if err != nil {
 		return err
 	}
-	(*StrMap)(a).SetData(mm)
 
 	return nil
 }
 
-func (a *TTMap) IsZero() bool {
-	return a == nil
+func (a *TTMap) SetParent(k string, parent Field) {
+	(*StrMap)(a).SetParent(k, parent)
 }
 
 var ttMeta *Meta
@@ -74,7 +72,7 @@ func TestDynamicStruct(t *testing.T) {
 		bb, err := json.Marshal(emptyTT)
 		Equal(t, err, nil)
 
-		mm := &TTMap{}
+		mm := (*TTMap)(NewStrMap(nil))
 		err = json.Unmarshal(bb, mm)
 		Equal(t, err, nil)
 		NotEqual(t, mm, nil)
@@ -90,7 +88,7 @@ func TestDynamicStruct(t *testing.T) {
 		bb, err := bson.Marshal(emptyTT)
 		Equal(t, err, nil)
 
-		mm := &TTMap{}
+		mm := (*TTMap)(NewStrMap(nil))
 		err = bson.Unmarshal(bb, mm)
 		Equal(t, err, nil)
 		NotEqual(t, mm, nil)

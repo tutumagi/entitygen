@@ -78,7 +78,7 @@ func (a *Desk) GetBelow() *Desk {
 	return val.(*Desk)
 }
 func (a *Desk) SetBelow(below *Desk) {
-	below.setParent("below", (*attr.StrMap)(a))
+	below.SetParent("below", (*attr.StrMap)(a))
 	(*attr.StrMap)(a).Set("below", below)
 }
 
@@ -91,7 +91,7 @@ func (a *Desk) ChangeKey() map[string]struct{} {
 func (a *Desk) ClearChangeKey() {
 	(*attr.StrMap)(a).ClearChangeKey()
 }
-func (a *Desk) setParent(k string, parent attr.Field) {
+func (a *Desk) SetParent(k string, parent attr.Field) {
 	(*attr.StrMap)(a).SetParent(k, parent)
 }
 func (a *Desk) ForEach(fn func(k string, v interface{}) bool) {
@@ -115,33 +115,19 @@ func (a *Desk) MarshalJSON() ([]byte, error) {
 	return json.Marshal((*attr.StrMap)(a).ToMap())
 }
 func (a *Desk) UnmarshalJSON(b []byte) error {
-	mm, err := DeskMeta.UnmarshalJson(b)
+	_, err := DeskMeta.UnmarshalJson(b, (*attr.StrMap)(a))
 	if err != nil {
 		return err
 	}
-	(*attr.StrMap)(a).SetData(mm)
-	(*attr.StrMap)(a).ForEach(func(k string, v interface{}) bool {
-		if k != "id" && !DeskMeta.GetDef(k).IsPrimary() {
-			v.(IField).setParent(k, (*attr.StrMap)(a))
-		}
-		return true
-	})
 	return nil
 }
 func (a *Desk) MarshalBSON() ([]byte, error) {
 	return bson.Marshal((*attr.StrMap)(a).ToMap())
 }
 func (a *Desk) UnmarshalBSON(b []byte) error {
-	mm, err := DeskMeta.UnmarshalBson(b)
+	_, err := DeskMeta.UnmarshalBson(b, (*attr.StrMap)(a))
 	if err != nil {
 		return err
 	}
-	(*attr.StrMap)(a).SetData(mm)
-	(*attr.StrMap)(a).ForEach(func(k string, v interface{}) bool {
-		if k != "id" && !DeskMeta.GetDef(k).IsPrimary() {
-			v.(IField).setParent(k, (*attr.StrMap)(a))
-		}
-		return true
-	})
 	return nil
 }

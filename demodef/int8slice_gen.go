@@ -35,7 +35,7 @@ func (a *Int8Slice) DelAt(idx int) bool {
 func (a *Int8Slice) Count() int {
 	return (*attr.Slice)(a).Len()
 }
-func (a *Int8Slice) setParent(k string, parent attr.Field) {
+func (a *Int8Slice) SetParent(k string, parent attr.Field) {
 	(*attr.Slice)(a).SetParent(k, parent)
 }
 func (a *Int8Slice) ForEach(fn func(k int, v int8) bool) {

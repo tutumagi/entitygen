@@ -14,20 +14,20 @@ func writeEncodeDecode(f *File, thisFn func() *Statement, convertThisFn func() *
 		// unmarshal
 		f.Func().Params(thisFn()).Id(decodeFnName).Params(Id("b").Index().Byte()).Error().
 			BlockFunc(func(g *Group) {
-				g.Id("mm").Id(",").Id("err").Op(":=").Add(decodePackageFn.Call(Id("b")))
+				g.Id("_").Id(",").Id("err").Op(":=").Add(decodePackageFn.Call(Id("b"), convertThisFn()))
 				g.If(Id("err").Op("!=").Nil()).Block(
 					Return(Id("err")),
 				)
-				g.Add(convertThisFn().Dot("SetData").Params(Id("mm")))
-				g.Add(convertThisFn().Dot("ForEach").Params(
-					Func().Params(Id("k").String(), Id("v").Interface()).Bool().
-						BlockFunc(func(g *Group) {
-							g.If(Id("k").Op("!=").Lit("id").Op("&&").Op("!").Id(attrMetaName).Dot("GetDef").Params(Id("k")).Dot("IsPrimary").Params().Block(
-								Id("v").Dot("").Parens(Id("IField")).Dot("setParent").Params(Id("k"), convertThisFn()),
-							))
-							g.Return(True())
-						}),
-				))
+				// g.Add(convertThisFn().Dot("SetData").Params(Id("mm").Dot("Data").Call()))
+				// g.Add(convertThisFn().Dot("ForEach").Params(
+				// 	Func().Params(Id("k").String(), Id("v").Interface()).Bool().
+				// 		BlockFunc(func(g *Group) {
+				// 			g.If(Id("k").Op("!=").Lit("id").Op("&&").Op("!").Id(attrMetaName).Dot("GetDef").Params(Id("k")).Dot("IsPrimary").Params().Block(
+				// 				Id("v").Dot("").Parens(Id("IField")).Dot(setParentFuncName).Params(Id("k"), convertThisFn()),
+				// 			))
+				// 			g.Return(True())
+				// 		}),
+				// ))
 				g.Return(Nil())
 			},
 			)

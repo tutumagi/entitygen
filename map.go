@@ -103,7 +103,7 @@ func setParenctCode(
 		// mk 表示 map key :)
 		parentKey = Qual("fmt", "Sprintf").Call(Lit("mk%d").Op(",").Id(keyParamName))
 	}
-	return Id(valParamName).Dot("setParent").Call(parentKey, convertThisFn())
+	return Id(valParamName).Dot(setParentFuncName).Call(parentKey, convertThisFn())
 }
 
 func setSliceParentCode(
@@ -113,5 +113,5 @@ func setSliceParentCode(
 ) *Statement {
 	parentKey := Qual("fmt", "Sprintf").Call(Lit("ik%d").Op(",").Id(idxParamName))
 
-	return Id(valParamName).Dot("setParent").Call(parentKey, convertThisFn())
+	return Id(valParamName).Dot(setParentFuncName).Call(parentKey, convertThisFn())
 }

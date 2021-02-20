@@ -74,33 +74,21 @@ func (a *DeskDef) MarshalJSON() ([]byte, error) {
 	return json.Marshal((*attr.StrMap)(a).ToMap())
 }
 func (a *DeskDef) UnmarshalJSON(b []byte) error {
-	mm, err := deskAttrDef.UnmarshalJson(b)
+	_, err := deskAttrDef.UnmarshalJson(b, (*attr.StrMap)(a))
 	if err != nil {
 		return err
 	}
-	(*attr.StrMap)(a).SetData(mm)
-	(*attr.StrMap)(a).ForEach(func(k string, v interface{}) bool {
-		if k != "id" && !deskAttrDef.GetDef(k).IsPrimary() {
-			v.(IField).setParent(k, (*attr.StrMap)(a))
-		}
-		return true
-	})
+
 	return nil
 }
 func (a *DeskDef) MarshalBSON() ([]byte, error) {
 	return bson.Marshal((*attr.StrMap)(a).ToMap())
 }
 func (a *DeskDef) UnmarshalBSON(b []byte) error {
-	mm, err := deskAttrDef.UnmarshalBson(b)
+	_, err := deskAttrDef.UnmarshalBson(b, (*attr.StrMap)(a))
 	if err != nil {
 		return err
 	}
-	(*attr.StrMap)(a).SetData(mm)
-	(*attr.StrMap)(a).ForEach(func(k string, v interface{}) bool {
-		if k != "id" && !deskAttrDef.GetDef(k).IsPrimary() {
-			v.(IField).setParent(k, (*attr.StrMap)(a))
-		}
-		return true
-	})
+
 	return nil
 }

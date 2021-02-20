@@ -21,12 +21,12 @@ func NewVector2Slice(items []*Vector2) *Vector2Slice {
 	return (*Vector2Slice)(attr.NewSlice(convertData))
 }
 func (a *Vector2Slice) Set(idx int, item *Vector2) {
-	item.setParent(fmt.Sprintf("ik%d", idx), (*attr.Slice)(a))
+	item.SetParent(fmt.Sprintf("ik%d", idx), (*attr.Slice)(a))
 	(*attr.Slice)(a).Set(idx, item)
 }
 func (a *Vector2Slice) Add(item *Vector2) {
 	idx := a.Count()
-	item.setParent(fmt.Sprintf("ik%d", idx), (*attr.Slice)(a))
+	item.SetParent(fmt.Sprintf("ik%d", idx), (*attr.Slice)(a))
 	(*attr.Slice)(a).Add(item)
 }
 func (a *Vector2Slice) At(idx int) *Vector2 {
@@ -42,7 +42,7 @@ func (a *Vector2Slice) DelAt(idx int) bool {
 func (a *Vector2Slice) Count() int {
 	return (*attr.Slice)(a).Len()
 }
-func (a *Vector2Slice) setParent(k string, parent attr.Field) {
+func (a *Vector2Slice) SetParent(k string, parent attr.Field) {
 	(*attr.Slice)(a).SetParent(k, parent)
 }
 func (a *Vector2Slice) ForEach(fn func(k int, v *Vector2) bool) {
@@ -75,7 +75,7 @@ func (a *Vector2Slice) UnmarshalJSON(b []byte) error {
 	}
 	convertData := []interface{}{}
 	for k, v := range dd {
-		v.setParent(fmt.Sprintf("ik%d", k), (*attr.Slice)(a))
+		v.SetParent(fmt.Sprintf("ik%d", k), (*attr.Slice)(a))
 		convertData = append(convertData, v)
 	}
 	(*attr.Slice)(a).SetData(convertData)
@@ -94,7 +94,7 @@ func (a *Vector2Slice) UnmarshalBSON(b []byte) error {
 	}
 	convertData := []interface{}{}
 	for k, v := range dd["d"] {
-		v.setParent(fmt.Sprintf("ik%d", k), (*attr.Slice)(a))
+		v.SetParent(fmt.Sprintf("ik%d", k), (*attr.Slice)(a))
 		convertData = append(convertData, v)
 	}
 	(*attr.Slice)(a).SetData(convertData)

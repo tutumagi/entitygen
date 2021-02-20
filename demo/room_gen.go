@@ -190,17 +190,11 @@ func (m *RoomDef) MarshalJSON() ([]byte, error) {
 	return json.Marshal((*attr.StrMap)(m).ToMap())
 }
 func (m *RoomDef) UnmarshalJSON(b []byte) error {
-	mm, err := roomAttrDef.UnmarshalJson(b)
+	_, err := roomAttrDef.UnmarshalJson(b, (*attr.StrMap)(m))
 	if err != nil {
 		return err
 	}
-	(*attr.StrMap)(m).SetData(mm)
-	(*attr.StrMap)(m).ForEach(func(k string, v interface{}) bool {
-		if k != "id" && !roomAttrDef.GetDef(k).IsPrimary() {
-			v.(IField).setParent(k, (*attr.StrMap)(m))
-		}
-		return true
-	})
+
 	return nil
 }
 
@@ -209,17 +203,11 @@ func (m *RoomDef) MarshalBSON() ([]byte, error) {
 }
 
 func (m *RoomDef) UnmarshalBSON(b []byte) error {
-	mm, err := roomAttrDef.UnmarshalBson(b)
+	_, err := roomAttrDef.UnmarshalBson(b, (*attr.StrMap)(m))
 	if err != nil {
 		return err
 	}
-	(*attr.StrMap)(m).SetData(mm)
-	(*attr.StrMap)(m).ForEach(func(k string, v interface{}) bool {
-		if k != "id" && !roomAttrDef.GetDef(k).IsPrimary() {
-			v.(IField).setParent(k, (*attr.StrMap)(m))
-		}
-		return true
-	})
+
 	return nil
 }
 

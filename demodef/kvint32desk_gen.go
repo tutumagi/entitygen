@@ -21,7 +21,7 @@ func NewKVInt32Desk(data map[int32]*Desk) *KVInt32Desk {
 	return (*KVInt32Desk)(attr.NewInt32Map(convertData))
 }
 func (a *KVInt32Desk) Set(k int32, v *Desk) {
-	v.setParent(fmt.Sprintf("mk%d", k), (*attr.Int32Map)(a))
+	v.SetParent(fmt.Sprintf("mk%d", k), (*attr.Int32Map)(a))
 	(*attr.Int32Map)(a).Set(k, v)
 }
 func (a *KVInt32Desk) Get(k int32) *Desk {
@@ -37,7 +37,7 @@ func (a *KVInt32Desk) Delete(k int32) bool {
 func (a *KVInt32Desk) Count() int {
 	return (*attr.Int32Map)(a).Len()
 }
-func (a *KVInt32Desk) setParent(k string, parent attr.Field) {
+func (a *KVInt32Desk) SetParent(k string, parent attr.Field) {
 	(*attr.Int32Map)(a).SetParent(k, parent)
 }
 func (a *KVInt32Desk) ForEach(fn func(k int32, v *Desk) bool) {
@@ -73,7 +73,7 @@ func (a *KVInt32Desk) UnmarshalJSON(b []byte) error {
 	}
 	convertData := map[int32]interface{}{}
 	for k, v := range dd {
-		v.setParent(fmt.Sprintf("mk%d", k), (*attr.Int32Map)(a))
+		v.SetParent(fmt.Sprintf("mk%d", k), (*attr.Int32Map)(a))
 		convertData[k] = v
 	}
 	(*attr.Int32Map)(a).SetData(convertData)
@@ -90,7 +90,7 @@ func (a *KVInt32Desk) UnmarshalBSON(b []byte) error {
 	}
 	convertData := map[int32]interface{}{}
 	for k, v := range dd {
-		v.setParent(fmt.Sprintf("mk%d", k), (*attr.Int32Map)(a))
+		v.SetParent(fmt.Sprintf("mk%d", k), (*attr.Int32Map)(a))
 		convertData[k] = v
 	}
 	(*attr.Int32Map)(a).SetData(convertData)

@@ -84,7 +84,7 @@ func writeParentForEachEqual(
 	convertAttrStrMap func(string) *Statement,
 ) {
 	// 4. 写 setParent
-	f.Func().Params(thisFn()).Id("setParent").Params(Id("k").String(), Id("parent").Add(attrField())).
+	f.Func().Params(thisFn()).Id(setParentFuncName).Params(Id("k").String(), Id("parent").Add(attrField())).
 		Block(
 			convertThisFn().Dot("SetParent").Call(Id("k"), Id("parent")),
 		)

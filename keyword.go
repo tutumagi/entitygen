@@ -9,8 +9,9 @@ import (
 )
 
 const (
-	thisKeyword     = "a"
-	attrPackageName = "gitlab.gamesword.com/nut/entitygen/attr"
+	thisKeyword       = "a"
+	attrPackageName   = "gitlab.gamesword.com/nut/entitygen/attr"
+	setParentFuncName = "SetParent"
 )
 
 // 一些预设的类型或者关键字

@@ -12,7 +12,11 @@ import (
 )
 
 type Field interface {
+	_InlineField
 	setChangeKey(k string)
+}
+
+type _InlineField interface {
 	SetParent(k string, parent Field)
 }
 
@@ -313,7 +317,7 @@ func (meta *Meta) builder() dynamicstruct.DynamicStruct {
 			builder.AddField(
 				strings.Title(k), // 首字母大写
 				v.typv,
-				fmt.Sprintf(`json:"%s" bson:"%s"`, k, tagStr),
+				fmt.Sprintf(`json:"%s, omitempty" bson:"%s"`, k, tagStr),
 			)
 		}
 
@@ -323,12 +327,12 @@ func (meta *Meta) builder() dynamicstruct.DynamicStruct {
 }
 
 // 通过 dynamicStruct 解析到的struct，转为 map[string]interface{}
-func (meta *Meta) Unmarshal(srcStruct interface{}) map[string]interface{} {
-	return meta.readerToMap(dynamicstruct.NewReader(srcStruct))
+func (meta *Meta) Unmarshal(srcStruct interface{}, sm *StrMap) *StrMap {
+	return meta.readerToMap(dynamicstruct.NewReader(srcStruct), sm)
 }
 
 // 通过 dynamicStruct 解析到的struct，转为 []map[string]interface{}
-func (meta *Meta) UnmarshalSlice(srcStruct interface{}) []map[string]interface{} {
+func (meta *Meta) UnmarshalSlice(srcStruct interface{}) []*StrMap {
 	// srcStruct 类型为 *[]*StrMap
 	// v := reflect.ValueOf(srcStruct)
 	// if v.Kind() == reflect.Ptr {
@@ -337,42 +341,49 @@ func (meta *Meta) UnmarshalSlice(srcStruct interface{}) []map[string]interface{}
 	// if v.Kind() == reflect.Slice {
 
 	// }
-	var attrs = []map[string]interface{}{}
+	var attrs = []*StrMap{}
 	readers := dynamicstruct.NewReader(srcStruct).ToSliceOfReaders()
 	for _, r := range readers {
-		attrs = append(attrs, meta.readerToMap(r))
+		attrs = append(attrs, meta.readerToMap(r, nil))
 	}
 
 	return attrs
 }
 
 // 将 dynamicstruct.Reader 转为 map[string]interface{}
-func (meta *Meta) readerToMap(r dynamicstruct.Reader) map[string]interface{} {
-	var attrs = map[string]interface{}{}
+func (meta *Meta) readerToMap(r dynamicstruct.Reader, attrs *StrMap) *StrMap {
+	if attrs == nil {
+		attrs = NewStrMap(nil)
+	}
 	for _, field := range r.GetAllFields() {
 		name := lowerFirst(field.Name())
-		attrs[name] = field.Interface()
+		v := field.Interface()
+		attrs.Set(name, v)
+
+		if !meta.GetDef(name).IsPrimary() {
+			v.(_InlineField).SetParent(name, attrs)
+		}
 	}
 
 	return attrs
 }
 
-func (meta *Meta) UnmarshalBson(bytes []byte) (map[string]interface{}, error) {
+func (meta *Meta) UnmarshalBson(bytes []byte, sm *StrMap) (*StrMap, error) {
 	dynStruct := meta.DynamicStruct()
 	err := bson.Unmarshal(bytes, dynStruct)
 	if err != nil {
 		return nil, err
 	}
-	return meta.Unmarshal(dynStruct), nil
+	return meta.Unmarshal(dynStruct, sm), nil
 }
 
-func (meta *Meta) UnmarshalJson(bytes []byte) (map[string]interface{}, error) {
+func (meta *Meta) UnmarshalJson(bytes []byte, sm *StrMap) (*StrMap, error) {
 	dynStruct := meta.DynamicStruct()
 	err := json.Unmarshal(bytes, dynStruct)
 	if err != nil {
 		return nil, err
 	}
-	return meta.Unmarshal(dynStruct), nil
+	return meta.Unmarshal(dynStruct, sm), nil
 }
 
 func lowerFirst(s string) string {

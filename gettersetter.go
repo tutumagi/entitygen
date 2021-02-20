@@ -38,7 +38,7 @@ func writeGetterSetter(f *File, fields []*structField, thisFn func() *Statement,
 				BlockFunc(func(g *Group) {
 					if !isBasic {
 						// g.If(Id(field.key).Op("==").Nil()).Block(Return())
-						g.Id(field.key).Dot("setParent").Call(Lit(field.key), convertThisFn())
+						g.Id(field.key).Dot(setParentFuncName).Call(Lit(field.key), convertThisFn())
 						g.Add(convertThisFn()).Dot("Set").Params(Lit(field.key), Id(field.key))
 					} else {
 						g.Add(convertThisFn()).Dot("Set").Params(Lit(field.key), Id(field.key))

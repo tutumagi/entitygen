@@ -20,7 +20,7 @@ func NewKVStrDesk(data map[string]*Desk) *KVStrDesk {
 	return (*KVStrDesk)(attr.NewStrMap(convertData))
 }
 func (a *KVStrDesk) Set(k string, v *Desk) {
-	v.setParent(k, (*attr.StrMap)(a))
+	v.SetParent(k, (*attr.StrMap)(a))
 	(*attr.StrMap)(a).Set(k, v)
 }
 func (a *KVStrDesk) Get(k string) *Desk {
@@ -36,7 +36,7 @@ func (a *KVStrDesk) Delete(k string) bool {
 func (a *KVStrDesk) Count() int {
 	return (*attr.StrMap)(a).Len()
 }
-func (a *KVStrDesk) setParent(k string, parent attr.Field) {
+func (a *KVStrDesk) SetParent(k string, parent attr.Field) {
 	(*attr.StrMap)(a).SetParent(k, parent)
 }
 func (a *KVStrDesk) ForEach(fn func(k string, v *Desk) bool) {
@@ -72,7 +72,7 @@ func (a *KVStrDesk) UnmarshalJSON(b []byte) error {
 	}
 	convertData := map[string]interface{}{}
 	for k, v := range dd {
-		v.setParent(k, (*attr.StrMap)(a))
+		v.SetParent(k, (*attr.StrMap)(a))
 		convertData[k] = v
 	}
 	(*attr.StrMap)(a).SetData(convertData)
@@ -89,7 +89,7 @@ func (a *KVStrDesk) UnmarshalBSON(b []byte) error {
 	}
 	convertData := map[string]interface{}{}
 	for k, v := range dd {
-		v.setParent(k, (*attr.StrMap)(a))
+		v.SetParent(k, (*attr.StrMap)(a))
 		convertData[k] = v
 	}
 	(*attr.StrMap)(a).SetData(convertData)

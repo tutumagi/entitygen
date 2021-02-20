@@ -134,6 +134,9 @@ func (a *StrMap) SetData(data map[string]interface{}) {
 }
 
 func (a *StrMap) Set(key string, val interface{}) {
+	if a.data == nil {
+		a.data = map[string]interface{}{}
+	}
 	a.data[key] = val
 	a.setChangeKey(key)
 }

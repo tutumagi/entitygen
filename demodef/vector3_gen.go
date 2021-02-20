@@ -67,7 +67,7 @@ func (a *Vector3) ChangeKey() map[string]struct{} {
 func (a *Vector3) ClearChangeKey() {
 	(*attr.StrMap)(a).ClearChangeKey()
 }
-func (a *Vector3) setParent(k string, parent attr.Field) {
+func (a *Vector3) SetParent(k string, parent attr.Field) {
 	(*attr.StrMap)(a).SetParent(k, parent)
 }
 func (a *Vector3) ForEach(fn func(k string, v interface{}) bool) {
@@ -91,33 +91,19 @@ func (a *Vector3) MarshalJSON() ([]byte, error) {
 	return json.Marshal((*attr.StrMap)(a).ToMap())
 }
 func (a *Vector3) UnmarshalJSON(b []byte) error {
-	mm, err := Vector3Meta.UnmarshalJson(b)
+	_, err := Vector3Meta.UnmarshalJson(b, (*attr.StrMap)(a))
 	if err != nil {
 		return err
 	}
-	(*attr.StrMap)(a).SetData(mm)
-	(*attr.StrMap)(a).ForEach(func(k string, v interface{}) bool {
-		if k != "id" && !Vector3Meta.GetDef(k).IsPrimary() {
-			v.(IField).setParent(k, (*attr.StrMap)(a))
-		}
-		return true
-	})
 	return nil
 }
 func (a *Vector3) MarshalBSON() ([]byte, error) {
 	return bson.Marshal((*attr.StrMap)(a).ToMap())
 }
 func (a *Vector3) UnmarshalBSON(b []byte) error {
-	mm, err := Vector3Meta.UnmarshalBson(b)
+	_, err := Vector3Meta.UnmarshalBson(b, (*attr.StrMap)(a))
 	if err != nil {
 		return err
 	}
-	(*attr.StrMap)(a).SetData(mm)
-	(*attr.StrMap)(a).ForEach(func(k string, v interface{}) bool {
-		if k != "id" && !Vector3Meta.GetDef(k).IsPrimary() {
-			v.(IField).setParent(k, (*attr.StrMap)(a))
-		}
-		return true
-	})
 	return nil
 }
