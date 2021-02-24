@@ -65,16 +65,18 @@ func (a *DeskSlice) Data() []*Desk {
 	return dd
 }
 func (a *DeskSlice) MarshalJSON() ([]byte, error) {
-	return json.Marshal(a.Data())
+	return json.Marshal(map[string][]*Desk{
+		"d": a.Data(),
+	})
 }
 func (a *DeskSlice) UnmarshalJSON(b []byte) error {
-	dd := []*Desk{}
+	dd := map[string][]*Desk{}
 	err := json.Unmarshal(b, &dd)
 	if err != nil {
 		return err
 	}
 	convertData := []interface{}{}
-	for k, v := range dd {
+	for k, v := range dd["d"] {
 		v.SetParent(fmt.Sprintf("ik%d", k), (*attr.Slice)(a))
 		convertData = append(convertData, v)
 	}

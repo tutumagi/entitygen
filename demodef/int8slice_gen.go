@@ -58,16 +58,18 @@ func (a *Int8Slice) Data() []int8 {
 	return dd
 }
 func (a *Int8Slice) MarshalJSON() ([]byte, error) {
-	return json.Marshal(a.Data())
+	return json.Marshal(map[string][]int8{
+		"d": a.Data(),
+	})
 }
 func (a *Int8Slice) UnmarshalJSON(b []byte) error {
-	dd := []int8{}
+	dd := map[string][]int8{}
 	err := json.Unmarshal(b, &dd)
 	if err != nil {
 		return err
 	}
 	convertData := []interface{}{}
-	for k, v := range dd {
+	for k, v := range dd["d"] {
 		_ = k
 		convertData = append(convertData, v)
 	}

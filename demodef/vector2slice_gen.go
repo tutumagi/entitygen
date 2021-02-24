@@ -65,16 +65,18 @@ func (a *Vector2Slice) Data() []*Vector2 {
 	return dd
 }
 func (a *Vector2Slice) MarshalJSON() ([]byte, error) {
-	return json.Marshal(a.Data())
+	return json.Marshal(map[string][]*Vector2{
+		"d": a.Data(),
+	})
 }
 func (a *Vector2Slice) UnmarshalJSON(b []byte) error {
-	dd := []*Vector2{}
+	dd := map[string][]*Vector2{}
 	err := json.Unmarshal(b, &dd)
 	if err != nil {
 		return err
 	}
 	convertData := []interface{}{}
-	for k, v := range dd {
+	for k, v := range dd["d"] {
 		v.SetParent(fmt.Sprintf("ik%d", k), (*attr.Slice)(a))
 		convertData = append(convertData, v)
 	}
