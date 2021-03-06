@@ -7,7 +7,7 @@ import (
 	. "github.com/dave/jennifer/jen"
 )
 
-func writeAttrMeta(f *File, attrMetaName string, structName string, isEntity bool, fields []*structField) {
+func writeAttrMeta(f *File, attrMetaName string, structName string, isEntity bool, fields []*fieldInfo) {
 	// var xxxAttrDef *attr.Def
 	f.Var().Id(attrMetaName).Id("*").Add(attrMeta())
 	f.Func().Id("init").Params().

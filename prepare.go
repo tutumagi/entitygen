@@ -10,7 +10,7 @@ import (
 	. "github.com/dave/jennifer/jen"
 )
 
-type structField struct {
+type fieldInfo struct {
 	name       string // 字段名
 	key        string // 字段存储在 map 中的 key，目前的规则是字段名首字母小写
 	typ        types.Type
@@ -30,8 +30,8 @@ type structField struct {
 	emptyValue Code
 }
 
-func getStructFields(structType *types.Struct, isEntityDef bool) []*structField {
-	result := make([]*structField, 0, structType.NumFields())
+func getStructFields(structType *types.Struct, isEntityDef bool) []*fieldInfo {
+	result := make([]*fieldInfo, 0, structType.NumFields())
 	for i := 0; i < structType.NumFields(); i++ {
 		field := structType.Field(i)
 		name := field.Name()
@@ -111,7 +111,7 @@ func getStructFields(structType *types.Struct, isEntityDef bool) []*structField 
 
 		typName := getTypString(typ)
 		attrGetter, _ := getFieldAttrGetterFnName(typ)
-		result = append(result, &structField{
+		result = append(result, &fieldInfo{
 			name:       name,
 			key:        key,
 			typ:        typ,

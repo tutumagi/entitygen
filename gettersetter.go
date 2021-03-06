@@ -7,7 +7,7 @@ import (
 	. "github.com/dave/jennifer/jen"
 )
 
-func writeGetterSetter(f *File, isEntity bool, fields []*structField, thisFn func() *Statement, convertThisFn func() *Statement) error {
+func writeGetterSetter(f *File, isEntity bool, fields []*fieldInfo, thisFn func() *Statement, convertThisFn func() *Statement) error {
 	// 写自定义属性的 getter/setter
 	for i := 0; i < len(fields); i++ {
 		field := fields[i]

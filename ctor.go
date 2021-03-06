@@ -4,7 +4,7 @@ import (
 	. "github.com/dave/jennifer/jen"
 )
 
-func writeCtor(f *File, structName string, isEntity bool, fields []*structField) {
+func writeCtor(f *File, structName string, isEntity bool, fields []*fieldInfo) {
 
 	// 写 EmptyXXX
 	f.Func().Id(EmptyCtor(structName)).Params().Op("*").Id(structName).
