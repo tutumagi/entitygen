@@ -1,6 +1,11 @@
 >`jen`的用法：[参考代码](https://dev.to/hlubek/metaprogramming-with-go-or-how-to-build-code-generators-that-parse-go-code-2k3j)
 
 
+#### 修改/维护
+1. 主要是修改 `entitygen/` 和 `domain/` 目录下的代码，`attr/` 目录下的改动需要讨论才可以改动
+2. 修改完成后，执行  `go generate ./...`，生成成功后， `go test -coverprofile=./profile/cover.txt ./...` 执行测试，测试通过再提交
+
+
 #### 用法
 ##### 第一次生成
 1. 确保 `go env` 中的环境变量如下（如果不是，执行下面这个命令 `go env -w GOPRIVATE=gitlab.gamesword.com`）

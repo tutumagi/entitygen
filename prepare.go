@@ -60,6 +60,18 @@ func getStructFields(structType *types.Struct, isEntityDef bool) []*structField 
 
 		// 如果是实体定义 才需要检查 flag, storedb 和 client 的标签
 		if isEntityDef {
+			lowerName := strings.ToLower(name)
+			// 检查属性定义里面有没有跟内置的属性重复的地方
+			if strings.ToLower(buildinIDKey) == lowerName {
+				panic(fmt.Sprintf("%s 是内置字段，不能使用", buildinIDKey))
+			}
+			if strings.ToLower(buildinPosKey) == lowerName {
+				panic(fmt.Sprintf("%s 是内置字段，不能使用", buildinPosKey))
+			}
+			if strings.ToLower(buildinRotKey) == lowerName {
+				panic(fmt.Sprintf("%s 是内置字段，不能使用", buildinRotKey))
+			}
+
 			{
 				storeDBStr, ok := tagValue.Lookup("storedb")
 				if !ok {
@@ -149,7 +161,7 @@ func getEmptyValue(typName string, typ types.Type) Code {
 	default:
 		return Nil()
 	}
-	return Id("")
+	// return Id("")
 }
 
 // // 获取 nil 值，基础类型就是和空值一样，非基础类型就是 nil

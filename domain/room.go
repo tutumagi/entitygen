@@ -5,7 +5,6 @@ import "github.com/g3n/engine/math32"
 // RoomDef model
 // 以 Def 结尾的表示是实体定义
 type RoomDef struct {
-	// ID string `flag:"cell" client:"true" storedb:"true"`
 	// CsvPos 是指配置表里面的pos，表示房间在整个建筑结构里面的方位
 	CsvPos int32 `flag:"cell" client:"true" storedb:"true"`
 	// 所属建筑的id
