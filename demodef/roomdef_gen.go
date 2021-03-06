@@ -33,9 +33,9 @@ func init() {
 	// 实体内置的 ID
 	RoomDefMeta.DefAttr("id", attr.String, attr.AfOtherClients, true)
 	// 实体内置的 位置
-	RoomDefMeta.DefAttr("pos", attr.Vector3, attr.AfCell, true)
+	RoomDefMeta.DefAttr("pos", attr.Vector3, attr.AfOtherClients, true)
 	// 实体内置的 朝向
-	RoomDefMeta.DefAttr("rot", attr.Vector3, attr.AfCell, true)
+	RoomDefMeta.DefAttr("rot", attr.Vector3, attr.AfBase, false)
 }
 
 type RoomDef attr.StrMap

@@ -10,6 +10,19 @@ import (
 	. "github.com/dave/jennifer/jen"
 )
 
+// 标明 rot 和 pos 的一些标记，只给 entStructInfo 使用
+type buildinVec3Info struct {
+	hasCell   bool
+	hasClient bool
+	storedb   bool
+}
+
+// 记录该实体是否需要生成 rot 和 pos 的信息（以及他们的 flag：是否存 db，是否需要到 cellapp 里面去）
+type entStructInfo struct {
+	rot *buildinVec3Info // 为空，则不生成内置的 rot 字段；不为空，则表示需要生成内置的 rot 字段
+	pos *buildinVec3Info // 为空，则不生成内置的 pos 字段；不为空，则表示需要生成内置的 pos 字段
+}
+
 type fieldInfo struct {
 	name       string // 字段名
 	key        string // 字段存储在 map 中的 key，目前的规则是字段名首字母小写
@@ -30,7 +43,41 @@ type fieldInfo struct {
 	emptyValue Code
 }
 
-func getStructFields(structType *types.Struct, isEntityDef bool) []*fieldInfo {
+func getEntStruct(structType *types.Struct) *entStructInfo {
+	entInfo := &entStructInfo{}
+	for i := 0; i < structType.NumFields(); i++ {
+		field := structType.Field(i)
+		name := field.Name()
+
+		tagValue := reflect.StructTag(structType.Tag(i))
+		storeDB, _, flagCell, client := checkFieldTagValue(name, tagValue)
+
+		lowerName := strings.ToLower(name)
+		// 检查属性定义里面有没有跟内置的属性重复的地方
+		if strings.ToLower(buildinIDKey) == lowerName {
+			panic(fmt.Sprintf("%s 是内置字段，不能使用\n", buildinIDKey))
+		}
+		if strings.ToLower(buildinPosKey) == lowerName {
+			fmt.Printf("需要生成 pos 字段\n")
+			entInfo.pos = &buildinVec3Info{
+				hasCell:   flagCell,
+				hasClient: client,
+				storedb:   storeDB,
+			}
+		}
+		if strings.ToLower(buildinRotKey) == lowerName {
+			fmt.Printf("需要生成 rot 字段\n")
+			entInfo.rot = &buildinVec3Info{
+				hasCell:   flagCell,
+				hasClient: client,
+				storedb:   storeDB,
+			}
+		}
+	}
+	return entInfo
+}
+
+func getStructFields(structType *types.Struct, isEntityDef bool) ([]*fieldInfo, *entStructInfo) {
 	result := make([]*fieldInfo, 0, structType.NumFields())
 	for i := 0; i < structType.NumFields(); i++ {
 		field := structType.Field(i)
@@ -54,7 +101,6 @@ func getStructFields(structType *types.Struct, isEntityDef bool) []*fieldInfo {
 				}
 				return name
 			}()
-			fmt.Printf("field:%s 没有 key，使用 name 作为 key(%s) \n", name, key)
 		}
 		getterSetterName := strings.Title(key)
 
@@ -66,47 +112,12 @@ func getStructFields(structType *types.Struct, isEntityDef bool) []*fieldInfo {
 				panic(fmt.Sprintf("%s 是内置字段，不能使用", buildinIDKey))
 			}
 			if strings.ToLower(buildinPosKey) == lowerName {
-				panic(fmt.Sprintf("%s 是内置字段，不能使用", buildinPosKey))
+				continue
 			}
 			if strings.ToLower(buildinRotKey) == lowerName {
-				panic(fmt.Sprintf("%s 是内置字段，不能使用", buildinRotKey))
+				continue
 			}
-
-			{
-				storeDBStr, ok := tagValue.Lookup("storedb")
-				if !ok {
-					failErr(fmt.Errorf("field:%s 必须有tag:storedb", name))
-				}
-				if storeDBStr != "true" && storeDBStr != "false" {
-					failErr(fmt.Errorf("field:%s storedb(%s) 必须是 true 或者 false", name, storeDBStr))
-				}
-
-				storeDB = storeDBStr == "true"
-			}
-
-			{
-				clientStr, ok := tagValue.Lookup("client")
-				if !ok {
-					failErr(fmt.Errorf("field:%s 必须有tag:client", name))
-				}
-				if clientStr != "true" && clientStr != "false" {
-					failErr(fmt.Errorf("field:%s client(%s) 必须是 true 或者 false", name, clientStr))
-				}
-
-				client = clientStr == "true"
-			}
-
-			{
-				flagStr, ok := tagValue.Lookup("flag")
-				if !ok {
-					failErr(fmt.Errorf("field:%s 必须有tag:flag", name))
-				}
-				if flagStr != "base" && flagStr != "cell" {
-					failErr(fmt.Errorf("field:%s flag(%s) 必须是 base 或者 cell", name, flagStr))
-				}
-
-				flagCell = flagStr == "cell"
-			}
+			storeDB, flagBase, flagCell, client = checkFieldTagValue(name, tagValue)
 		}
 
 		typName := getTypString(typ)
@@ -127,7 +138,11 @@ func getStructFields(structType *types.Struct, isEntityDef bool) []*fieldInfo {
 			attrGetter: attrGetter,
 		})
 	}
-	return result
+
+	if isEntityDef {
+		return result, getEntStruct(structType)
+	}
+	return result, nil
 }
 
 // 获取类型的空值
@@ -240,4 +255,49 @@ func getFieldAttrGetterFnName(typ types.Type) (string, bool) {
 	default:
 		return "Value", true
 	}
+}
+
+func checkFieldTagValue(fieldName string, tagValue reflect.StructTag) (storeDB bool, flagBase bool, flagCell bool, client bool) {
+	storeDB = true
+	flagBase = true // 目前的实现里面属性肯定会存储在 base 里面
+	flagCell = false
+	client = true
+
+	{
+		storeDBStr, ok := tagValue.Lookup("storedb")
+		if !ok {
+			failErr(fmt.Errorf("field:%s 必须有tag:storedb", fieldName))
+		}
+		if storeDBStr != "true" && storeDBStr != "false" {
+			failErr(fmt.Errorf("field:%s storedb(%s) 必须是 true 或者 false", fieldName, storeDBStr))
+		}
+
+		storeDB = storeDBStr == "true"
+	}
+
+	{
+		clientStr, ok := tagValue.Lookup("client")
+		if !ok {
+			failErr(fmt.Errorf("field:%s 必须有tag:client", fieldName))
+		}
+		if clientStr != "true" && clientStr != "false" {
+			failErr(fmt.Errorf("field:%s client(%s) 必须是 true 或者 false", fieldName, clientStr))
+		}
+
+		client = clientStr == "true"
+	}
+
+	{
+		flagStr, ok := tagValue.Lookup("flag")
+		if !ok {
+			failErr(fmt.Errorf("field:%s 必须有tag:flag", fieldName))
+		}
+		if flagStr != "base" && flagStr != "cell" {
+			failErr(fmt.Errorf("field:%s flag(%s) 必须是 base 或者 cell", fieldName, flagStr))
+		}
+
+		flagCell = flagStr == "cell"
+	}
+
+	return
 }

@@ -7,7 +7,7 @@ import (
 	. "github.com/dave/jennifer/jen"
 )
 
-func writeAttrMeta(f *File, attrMetaName string, structName string, isEntity bool, fields []*fieldInfo) {
+func writeAttrMeta(f *File, attrMetaName string, structName string, entInfo *entStructInfo, fields []*fieldInfo) {
 	// var xxxAttrDef *attr.Def
 	f.Var().Id(attrMetaName).Id("*").Add(attrMeta())
 	f.Func().Id("init").Params().
@@ -54,40 +54,60 @@ func writeAttrMeta(f *File, attrMetaName string, structName string, isEntity boo
 				}
 
 				// 写实体内置的属性定义
-				if isEntity {
+				if entInfo != nil {
 					// 默认的属性，位置，朝向和 ID
 					// RoomDefMeta.DefAttr("id", attr.String, attr.AfOtherClients, true)
 					// RoomDefMeta.DefAttr("pos", attr.Vector3, attr.AfBase, true)
 					// RoomDefMeta.DefAttr("rot", attr.Vector3, attr.AfBase, true)
 
-					if EntityGenID || EntityGenPos || EntityGenRot {
-						g.Comment("实体内置的属性")
-					}
-					if EntityGenID {
-						g.Comment("实体内置的 ID")
-						g.Id(attrMetaName).Dot("DefAttr").Call(
-							Lit(buildinIDKey),
-							Qual(attrPackageName, "String"),
-							Qual(attrPackageName, "AfOtherClients"),
-							True(), // id 肯定需要写到 db 里面去
-						)
-					}
-					if EntityGenPos {
+					g.Comment("实体内置的属性")
+
+					g.Comment("实体内置的 ID")
+					g.Id(attrMetaName).Dot("DefAttr").Call(
+						Lit(buildinIDKey),
+						Qual(attrPackageName, "String"),
+						Qual(attrPackageName, "AfOtherClients"),
+						True(), // id 肯定需要写到 db 里面去
+					)
+
+					if entInfo.pos != nil {
 						g.Comment("实体内置的 位置")
-						g.Id(attrMetaName).Dot("DefAttr").Call(
-							Lit(buildinPosKey),
-							Qual(attrPackageName, "Vector3"),
-							Qual(attrPackageName, "AfCell"),
-							True(), // TODO 位置需不需要写到 db 里面去，应该来外部来配置，不是每种实体都需要记录位置到 db
+						g.Id(attrMetaName).Dot("DefAttr").CallFunc(
+							func(ig *Group) {
+								ig.Lit(buildinPosKey)
+								ig.Qual(attrPackageName, "Vector3")
+								if entInfo.pos.hasCell {
+									ig.Qual(attrPackageName, "AfOtherClients")
+								} else {
+									ig.Qual(attrPackageName, "AfBase")
+								}
+
+								if entInfo.pos.storedb {
+									ig.True()
+								} else {
+									ig.False()
+								}
+							},
 						)
 					}
-					if EntityGenRot {
+					if entInfo.rot != nil {
 						g.Comment("实体内置的 朝向")
-						g.Id(attrMetaName).Dot("DefAttr").Call(
-							Lit("rot"),
-							Qual(attrPackageName, "Vector3"),
-							Qual(attrPackageName, "AfCell"),
-							True(), // TODO 朝向需不需要写到 db 里面去，应该来外部来配置，不是每种实体都需要记录位置到 db
+						g.Id(attrMetaName).Dot("DefAttr").CallFunc(
+							func(ig *Group) {
+								ig.Lit(buildinRotKey)
+								ig.Qual(attrPackageName, "Vector3")
+								if entInfo.rot.hasCell {
+									ig.Qual(attrPackageName, "AfOtherClients")
+								} else {
+									ig.Qual(attrPackageName, "AfBase")
+								}
+
+								if entInfo.rot.storedb {
+									ig.True()
+								} else {
+									ig.False()
+								}
+							},
 						)
 					}
 				}

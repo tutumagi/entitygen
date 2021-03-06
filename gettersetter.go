@@ -7,7 +7,7 @@ import (
 	. "github.com/dave/jennifer/jen"
 )
 
-func writeGetterSetter(f *File, isEntity bool, fields []*fieldInfo, thisFn func() *Statement, convertThisFn func() *Statement) error {
+func writeGetterSetter(f *File, entInfo *entStructInfo, fields []*fieldInfo, thisFn func() *Statement, convertThisFn func() *Statement) error {
 	// 写自定义属性的 getter/setter
 	for i := 0; i < len(fields); i++ {
 		field := fields[i]
@@ -62,9 +62,9 @@ func writeGetterSetter(f *File, isEntity bool, fields []*fieldInfo, thisFn func(
 	}
 
 	// 写实体内置的 getter/setter
-	if isEntity {
-		writeBuiltinProp(f, EntityGenID, EntityGenPos, EntityGenRot, thisFn, convertThisFn)
-	}
+
+	writeBuiltinProp(f, entInfo, thisFn, convertThisFn)
+
 	return nil
 }
 
@@ -117,13 +117,14 @@ func writeMapGetSetDel(
 
 func writeBuiltinProp(
 	f *File,
-	writeID bool,
-	writePos bool,
-	writeRot bool,
+	entInfo *entStructInfo,
 	thisFn func() *Statement,
 	convertThisFn func() *Statement,
 ) {
-	if writeRot {
+	if entInfo == nil {
+		return
+	}
+	if entInfo.rot != nil {
 		// GetRot
 		f.Func().Params(thisFn()).Id("GetRot").Params().Op("*").Add(attrVec3()).
 			BlockFunc(func(g *Group) {
@@ -141,7 +142,7 @@ func writeBuiltinProp(
 			})
 	}
 
-	if writePos {
+	if entInfo.pos != nil {
 		// GetPos
 		f.Func().Params(thisFn()).Id("GetPos").Params().Op("*").Add(attrVec3()).
 			BlockFunc(func(g *Group) {
@@ -159,18 +160,15 @@ func writeBuiltinProp(
 			})
 	}
 
-	if writeID {
-		// GetId
-		f.Func().Params(thisFn()).Id("GetId").Params().String().
-			BlockFunc(func(g *Group) {
-				g.Return(convertThisFn().Dot("Str").Call(Lit(buildinIDKey)))
-			})
+	// GetId
+	f.Func().Params(thisFn()).Id("GetId").Params().String().
+		BlockFunc(func(g *Group) {
+			g.Return(convertThisFn().Dot("Str").Call(Lit(buildinIDKey)))
+		})
 
-		//  SetId
-		f.Func().Params(thisFn()).Id("SetId").Params(Id(buildinIDKey).String()).
-			BlockFunc(func(g *Group) {
-				g.Add(convertThisFn()).Dot("Set").Params(Lit(buildinIDKey), Id(buildinIDKey))
-			})
-	}
-
+	//  SetId
+	f.Func().Params(thisFn()).Id("SetId").Params(Id(buildinIDKey).String()).
+		BlockFunc(func(g *Group) {
+			g.Add(convertThisFn()).Dot("Set").Params(Lit(buildinIDKey), Id(buildinIDKey))
+		})
 }

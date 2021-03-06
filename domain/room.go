@@ -32,6 +32,9 @@ type RoomDef struct {
 	Vec3 *math32.Vector3 `flag:"cell" client:"true" storedb:"true"`
 
 	Vec2Arr []*math32.Vector2 `flag:"cell" client:"true" storedb:"true"`
+
+	Pos *math32.Vector2 `flag:"cell" client:"true" storedb:"true"`
+	Rot *math32.Vector2 `flag:"base" client:"true" storedb:"false"`
 }
 
 // 桌子

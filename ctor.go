@@ -4,7 +4,7 @@ import (
 	. "github.com/dave/jennifer/jen"
 )
 
-func writeCtor(f *File, structName string, isEntity bool, fields []*fieldInfo) {
+func writeCtor(f *File, structName string, entInfo *entStructInfo, fields []*fieldInfo) {
 
 	// 写 EmptyXXX
 	f.Func().Id(EmptyCtor(structName)).Params().Op("*").Id(structName).
@@ -31,24 +31,21 @@ func writeCtor(f *File, structName string, isEntity bool, fields []*fieldInfo) {
 
 			g.Id("m").Dot("ClearChangeKey").Call()
 
-			if isEntity {
+			if entInfo != nil {
 				// 默认的属性，位置，朝向和 ID
 				// m.SetPos(attr.EmptyVec3())
 				// m.SetRot(attr.EmptyVec3())
 				// m.SetID("")
+				g.Comment("实体内置的属性")
 
-				if EntityGenID || EntityGenPos || EntityGenRot {
-					g.Comment("实体内置的属性")
-				}
-				if EntityGenID {
-					g.Comment("实体内置的 ID")
-					g.Id("m").Dot("SetId").Call(Lit(""))
-				}
-				if EntityGenPos {
+				g.Comment("实体内置的 ID")
+				g.Id("m").Dot("SetId").Call(Lit(""))
+
+				if entInfo.pos != nil {
 					g.Comment("实体内置的 位置")
 					g.Id("m").Dot("SetPos").Call(Qual(attrPackageName, "EmptyVec3").Call())
 				}
-				if EntityGenRot {
+				if entInfo.rot != nil {
 					g.Comment("实体内置的 朝向")
 					g.Id("m").Dot("SetRot").Call(Qual(attrPackageName, "EmptyVec3").Call())
 				}

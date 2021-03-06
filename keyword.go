@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	. "github.com/dave/jennifer/jen"
+	"gitlab.gamesword.com/nut/entitygen/attr"
 )
 
 const (
@@ -67,9 +68,13 @@ func StructTypeName(sourceTypeName string) string {
 }
 
 // 通过原始 struct 名字，获取生成的 struct 的 meta 变量名字
-func StructMetaName(srcName string) string {
+func StructMetaName(srcName string, isEntity bool) string {
 	// return strings.ToLower(srcName) + "Meta"
-	return srcName + "Meta"
+	result := srcName + "Meta"
+	if !isEntity {
+		return attr.LowerFirst(result)
+	}
+	return result
 }
 
 // 生成的 Map 名字 KV{Key}{Val}
