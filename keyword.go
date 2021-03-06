@@ -12,6 +12,11 @@ const (
 	thisKeyword       = "a"
 	attrPackageName   = "gitlab.gamesword.com/nut/entitygen/attr"
 	setParentFuncName = "SetParent"
+
+	// 实体内置的属性 id
+	buildinIDKey  = "id"
+	buildinPosKey = "pos"
+	buildinRotKey = "rot"
 )
 
 // 一些预设的类型或者关键字
@@ -23,6 +28,8 @@ var (
 
 	// attr.NewMeta
 	attrNewMeta = func() *Statement { return Qual(attrPackageName, "NewMeta") }
+
+	attrVec3 = func() *Statement { return Qual(attrPackageName, "Vec3") }
 )
 
 // 根据 要生成的类型名字，和依赖的 attr 里面的名字生成一些预设的 statement

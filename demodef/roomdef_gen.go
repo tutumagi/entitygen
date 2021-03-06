@@ -29,6 +29,13 @@ func init() {
 	RoomDefMeta.DefAttr("int8ss", &Int8Slice{}, attr.AfOtherClients, true)
 	RoomDefMeta.DefAttr("vec3", &Vector3{}, attr.AfOtherClients, true)
 	RoomDefMeta.DefAttr("vec2Arr", &Vector2Slice{}, attr.AfOtherClients, true)
+	// 实体内置的属性
+	// 实体内置的 ID
+	RoomDefMeta.DefAttr("id", attr.String, attr.AfOtherClients, true)
+	// 实体内置的 位置
+	RoomDefMeta.DefAttr("pos", attr.Vector3, attr.AfCell, true)
+	// 实体内置的 朝向
+	RoomDefMeta.DefAttr("rot", attr.Vector3, attr.AfCell, true)
 }
 
 type RoomDef attr.StrMap
@@ -52,6 +59,13 @@ func NewRoomDef(csvPos int32, buildID string, extends *KVInt32Int32, extends1 *K
 	m.SetVec3(vec3)
 	m.SetVec2Arr(vec2Arr)
 	m.ClearChangeKey()
+	// 实体内置的属性
+	// 实体内置的 ID
+	m.SetId("")
+	// 实体内置的 位置
+	m.SetPos(attr.EmptyVec3())
+	// 实体内置的 朝向
+	m.SetRot(attr.EmptyVec3())
 	return m
 }
 func (a *RoomDef) GetCsvPos() int32 {
@@ -202,6 +216,34 @@ func (a *RoomDef) SetVec2Arr(vec2Arr *Vector2Slice) {
 	(*attr.StrMap)(a).Set("vec2Arr", vec2Arr)
 }
 
+func (a *RoomDef) GetRot() *attr.Vec3 {
+	val := (*attr.StrMap)(a).Value("rot")
+	if val == nil {
+		return nil
+	}
+	return val.(*attr.Vec3)
+}
+func (a *RoomDef) SetRot(rot *attr.Vec3) {
+	rot.SetParent("rot", (*attr.StrMap)(a))
+	(*attr.StrMap)(a).Set("rot", rot)
+}
+func (a *RoomDef) GetPos() *attr.Vec3 {
+	val := (*attr.StrMap)(a).Value("pos")
+	if val == nil {
+		return nil
+	}
+	return val.(*attr.Vec3)
+}
+func (a *RoomDef) SetPos(pos *attr.Vec3) {
+	pos.SetParent("pos", (*attr.StrMap)(a))
+	(*attr.StrMap)(a).Set("pos", pos)
+}
+func (a *RoomDef) GetId() string {
+	return (*attr.StrMap)(a).Str("id")
+}
+func (a *RoomDef) SetId(id string) {
+	(*attr.StrMap)(a).Set("id", id)
+}
 func (a *RoomDef) HasChange() bool {
 	return (*attr.StrMap)(a).HasChange()
 }

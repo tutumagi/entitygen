@@ -7,18 +7,18 @@ import (
 	bson "go.mongodb.org/mongo-driver/bson"
 )
 
-var Vector3Meta *attr.Meta
+var vector3Meta *attr.Meta
 
 func init() {
-	Vector3Meta = attr.NewMeta(func() interface{} {
+	vector3Meta = attr.NewMeta(func() interface{} {
 		return EmptyVector3()
 	}, func() interface{} {
 		return &[]*Vector3{}
 	})
 
-	Vector3Meta.DefAttr("x", attr.Float32, attr.AfBase, true)
-	Vector3Meta.DefAttr("y", attr.Float32, attr.AfBase, true)
-	Vector3Meta.DefAttr("z", attr.Float32, attr.AfBase, true)
+	vector3Meta.DefAttr("x", attr.Float32, attr.AfBase, true)
+	vector3Meta.DefAttr("y", attr.Float32, attr.AfBase, true)
+	vector3Meta.DefAttr("z", attr.Float32, attr.AfBase, true)
 }
 
 type Vector3 attr.StrMap
@@ -91,7 +91,7 @@ func (a *Vector3) MarshalJSON() ([]byte, error) {
 	return json.Marshal((*attr.StrMap)(a).ToMap())
 }
 func (a *Vector3) UnmarshalJSON(b []byte) error {
-	_, err := Vector3Meta.UnmarshalJson(b, (*attr.StrMap)(a))
+	_, err := vector3Meta.UnmarshalJson(b, (*attr.StrMap)(a))
 	if err != nil {
 		return err
 	}
@@ -101,7 +101,7 @@ func (a *Vector3) MarshalBSON() ([]byte, error) {
 	return bson.Marshal((*attr.StrMap)(a).ToMap())
 }
 func (a *Vector3) UnmarshalBSON(b []byte) error {
-	_, err := Vector3Meta.UnmarshalBson(b, (*attr.StrMap)(a))
+	_, err := vector3Meta.UnmarshalBson(b, (*attr.StrMap)(a))
 	if err != nil {
 		return err
 	}

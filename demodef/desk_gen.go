@@ -7,20 +7,20 @@ import (
 	bson "go.mongodb.org/mongo-driver/bson"
 )
 
-var DeskMeta *attr.Meta
+var deskMeta *attr.Meta
 
 func init() {
-	DeskMeta = attr.NewMeta(func() interface{} {
+	deskMeta = attr.NewMeta(func() interface{} {
 		return EmptyDesk()
 	}, func() interface{} {
 		return &[]*Desk{}
 	})
 
-	DeskMeta.DefAttr("width", attr.Int32, attr.AfBase, true)
-	DeskMeta.DefAttr("height", attr.Int32, attr.AfBase, true)
-	DeskMeta.DefAttr("name", attr.String, attr.AfBase, true)
-	DeskMeta.DefAttr("csvID", attr.Int32, attr.AfBase, true)
-	DeskMeta.DefAttr("below", &Desk{}, attr.AfBase, true)
+	deskMeta.DefAttr("width", attr.Int32, attr.AfBase, true)
+	deskMeta.DefAttr("height", attr.Int32, attr.AfBase, true)
+	deskMeta.DefAttr("name", attr.String, attr.AfBase, true)
+	deskMeta.DefAttr("csvID", attr.Int32, attr.AfBase, true)
+	deskMeta.DefAttr("below", &Desk{}, attr.AfBase, true)
 }
 
 type Desk attr.StrMap
@@ -115,7 +115,7 @@ func (a *Desk) MarshalJSON() ([]byte, error) {
 	return json.Marshal((*attr.StrMap)(a).ToMap())
 }
 func (a *Desk) UnmarshalJSON(b []byte) error {
-	_, err := DeskMeta.UnmarshalJson(b, (*attr.StrMap)(a))
+	_, err := deskMeta.UnmarshalJson(b, (*attr.StrMap)(a))
 	if err != nil {
 		return err
 	}
@@ -125,7 +125,7 @@ func (a *Desk) MarshalBSON() ([]byte, error) {
 	return bson.Marshal((*attr.StrMap)(a).ToMap())
 }
 func (a *Desk) UnmarshalBSON(b []byte) error {
-	_, err := DeskMeta.UnmarshalBson(b, (*attr.StrMap)(a))
+	_, err := deskMeta.UnmarshalBson(b, (*attr.StrMap)(a))
 	if err != nil {
 		return err
 	}

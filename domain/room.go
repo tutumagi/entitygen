@@ -10,13 +10,6 @@ type RoomDef struct {
 	CsvPos int32 `flag:"cell" client:"true" storedb:"true"`
 	// 所属建筑的id
 	BuildID string `flag:"cell" client:"true" storedb:"true"`
-	// CsvID   int32  `flag:"cell" client:"true" storedb:"true"`
-	// Left    string `flag:"cell" client:"true" storedb:"true"`
-	// Right   string `flag:"cell" client:"true" storedb:"true"`
-	// Top     string `flag:"cell" client:"true" storedb:"true"`
-	// Bottom  string `flag:"cell" client:"true" storedb:"true"`
-	// Front   string `flag:"cell" client:"true" storedb:"true"`
-	// Behind  string `flag:"cell" client:"true" storedb:"true"`
 
 	Extends map[int32]int32 `flag:"cell" client:"true" storedb:"true"`
 

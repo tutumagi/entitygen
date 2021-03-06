@@ -7,9 +7,9 @@ import (
 	. "github.com/dave/jennifer/jen"
 )
 
-func writeGetterSetter(f *File, fields []*structField, thisFn func() *Statement, convertThisFn func() *Statement) error {
+func writeGetterSetter(f *File, isEntity bool, fields []*structField, thisFn func() *Statement, convertThisFn func() *Statement) error {
+	// 写自定义属性的 getter/setter
 	for i := 0; i < len(fields); i++ {
-
 		field := fields[i]
 
 		switch v := field.typ.(type) {
@@ -60,6 +60,11 @@ func writeGetterSetter(f *File, fields []*structField, thisFn func() *Statement,
 			return fmt.Errorf("struct field type not handled: %T", v)
 		}
 	}
+
+	// 写实体内置的 getter/setter
+	if isEntity {
+		writeBuiltinProp(f, EntityGenID, EntityGenPos, EntityGenRot, thisFn, convertThisFn)
+	}
 	return nil
 }
 
@@ -108,4 +113,64 @@ func writeMapGetSetDel(
 		Block(
 			Return(convertThisFn().Dot("Len").Call()),
 		)
+}
+
+func writeBuiltinProp(
+	f *File,
+	writeID bool,
+	writePos bool,
+	writeRot bool,
+	thisFn func() *Statement,
+	convertThisFn func() *Statement,
+) {
+	if writeRot {
+		// GetRot
+		f.Func().Params(thisFn()).Id("GetRot").Params().Op("*").Add(attrVec3()).
+			BlockFunc(func(g *Group) {
+				g.Id("val").Op(":=").Add(convertThisFn()).Dot("Value").Call(Lit(buildinRotKey))
+
+				g.If(Id("val").Op("==").Nil()).Block(Return(Nil()))
+				g.Return(Id("val").Dot("").Parens(Op("*").Add(attrVec3()))) // 做类型转换
+			})
+
+		//  SetRot
+		f.Func().Params(thisFn()).Id("SetRot").Params(Id(buildinRotKey).Op("*").Add(attrVec3())).
+			BlockFunc(func(g *Group) {
+				g.Id(buildinRotKey).Dot(setParentFuncName).Call(Lit(buildinRotKey), convertThisFn())
+				g.Add(convertThisFn()).Dot("Set").Params(Lit(buildinRotKey), Id(buildinRotKey))
+			})
+	}
+
+	if writePos {
+		// GetPos
+		f.Func().Params(thisFn()).Id("GetPos").Params().Op("*").Add(attrVec3()).
+			BlockFunc(func(g *Group) {
+				g.Id("val").Op(":=").Add(convertThisFn()).Dot("Value").Call(Lit(buildinPosKey))
+
+				g.If(Id("val").Op("==").Nil()).Block(Return(Nil()))
+				g.Return(Id("val").Dot("").Parens(Op("*").Add(attrVec3()))) // 做类型转换
+			})
+
+		//  SetPos
+		f.Func().Params(thisFn()).Id("SetPos").Params(Id(buildinPosKey).Op("*").Add(attrVec3())).
+			BlockFunc(func(g *Group) {
+				g.Id(buildinPosKey).Dot(setParentFuncName).Call(Lit(buildinPosKey), convertThisFn())
+				g.Add(convertThisFn()).Dot("Set").Params(Lit(buildinPosKey), Id(buildinPosKey))
+			})
+	}
+
+	if writeID {
+		// GetId
+		f.Func().Params(thisFn()).Id("GetId").Params().String().
+			BlockFunc(func(g *Group) {
+				g.Return(convertThisFn().Dot("Str").Call(Lit(buildinIDKey)))
+			})
+
+		//  SetId
+		f.Func().Params(thisFn()).Id("SetId").Params(Id(buildinIDKey).String()).
+			BlockFunc(func(g *Group) {
+				g.Add(convertThisFn()).Dot("Set").Params(Lit(buildinIDKey), Id(buildinIDKey))
+			})
+	}
+
 }

@@ -76,7 +76,7 @@ func writeMap(f *File, v *types.Map) (string, error) {
 				},
 			)
 
-			g.Return(Parens(Op("*").Id(structName)).Params(Qual("gitlab.gamesword.com/nut/entitygen/attr", fmt.Sprintf("New%s", attrTypName)).Call(Id("convertData"))))
+			g.Return(Parens(Op("*").Id(structName)).Params(Qual(attrPackageName, fmt.Sprintf("New%s", attrTypName)).Call(Id("convertData"))))
 		})
 
 	// 5. 写所有字段的 getter/setter

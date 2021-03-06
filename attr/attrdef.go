@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"reflect"
 	"strings"
-	"unicode"
 
 	dynamicstruct "github.com/ompluscator/dynamic-struct"
 	"go.mongodb.org/mongo-driver/bson"
@@ -72,6 +71,7 @@ func isPrimary(a AttrTyp) bool {
 		Float64,
 		Bool,
 		String:
+		// Vector3:
 		return true
 	default:
 		return false
@@ -164,6 +164,12 @@ func primaryUnmarshal(att AttrTyp) func(b []byte) (interface{}, error) {
 			err := json.Unmarshal(b, &a)
 			return a, err
 		}
+	case Vector3:
+		return func(b []byte) (interface{}, error) {
+			var a Vec3
+			err := json.Unmarshal(b, &a)
+			return a, err
+		}
 	default:
 		panic(fmt.Sprintf("unsupport return no primary unmarshal func. kind:%d", reflect.TypeOf(att).Kind()))
 	}
@@ -187,6 +193,8 @@ var (
 	Bool AttrTyp = bool(false)
 
 	String AttrTyp = string("")
+
+	Vector3 AttrTyp = &Vec3{}
 )
 
 type FieldDef struct {
@@ -305,7 +313,6 @@ func (meta *Meta) builder() dynamicstruct.DynamicStruct {
 	if meta.dynStruct == nil {
 		// builder := dynamicstruct.ExtendStruct(_Empty{}) // 这个是默认数据结构中都有一个 ID("id")
 		builder := dynamicstruct.NewStruct()
-		// builder.AddField("ID", "", `json:"id" bson:"id"`)
 		for k, v := range meta.fields {
 			tagStr := "-"
 			if v.storeDB {
@@ -356,7 +363,7 @@ func (meta *Meta) readerToMap(r dynamicstruct.Reader, attrs *StrMap) *StrMap {
 		attrs = NewStrMap(nil)
 	}
 	for _, field := range r.GetAllFields() {
-		name := lowerFirst(field.Name())
+		name := LowerFirst(field.Name())
 		v := field.Interface()
 		attrs.Set(name, v)
 
@@ -384,13 +391,6 @@ func (meta *Meta) UnmarshalJson(bytes []byte, sm *StrMap) (*StrMap, error) {
 		return nil, err
 	}
 	return meta.Unmarshal(dynStruct, sm), nil
-}
-
-func lowerFirst(s string) string {
-	for _, c := range s {
-		return string(unicode.ToLower(c)) + s[1:]
-	}
-	return s
 }
 
 type IAttr interface {

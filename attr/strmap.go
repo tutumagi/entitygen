@@ -8,8 +8,8 @@ import (
 
 // StrMap str 作为 key 的 map
 type StrMap struct {
-	key       interface{} // 在父节点中的 key，可能是 string，可能是 int32
-	parentKey string
+	// key       interface{}
+	parentKey string // 在父节点中的 key
 	// 存这个数据的祖宗
 	parent Field
 
@@ -21,7 +21,7 @@ type StrMap struct {
 var strMapPool *sync.Pool = &sync.Pool{
 	New: func() interface{} {
 		return &StrMap{
-			key:        "",
+			// key:        "",
 			parentKey:  "",
 			parent:     nil,
 			data:       map[string]interface{}{},
@@ -32,7 +32,7 @@ var strMapPool *sync.Pool = &sync.Pool{
 
 func NewStrMap(data map[string]interface{}) *StrMap {
 	a := strMapPool.Get().(*StrMap)
-	a.key = ""
+	// a.key = ""
 	a.parentKey = ""
 	a.parent = nil
 
@@ -437,6 +437,20 @@ func (a *StrMap) Equal(other *StrMap) bool {
 				if otherV != nil {
 					if otherVV, ok := otherV.(IAttr); ok {
 						if othervvv, ok := otherVV.Undertype().(*Slice); ok {
+							if im.Equal(othervvv) {
+								continue
+							}
+						}
+					}
+				}
+				equal = false
+				break
+			}
+			if im, ok := uu.Undertype().(_Vec3); ok {
+				otherV := other.Value(k)
+				if otherV != nil {
+					if otherVV, ok := otherV.(IAttr); ok {
+						if othervvv, ok := otherVV.Undertype().(_Vec3); ok {
 							if im.Equal(othervvv) {
 								continue
 							}

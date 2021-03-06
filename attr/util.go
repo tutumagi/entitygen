@@ -1,6 +1,9 @@
 package attr
 
-import "reflect"
+import (
+	"reflect"
+	"unicode"
+)
 
 func isNil(v interface{}) bool {
 	if v == nil {
@@ -36,4 +39,11 @@ func isNil(v interface{}) bool {
 	// 	return true
 	// }
 	// return false
+}
+
+func LowerFirst(s string) string {
+	for _, c := range s {
+		return string(unicode.ToLower(c)) + s[1:]
+	}
+	return s
 }

@@ -9,4 +9,5 @@ require (
 	github.com/ompluscator/dynamic-struct v1.2.0
 	go.mongodb.org/mongo-driver v1.4.4
 	golang.org/x/tools v0.0.0-20210115202250-e0d201561e39
+	gopkg.in/mgo.v2 v2.0.0-20190816093944-a6b53ec6cb22
 )
