@@ -77,7 +77,7 @@ func getEntStruct(structType *types.Struct) *entStructInfo {
 	return entInfo
 }
 
-func getStructFields(structType *types.Struct, isEntityDef bool) ([]*fieldInfo, *entStructInfo) {
+func getStructInfo(structType *types.Struct, isEntityDef bool) ([]*fieldInfo, *entStructInfo) {
 	result := make([]*fieldInfo, 0, structType.NumFields())
 	for i := 0; i < structType.NumFields(); i++ {
 		field := structType.Field(i)

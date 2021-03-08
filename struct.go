@@ -14,7 +14,7 @@ func writeStruct(f *File, sourceTypeName string, structType *types.Struct) strin
 	// 1. 对 struct 做一些准备工作
 	// 读取 types.Struct 所有字段信息，计算出我们要的信息，并做合法性判断
 	// 结构体类型名字如果是以 Def 结尾则表示是实体类型
-	fields, entInfo := getStructFields(structType, isEntity)
+	fields, entInfo := getStructInfo(structType, isEntity)
 
 	// 生成的结构体名字
 	structName := StructTypeName(sourceTypeName)
