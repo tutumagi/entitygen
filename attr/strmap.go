@@ -15,7 +15,7 @@ type StrMap struct {
 
 	data map[string]interface{}
 
-	changedkey map[string]struct{}
+	changedkey *sync.Map
 }
 
 var strMapPool *sync.Pool = &sync.Pool{
@@ -25,7 +25,7 @@ var strMapPool *sync.Pool = &sync.Pool{
 			parentKey:  "",
 			parent:     nil,
 			data:       map[string]interface{}{},
-			changedkey: map[string]struct{}{},
+			changedkey: &sync.Map{},
 		}
 	},
 }
@@ -48,9 +48,13 @@ func ReleaseStrMap(strMap *StrMap) {
 	for k := range strMap.data {
 		delete(strMap.data, k)
 	}
-	for k := range strMap.changedkey {
-		delete(strMap.changedkey, k)
-	}
+	strMap.changedkey.Range(func(key, value interface{}) bool {
+		strMap.changedkey.Delete(key)
+		return true
+	})
+	// for k := range strMap.changedkey {
+	// 	delete(strMap.changedkey, k)
+	// }
 	strMapPool.Put(strMap)
 }
 
@@ -339,26 +343,42 @@ func (a *StrMap) setChangeKey(key string) {
 		// NOTE: 注意，理论上来说这里不应该做判断，当没有 parent 的时候，必须要有 changedkey，如果没有代表有 bug
 		// 但是这里 当我们使用 []*StrMap{} 去 mongo 里面做批量查询时，通过反射创建的StrMap里面 changedkey 为 nil
 		if a.changedkey == nil {
-			a.changedkey = map[string]struct{}{}
+			a.changedkey = &sync.Map{}
 		}
-		a.changedkey[key] = struct{}{}
+		a.changedkey.Store(key, struct{}{})
 	} else {
 		a.parent.setChangeKey(a.parentKey)
 	}
 }
 
 func (a *StrMap) HasChange() bool {
-	return len(a.changedkey) > 0
+	hasChange := false
+	a.changedkey.Range(func(key, value interface{}) bool {
+		hasChange = true // 只要迭代了一次，就认为是有变化的 key
+		return false
+	})
+	return hasChange
+	// return len(a.changedkey) > 0
 }
 
 func (a *StrMap) ClearChangeKey() {
-	for k := range a.changedkey {
-		delete(a.changedkey, k)
-	}
+	// for k := range a.changedkey {
+	// 	delete(a.changedkey, k)
+	// }
+	a.changedkey.Range(func(key, value interface{}) bool {
+		a.changedkey.Delete(key)
+		return true
+	})
 }
 
 func (a *StrMap) ChangeKey() map[string]struct{} {
-	return a.changedkey
+	var result = map[string]struct{}{}
+	a.changedkey.Range(func(key, value interface{}) bool {
+		result[key.(string)] = struct{}{}
+		return true
+	})
+	return result
+	// return a.changedkey
 }
 
 func (a *StrMap) String() string {

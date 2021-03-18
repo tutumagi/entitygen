@@ -51,9 +51,9 @@ func (a *Vec3) GetX() float32 {
 }
 func (a *Vec3) SetX(x float32) {
 	a.data.X = x
-	// if a.parent != nil {
-	// 	a.parent.setChangeKey(a.parentKey)
-	// }
+	if a.parent != nil {
+		a.parent.setChangeKey(a.parentKey)
+	}
 }
 
 func (a *Vec3) GetY() float32 {
@@ -61,9 +61,9 @@ func (a *Vec3) GetY() float32 {
 }
 func (a *Vec3) SetY(y float32) {
 	a.data.Y = y
-	// if a.parent != nil {
-	// 	a.parent.setChangeKey(a.parentKey)
-	// }
+	if a.parent != nil {
+		a.parent.setChangeKey(a.parentKey)
+	}
 }
 
 func (a *Vec3) GetZ() float32 {
@@ -71,12 +71,15 @@ func (a *Vec3) GetZ() float32 {
 }
 func (a *Vec3) SetZ(z float32) {
 	a.data.Z = z
-	// if a.parent != nil {
-	// 	a.parent.setChangeKey(a.parentKey)
-	// }
+	if a.parent != nil {
+		a.parent.setChangeKey(a.parentKey)
+	}
 }
 
 func (a *Vec3) SetParent(k string, parent Field) {
+	if a == nil {
+		return
+	}
 	a.parentKey = k
 	a.parent = parent
 }
