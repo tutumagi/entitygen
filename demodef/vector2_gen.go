@@ -32,6 +32,16 @@ func NewVector2(x float32, y float32) *Vector2 {
 	m.ClearChangeKey()
 	return m
 }
+func CopyVector2(value *Vector2) *Vector2 {
+	if value == nil {
+		return nil
+	}
+	m := (*Vector2)(attr.NewStrMap(nil))
+	m.SetX(value.GetX())
+	m.SetY(value.GetY())
+	m.ClearChangeKey()
+	return m
+}
 func (a *Vector2) GetX() float32 {
 	val := (*attr.StrMap)(a).Float32("x")
 	return val

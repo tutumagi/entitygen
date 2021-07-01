@@ -35,7 +35,7 @@ func init() {
 	// 实体内置的 位置
 	RoomDefMeta.DefAttr("pos", attr.Vector3, attr.AfOtherClients, true)
 	// 实体内置的 朝向
-	RoomDefMeta.DefAttr("rot", attr.Vector3, attr.AfBase, false)
+	RoomDefMeta.DefAttr("rot", attr.Vector3, attr.AfBase, true)
 }
 
 type RoomDef attr.StrMap
@@ -58,6 +58,78 @@ func NewRoomDef(csvPos int32, buildID string, extends *KVInt32Int32, extends1 *K
 	m.SetInt8ss(int8ss)
 	m.SetVec3(vec3)
 	m.SetVec2Arr(vec2Arr)
+	m.ClearChangeKey()
+	// 实体内置的属性
+	// 实体内置的 ID
+	m.SetId("")
+	// 实体内置的 位置
+	m.SetPos(attr.EmptyVec3())
+	// 实体内置的 朝向
+	m.SetRot(attr.EmptyVec3())
+	return m
+}
+func CopyRoomDef(value *RoomDef) *RoomDef {
+	if value == nil {
+		return nil
+	}
+	m := (*RoomDef)(attr.NewStrMap(nil))
+	m.SetCsvPos(value.GetCsvPos())
+	m.SetBuildID(value.GetBuildID())
+	{
+		vv := value.GetExtends()
+		vv = CopyKVInt32Int32(vv)
+		m.SetExtends(vv)
+	}
+	{
+		vv := value.GetExtends1()
+		vv = CopyKVInt32Str(vv)
+		m.SetExtends1(vv)
+	}
+	{
+		vv := value.GetExtends2()
+		vv = CopyKVStrInt32(vv)
+		m.SetExtends2(vv)
+	}
+	{
+		vv := value.GetExtends3()
+		vv = CopyKVStrStr(vv)
+		m.SetExtends3(vv)
+	}
+	{
+		vv := value.GetDesk111()
+		vv = CopyDesk(vv)
+		m.SetDesk111(vv)
+	}
+	{
+		vv := value.GetDesks222()
+		vv = CopyKVInt32Desk(vv)
+		m.SetDesks222(vv)
+	}
+	{
+		vv := value.GetDesks333()
+		vv = CopyKVStrDesk(vv)
+		m.SetDesks333(vv)
+	}
+	{
+		vv := value.GetDesksArr()
+		vv = CopyDeskSlice(vv)
+		m.SetDesksArr(vv)
+	}
+	{
+		vv := value.GetInt8ss()
+		vv = CopyInt8Slice(vv)
+		m.SetInt8ss(vv)
+	}
+	{
+		vv := value.GetVec3()
+		vv = CopyVector3(vv)
+		m.SetVec3(vv)
+	}
+	{
+		vv := value.GetVec2Arr()
+		vv = CopyVector2Slice(vv)
+		m.SetVec2Arr(vv)
+	}
 	m.ClearChangeKey()
 	// 实体内置的属性
 	// 实体内置的 ID

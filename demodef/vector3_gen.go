@@ -34,6 +34,17 @@ func NewVector3(x float32, y float32, z float32) *Vector3 {
 	m.ClearChangeKey()
 	return m
 }
+func CopyVector3(value *Vector3) *Vector3 {
+	if value == nil {
+		return nil
+	}
+	m := (*Vector3)(attr.NewStrMap(nil))
+	m.SetX(value.GetX())
+	m.SetY(value.GetY())
+	m.SetZ(value.GetZ())
+	m.ClearChangeKey()
+	return m
+}
 func (a *Vector3) GetX() float32 {
 	val := (*attr.StrMap)(a).Float32("x")
 	return val

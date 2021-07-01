@@ -78,6 +78,33 @@ func writeMap(f *File, v *types.Map) (string, error) {
 
 			g.Return(Parens(Op("*").Id(structName)).Params(Qual(attrPackageName, fmt.Sprintf("New%s", attrTypName)).Call(Id("convertData"))))
 		})
+	// 拷贝构造
+	f.Func().Id(CopyCtor(structName)).Params(Id("value").Op("*").Id(structName)).Op("*").Id(structName).
+		BlockFunc(func(g *Group) {
+			g.If(Id("value").Op("==").Nil()).Block(Return(Nil()))
+			g.Id("a").Op(":=").Id(EmptyCtor(structName)).Call()
+			g.Id("value").Dot("ForEach").Call(Func().Params(Id("k").Id(keyTypStr), Id("v").Id(valTypStr)).Bool().BlockFunc(func(ggg *Group) {
+				if isBasicVal {
+					ggg.Id("a").Dot("Set").Call(Id("k"), Id("v"))
+				} else {
+					ggg.Id("a").Dot("Set").Call(Id("k"), Id(CopyCtor(trimHeadStar(valTypStr))).Call(Id("v")))
+				}
+				ggg.Return(True())
+			}))
+
+			g.Return(Id("a"))
+		})
+
+		// update
+	// f.Func().Params(thisFn()).Id(updateFuncName).Params(Id("value").Op("*").Id(structName)).
+	// 	BlockFunc(func(g *Group) {
+	// 		g.If(Id("value").Op("==").Nil()).Block(Return())
+	// 		g.Add(convertThisFn()).Dot("Clear").Call()
+	// 		g.Id("value").Dot("ForEach").Call(Func().Params(Id("k").Id(keyTypStr), Id("v").Id(valTypStr)).Bool().BlockFunc(func(ggg *Group) {
+	// 			ggg.Id(thisKeyword).Dot("Set").Call(Id("k"), Id("v"))
+	// 			ggg.Return(True())
+	// 		}))
+	// 	})
 
 	// 5. 写所有字段的 getter/setter
 	writeMapGetSetDel(f, keyTypStr, valTypStr, valTyp, isBasicVal, thisFn, convertThisFn)

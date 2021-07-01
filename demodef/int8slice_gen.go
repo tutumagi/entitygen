@@ -19,6 +19,17 @@ func NewInt8Slice(items []int8) *Int8Slice {
 	}
 	return (*Int8Slice)(attr.NewSlice(convertData))
 }
+func CopyInt8Slice(value *Int8Slice) *Int8Slice {
+	if value == nil {
+		return nil
+	}
+	a := EmptyInt8Slice()
+	value.ForEach(func(_ int, v int8) bool {
+		a.Add(v)
+		return true
+	})
+	return a
+}
 func (a *Int8Slice) Set(idx int, item int8) {
 	(*attr.Slice)(a).Set(idx, item)
 }

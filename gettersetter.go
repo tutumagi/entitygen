@@ -36,14 +36,29 @@ func writeGetterSetter(f *File, entInfo *entStructInfo, fields []*fieldInfo, thi
 			//  写 setter
 			f.Func().Params(thisFn()).Add(field.setter).Params(field.setParam).
 				BlockFunc(func(g *Group) {
-					if !isBasic {
-						// g.If(Id(field.key).Op("==").Nil()).Block(Return())
-						g.Id(field.key).Dot(setParentFuncName).Call(Lit(field.key), convertThisFn())
-						g.Add(convertThisFn()).Dot("Set").Params(Lit(field.key), Id(field.key))
-					} else {
-						g.Add(convertThisFn()).Dot("Set").Params(Lit(field.key), Id(field.key))
-					}
+					// if !isBasic {
+					// 	const tmp = "tmp"
+					// 	// g.If(Id(field.key).Op("==").Nil()).Block(Return())
+					// 	// // 先判断下当前对象有没有这个字段
+					// 	// g.Id(tmp).Op(":=").Id(thisKeyword).Op(".").Add(field.getter).Params()
+					// 	// g.If(Id(tmp).Op("==").Nil()).BlockFunc(func(ggg *Group) {
+					// 	// 	// 如果没有，就用参数拷贝构造一个新的值，赋值给当前对象
+					// 	// 	ggg.Id(tmp).Op("=").Op(CopyCtor(trimHeadStar(field.typName))).Call(Id(field.key))
+					// 	// }).Else().BlockFunc(func(ggg *Group) {
+					// 	// 	// 如果当前对象有这个字段，则直接更新即可
+					// 	// 	ggg.Id(tmp).Dot(updateFuncName).Call(Id(field.key))
+					// 	// })
+					// 	g.Id(tmp).Op(":=").Op(CopyCtor(trimHeadStar(field.typName))).Call(Id(field.key))
 
+					// 	g.Id(tmp).Dot(setParentFuncName).Call(Lit(field.key), convertThisFn())
+					// 	g.Add(convertThisFn()).Dot("Set").Params(Lit(field.key), Id(tmp))
+					// } else {
+					// 	g.Add(convertThisFn()).Dot("Set").Params(Lit(field.key), Id(field.key))
+					// }
+					if !isBasic {
+						g.Id(field.key).Dot(setParentFuncName).Call(Lit(field.key), convertThisFn())
+					}
+					g.Add(convertThisFn()).Dot("Set").Params(Lit(field.key), Id(field.key))
 				})
 
 			// 换行符
@@ -82,6 +97,8 @@ func writeMapGetSetDel(
 		BlockFunc(func(g *Group) {
 			if !isBasicVal {
 				// g.If(Id("v").Op("==").Nil()).Block(Return())
+				// g.Id("v").Op("=").Op(CopyCtor(trimHeadStar(valTypStr))).Call(Id("v"))
+
 				g.Add(setParenctCode("k", "v", keyTypStr, convertThisFn))
 				g.Add(convertThisFn().Dot("Set").Call(Id("k"), Id("v")))
 			} else {

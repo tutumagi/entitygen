@@ -20,6 +20,17 @@ func NewVector2Slice(items []*Vector2) *Vector2Slice {
 	}
 	return (*Vector2Slice)(attr.NewSlice(convertData))
 }
+func CopyVector2Slice(value *Vector2Slice) *Vector2Slice {
+	if value == nil {
+		return nil
+	}
+	a := EmptyVector2Slice()
+	value.ForEach(func(_ int, v *Vector2) bool {
+		a.Add(CopyVector2(v))
+		return true
+	})
+	return a
+}
 func (a *Vector2Slice) Set(idx int, item *Vector2) {
 	item.SetParent(fmt.Sprintf("ik%d", idx), (*attr.Slice)(a))
 	(*attr.Slice)(a).Set(idx, item)

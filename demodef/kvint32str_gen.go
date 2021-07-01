@@ -19,6 +19,17 @@ func NewKVInt32Str(data map[int32]string) *KVInt32Str {
 	}
 	return (*KVInt32Str)(attr.NewInt32Map(convertData))
 }
+func CopyKVInt32Str(value *KVInt32Str) *KVInt32Str {
+	if value == nil {
+		return nil
+	}
+	a := EmptyKVInt32Str()
+	value.ForEach(func(k int32, v string) bool {
+		a.Set(k, v)
+		return true
+	})
+	return a
+}
 func (a *KVInt32Str) Set(k int32, v string) {
 	(*attr.Int32Map)(a).Set(k, v)
 }

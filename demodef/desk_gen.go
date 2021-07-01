@@ -38,6 +38,23 @@ func NewDesk(width int32, height int32, name string, csvID int32, below *Desk) *
 	m.ClearChangeKey()
 	return m
 }
+func CopyDesk(value *Desk) *Desk {
+	if value == nil {
+		return nil
+	}
+	m := (*Desk)(attr.NewStrMap(nil))
+	m.SetWidth(value.GetWidth())
+	m.SetHeight(value.GetHeight())
+	m.SetName(value.GetName())
+	m.SetCsvID(value.GetCsvID())
+	{
+		vv := value.GetBelow()
+		vv = CopyDesk(vv)
+		m.SetBelow(vv)
+	}
+	m.ClearChangeKey()
+	return m
+}
 func (a *Desk) GetWidth() int32 {
 	val := (*attr.StrMap)(a).Int32("width")
 	return val

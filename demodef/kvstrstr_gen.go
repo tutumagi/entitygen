@@ -19,6 +19,17 @@ func NewKVStrStr(data map[string]string) *KVStrStr {
 	}
 	return (*KVStrStr)(attr.NewStrMap(convertData))
 }
+func CopyKVStrStr(value *KVStrStr) *KVStrStr {
+	if value == nil {
+		return nil
+	}
+	a := EmptyKVStrStr()
+	value.ForEach(func(k string, v string) bool {
+		a.Set(k, v)
+		return true
+	})
+	return a
+}
 func (a *KVStrStr) Set(k string, v string) {
 	(*attr.StrMap)(a).Set(k, v)
 }

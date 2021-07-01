@@ -27,6 +27,7 @@ type fieldInfo struct {
 	name       string // 字段名
 	key        string // 字段存储在 map 中的 key，目前的规则是字段名首字母小写
 	typ        types.Type
+	isBasic    bool // 是不是基础类型
 	storeDB    bool
 	base       bool
 	cell       bool
@@ -122,10 +123,12 @@ func getStructInfo(structType *types.Struct, isEntityDef bool) ([]*fieldInfo, *e
 
 		typName := getTypString(typ)
 		attrGetter, _ := getFieldAttrGetterFnName(typ)
+		_, isBasic := typ.(*types.Basic)
 		result = append(result, &fieldInfo{
 			name:       name,
 			key:        key,
 			typ:        typ,
+			isBasic:    isBasic,
 			storeDB:    storeDB,
 			base:       flagBase,
 			cell:       flagCell,

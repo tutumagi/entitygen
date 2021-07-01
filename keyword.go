@@ -18,6 +18,9 @@ const (
 	buildinIDKey  = "id"
 	buildinPosKey = "pos"
 	buildinRotKey = "rot"
+
+	// 更新对象
+	updateFuncName = "update"
 )
 
 // 一些预设的类型或者关键字
@@ -60,6 +63,10 @@ func EmptyCtor(typName string) string {
 
 func NormalCtor(typName string) string {
 	return fmt.Sprintf("New%s", typName)
+}
+
+func CopyCtor(typName string) string {
+	return fmt.Sprintf("Copy%s", typName)
 }
 
 // 通过原始 struct 名字，获取生成的 struct 名字

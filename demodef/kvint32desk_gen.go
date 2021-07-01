@@ -20,6 +20,17 @@ func NewKVInt32Desk(data map[int32]*Desk) *KVInt32Desk {
 	}
 	return (*KVInt32Desk)(attr.NewInt32Map(convertData))
 }
+func CopyKVInt32Desk(value *KVInt32Desk) *KVInt32Desk {
+	if value == nil {
+		return nil
+	}
+	a := EmptyKVInt32Desk()
+	value.ForEach(func(k int32, v *Desk) bool {
+		a.Set(k, CopyDesk(v))
+		return true
+	})
+	return a
+}
 func (a *KVInt32Desk) Set(k int32, v *Desk) {
 	v.SetParent(fmt.Sprintf("mk%d", k), (*attr.Int32Map)(a))
 	(*attr.Int32Map)(a).Set(k, v)

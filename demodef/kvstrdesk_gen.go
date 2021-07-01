@@ -19,6 +19,17 @@ func NewKVStrDesk(data map[string]*Desk) *KVStrDesk {
 	}
 	return (*KVStrDesk)(attr.NewStrMap(convertData))
 }
+func CopyKVStrDesk(value *KVStrDesk) *KVStrDesk {
+	if value == nil {
+		return nil
+	}
+	a := EmptyKVStrDesk()
+	value.ForEach(func(k string, v *Desk) bool {
+		a.Set(k, CopyDesk(v))
+		return true
+	})
+	return a
+}
 func (a *KVStrDesk) Set(k string, v *Desk) {
 	v.SetParent(k, (*attr.StrMap)(a))
 	(*attr.StrMap)(a).Set(k, v)

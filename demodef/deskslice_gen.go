@@ -20,6 +20,17 @@ func NewDeskSlice(items []*Desk) *DeskSlice {
 	}
 	return (*DeskSlice)(attr.NewSlice(convertData))
 }
+func CopyDeskSlice(value *DeskSlice) *DeskSlice {
+	if value == nil {
+		return nil
+	}
+	a := EmptyDeskSlice()
+	value.ForEach(func(_ int, v *Desk) bool {
+		a.Add(CopyDesk(v))
+		return true
+	})
+	return a
+}
 func (a *DeskSlice) Set(idx int, item *Desk) {
 	item.SetParent(fmt.Sprintf("ik%d", idx), (*attr.Slice)(a))
 	(*attr.Slice)(a).Set(idx, item)

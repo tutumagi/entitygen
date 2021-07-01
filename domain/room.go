@@ -34,7 +34,8 @@ type RoomDef struct {
 	Vec2Arr []*math32.Vector2 `flag:"cell" client:"true" storedb:"true"`
 
 	Pos *math32.Vector2 `flag:"cell" client:"true" storedb:"true"`
-	Rot *math32.Vector2 `flag:"base" client:"true" storedb:"false"`
+	// Rot *math32.Vector2 `flag:"base" client:"true" storedb:"false"` // 如果 storedb 为 false，bson marshal -> unmarshal 时 会丢失这个数据
+	Rot *math32.Vector2 `flag:"base" client:"true" storedb:"true"`
 }
 
 // 桌子
