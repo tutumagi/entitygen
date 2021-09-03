@@ -19,6 +19,10 @@ type StrMap struct {
 	changedkey map[string]struct{}
 }
 
+func (a *StrMap) AOIData() *StrMap {
+	return a
+}
+
 var strMapPool *sync.Pool = &sync.Pool{
 	New: func() interface{} {
 		return &StrMap{
