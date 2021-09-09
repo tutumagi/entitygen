@@ -278,17 +278,17 @@ func checkFieldTagValue(fieldName string, tagValue reflect.StructTag) (storeDB b
 		storeDB = storeDBStr == "true"
 	}
 
-	{
-		clientStr, ok := tagValue.Lookup("client")
-		if !ok {
-			failErr(fmt.Errorf("field:%s 必须有tag:client", fieldName))
-		}
-		if clientStr != "true" && clientStr != "false" {
-			failErr(fmt.Errorf("field:%s client(%s) 必须是 true 或者 false", fieldName, clientStr))
-		}
+	// {
+	// 	clientStr, ok := tagValue.Lookup("client")
+	// 	if !ok {
+	// 		failErr(fmt.Errorf("field:%s 必须有tag:client", fieldName))
+	// 	}
+	// 	if clientStr != "true" && clientStr != "false" {
+	// 		failErr(fmt.Errorf("field:%s client(%s) 必须是 true 或者 false", fieldName, clientStr))
+	// 	}
 
-		client = clientStr == "true"
-	}
+	// 	client = clientStr == "true"
+	// }
 
 	{
 		flagStr, ok := tagValue.Lookup("flag")
