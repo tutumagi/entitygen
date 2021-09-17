@@ -251,8 +251,8 @@ func (a *StrMap) Int64(key string) int64 {
 	return r
 }
 
-// UInt returns value with UInt type
-func (a *StrMap) UInt(key string) uint {
+// Uint returns value with Uint type
+func (a *StrMap) Uint(key string) uint {
 	v, ok := a.data[key]
 	if !ok {
 		return 0

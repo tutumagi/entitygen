@@ -58,7 +58,7 @@ type AttrTyp interface{}
 func isPrimary(a AttrTyp) bool {
 	switch a {
 	case Int,
-		UInt,
+		Uint,
 		Int8,
 		Int16,
 		Int32,
@@ -86,7 +86,7 @@ func primaryUnmarshal(att AttrTyp) func(b []byte) (interface{}, error) {
 			err := json.Unmarshal(b, &a)
 			return a, err
 		}
-	case UInt:
+	case Uint:
 		return func(b []byte) (interface{}, error) {
 			var a uint
 			err := json.Unmarshal(b, &a)
@@ -177,7 +177,7 @@ func primaryUnmarshal(att AttrTyp) func(b []byte) (interface{}, error) {
 
 var (
 	Int    AttrTyp = int(0)
-	UInt   AttrTyp = uint(0)
+	Uint   AttrTyp = uint(0)
 	Int8   AttrTyp = int8(0)
 	Int16  AttrTyp = int16(0)
 	Int32  AttrTyp = int32(0)
