@@ -178,13 +178,13 @@ func writeBuiltinProp(
 	}
 
 	// GetId
-	f.Func().Params(thisFn()).Id("GetEId").Params().String().
+	f.Func().Params(thisFn()).Id(buildinIDGetter).Params().String().
 		BlockFunc(func(g *Group) {
 			g.Return(convertThisFn().Dot("Str").Call(Lit(buildinIDKey)))
 		})
 
 	//  SetId
-	f.Func().Params(thisFn()).Id("SetEId").Params(Id(buildinIDKey).String()).
+	f.Func().Params(thisFn()).Id(buildinIDSetter).Params(Id(buildinIDKey).String()).
 		BlockFunc(func(g *Group) {
 			g.Add(convertThisFn()).Dot("Set").Params(Lit(buildinIDKey), Id(buildinIDKey))
 		})

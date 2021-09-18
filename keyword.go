@@ -15,12 +15,15 @@ const (
 	setParentFuncName = "SetParent"
 
 	// 实体内置的属性 id
-	buildinIDKey  = "eid"
+	buildinIDKey    = "eid"
+	buildinIDSetter = "SetEId"
+	buildinIDGetter = "GetEId"
+
 	buildinPosKey = "pos"
 	buildinRotKey = "rot"
 
 	// 更新对象
-	updateFuncName = "update"
+	// updateFuncName = "update"
 )
 
 // 一些预设的类型或者关键字

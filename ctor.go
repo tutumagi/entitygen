@@ -39,7 +39,7 @@ func writeCtor(f *File, structName string, entInfo *entStructInfo, fields []*fie
 				g.Comment("实体内置的属性")
 
 				g.Comment("实体内置的 ID")
-				g.Id("m").Dot("SetId").Call(Lit(""))
+				g.Id("m").Dot(buildinIDSetter).Call(Lit(""))
 
 				if entInfo.pos != nil {
 					g.Comment("实体内置的 位置")
@@ -82,7 +82,7 @@ func writeCtor(f *File, structName string, entInfo *entStructInfo, fields []*fie
 				g.Comment("实体内置的属性")
 
 				g.Comment("实体内置的 ID")
-				g.Id("m").Dot("SetId").Call(Lit(""))
+				g.Id("m").Dot(buildinIDSetter).Call(Lit(""))
 
 				if entInfo.pos != nil {
 					g.Comment("实体内置的 位置")
