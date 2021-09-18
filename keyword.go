@@ -16,8 +16,8 @@ const (
 
 	// 实体内置的属性 id
 	buildinIDKey    = "eid"
-	buildinIDSetter = "SetEId"
-	buildinIDGetter = "GetEId"
+	buildinIDSetter = "SetId"
+	buildinIDGetter = "GetId"
 
 	buildinPosKey = "pos"
 	buildinRotKey = "rot"
