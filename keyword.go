@@ -15,7 +15,7 @@ const (
 	setParentFuncName = "SetParent"
 
 	// 实体内置的属性 id
-	buildinIDKey  = "id"
+	buildinIDKey  = "eid"
 	buildinPosKey = "pos"
 	buildinRotKey = "rot"
 
