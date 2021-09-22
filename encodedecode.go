@@ -8,9 +8,20 @@ func writeEncodeDecode(f *File, thisFn func() *Statement, convertThisFn func() *
 	writer := func(encodeFnName string, encodePackageFn *Statement, decodeFnName string, decodePackageFn *Statement) {
 		// marshal
 		f.Func().Params(thisFn()).Id(encodeFnName).Params().Params(Index().Byte(), Error()).
-			Block(
-				Return(encodePackageFn.Call(convertThisFn().Dot("ToMap").Call())),
-			)
+			BlockFunc(func(g *Group) {
+				if encodeFnName == "MarshalJSON" {
+					g.Return(encodePackageFn.Call(convertThisFn().Dot("ToMap").Call()))
+				} else if encodeFnName == "MarshalBSON" {
+					g.Return(encodePackageFn.Call(convertThisFn().Dot("FilterMap").Call(
+						Func().Params(Id("k").String()).Bool().BlockFunc(func(gg *Group) {
+							gg.If(Id("def").Op(":=").Id(attrMetaName).Dot("GetDef").Call(Id("k")), Id("def").Op("!=").Nil()).BlockFunc(func(ggg *Group) {
+								ggg.Return(Id("def").Dot("StoreDB").Call())
+							})
+							gg.Return(False())
+						}),
+					)))
+				}
+			})
 		// unmarshal
 		f.Func().Params(thisFn()).Id(decodeFnName).Params(Id("b").Index().Byte()).Error().
 			BlockFunc(func(g *Group) {
