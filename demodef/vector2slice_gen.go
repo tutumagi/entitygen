@@ -4,7 +4,7 @@ package demodef
 import (
 	"encoding/json"
 	"fmt"
-	attr "gitlab.gamesword.com/nut/entitygen/attr"
+	attr "gitlab.testkaka.com/usm/game/entitygen/attr"
 	bson "go.mongodb.org/mongo-driver/bson"
 )
 

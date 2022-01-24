@@ -1,4 +1,4 @@
-module gitlab.gamesword.com/nut/entitygen
+module gitlab.testkaka.com/usm/game/entitygen
 
 go 1.14
 

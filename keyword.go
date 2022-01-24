@@ -6,12 +6,12 @@ import (
 	"strings"
 
 	. "github.com/dave/jennifer/jen"
-	"gitlab.gamesword.com/nut/entitygen/attr"
+	"gitlab.testkaka.com/usm/game/entitygen/attr"
 )
 
 const (
 	thisKeyword       = "a"
-	attrPackageName   = "gitlab.gamesword.com/nut/entitygen/attr"
+	attrPackageName   = "gitlab.testkaka.com/usm/game/entitygen/attr"
 	setParentFuncName = "SetParent"
 
 	// 实体内置的属性 id

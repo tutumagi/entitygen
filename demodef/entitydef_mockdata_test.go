@@ -2,7 +2,7 @@ package demodef
 
 import (
 	"github.com/g3n/engine/math32"
-	"gitlab.gamesword.com/nut/entitygen/domain"
+	"gitlab.testkaka.com/usm/game/entitygen/domain"
 )
 
 func mockRoom() (*RoomDef, *domain.RoomDef) {
