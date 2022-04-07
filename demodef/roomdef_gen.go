@@ -3,7 +3,7 @@ package demodef
 
 import (
 	"encoding/json"
-	attr "gitlab.testkaka.com/usm/game/entitygen/attr"
+	attr "gitlab.nftgaga.com/usm/game/entitygen/attr"
 	bson "go.mongodb.org/mongo-driver/bson"
 )
 
@@ -31,7 +31,7 @@ func init() {
 	RoomDefMeta.DefAttr("vec2Arr", &Vector2Slice{}, attr.AfOtherClients, true)
 	// 实体内置的属性
 	// 实体内置的 ID
-	RoomDefMeta.DefAttr("id", attr.String, attr.AfOtherClients, true)
+	RoomDefMeta.DefAttr("eid", attr.String, attr.AfOtherClients, true)
 	// 实体内置的 位置
 	RoomDefMeta.DefAttr("pos", attr.Vector3, attr.AfOtherClients, true)
 	// 实体内置的 朝向
@@ -311,10 +311,10 @@ func (a *RoomDef) SetPos(pos *attr.Vec3) {
 	(*attr.StrMap)(a).Set("pos", pos)
 }
 func (a *RoomDef) GetId() string {
-	return (*attr.StrMap)(a).Str("id")
+	return (*attr.StrMap)(a).Str("eid")
 }
-func (a *RoomDef) SetId(id string) {
-	(*attr.StrMap)(a).Set("id", id)
+func (a *RoomDef) SetId(eid string) {
+	(*attr.StrMap)(a).Set("eid", eid)
 }
 func (a *RoomDef) HasChange() bool {
 	return (*attr.StrMap)(a).HasChange()
@@ -356,7 +356,12 @@ func (a *RoomDef) UnmarshalJSON(b []byte) error {
 	return nil
 }
 func (a *RoomDef) MarshalBSON() ([]byte, error) {
-	return bson.Marshal((*attr.StrMap)(a).ToMap())
+	return bson.Marshal((*attr.StrMap)(a).FilterMap(func(k string) bool {
+		if def := RoomDefMeta.GetDef(k); def != nil {
+			return def.StoreDB()
+		}
+		return false
+	}))
 }
 func (a *RoomDef) UnmarshalBSON(b []byte) error {
 	_, err := RoomDefMeta.UnmarshalBson(b, (*attr.StrMap)(a))

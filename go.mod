@@ -1,4 +1,4 @@
-module gitlab.testkaka.com/usm/game/entitygen
+module gitlab.nftgaga.com/usm/game/entitygen
 
 go 1.14
 

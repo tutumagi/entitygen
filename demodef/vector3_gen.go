@@ -3,7 +3,7 @@ package demodef
 
 import (
 	"encoding/json"
-	attr "gitlab.testkaka.com/usm/game/entitygen/attr"
+	attr "gitlab.nftgaga.com/usm/game/entitygen/attr"
 	bson "go.mongodb.org/mongo-driver/bson"
 )
 
@@ -109,7 +109,12 @@ func (a *Vector3) UnmarshalJSON(b []byte) error {
 	return nil
 }
 func (a *Vector3) MarshalBSON() ([]byte, error) {
-	return bson.Marshal((*attr.StrMap)(a).ToMap())
+	return bson.Marshal((*attr.StrMap)(a).FilterMap(func(k string) bool {
+		if def := vector3Meta.GetDef(k); def != nil {
+			return def.StoreDB()
+		}
+		return false
+	}))
 }
 func (a *Vector3) UnmarshalBSON(b []byte) error {
 	_, err := vector3Meta.UnmarshalBson(b, (*attr.StrMap)(a))
