@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"testing"
 
-	"gitlab.nftgaga.com/usm/game/entitygen/domain"
+	"github.com/tutumagi/entitygen/domain"
 
 	. "github.com/go-playground/assert/v2"
 	"go.mongodb.org/mongo-driver/bson"

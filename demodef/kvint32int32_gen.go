@@ -3,7 +3,7 @@ package demodef
 
 import (
 	"encoding/json"
-	attr "gitlab.nftgaga.com/usm/game/entitygen/attr"
+	attr "github.com/tutumagi/entitygen/attr"
 	bson "go.mongodb.org/mongo-driver/bson"
 )
 

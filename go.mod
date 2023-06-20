@@ -1,4 +1,4 @@
-module gitlab.nftgaga.com/usm/game/entitygen
+module github.com/tutumagi/entitygen
 
 go 1.18
 

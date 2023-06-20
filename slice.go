@@ -50,7 +50,7 @@ func writeSlice(f *File, v *types.Slice) (string, error) {
 				},
 			)
 
-			g.Return(Parens(Op("*").Id(structName)).Params(Qual("gitlab.nftgaga.com/usm/game/entitygen/attr", fmt.Sprintf("New%s", attrTypName)).Call(Id("convertData"))))
+			g.Return(Parens(Op("*").Id(structName)).Params(Qual("github.com/tutumagi/entitygen/attr", fmt.Sprintf("New%s", attrTypName)).Call(Id("convertData"))))
 		})
 
 	f.Func().Id(CopyCtor(structName)).Params(Id("value").Op("*").Id(structName)).Op("*").Id(structName).
